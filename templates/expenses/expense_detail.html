@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}経費申請詳細{% endblock %}
+
+{% block content %}
+<div class="card">
+    <p>
+        <a href="{% url 'expenses:expense_list' %}">← 経費・旅費精算へ戻る</a>
+    </p>
+
+    {% if expense %}
+        <h2>経費申請詳細</h2>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td>{{ expense.id }}</td>
+                </tr>
+                <tr>
+                    <th>申請種別</th>
+                    <td>{{ expense.expense_type }}</td>
+                </tr>
+                <tr>
+                    <th>件名</th>
+                    <td>{{ expense.title }}</td>
+                </tr>
+                <tr>
+                    <th>申請者</th>
+                    <td>{{ expense.applicant }}</td>
+                </tr>
+                <tr>
+                    <th>部署</th>
+                    <td>{{ expense.department }}</td>
+                </tr>
+                <tr>
+                    <th>利用日</th>
+                    <td>{{ expense.expense_date }}</td>
+                </tr>
+                <tr>
+                    <th>分類</th>
+                    <td>{{ expense.category }}</td>
+                </tr>
+                <tr>
+                    <th>金額</th>
+                    <td class="amount-text">{{ expense.amount }}</td>
+                </tr>
+                <tr>
+                    <th>支払方法</th>
+                    <td>{{ expense.payment_method }}</td>
+                </tr>
+                <tr>
+                    <th>状態</th>
+                    <td>{{ expense.status }}</td>
+                </tr>
+                <tr>
+                    <th>承認者</th>
+                    <td>{{ expense.approver }}</td>
+                </tr>
+                <tr>
+                    <th>内容・目的</th>
+                    <td style="white-space: pre-wrap;">{{ expense.description }}</td>
+                </tr>
+                <tr>
+                    <th>作成日</th>
+                    <td>{{ expense.created_at }}</td>
+                </tr>
+                <tr>
+                    <th>更新日</th>
+                    <td>{{ expense.updated_at }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <h2>経費申請が見つかりません</h2>
+        <p>指定された経費申請IDのデータがありません。</p>
+    {% endif %}
+</div>
+
+{% if expense %}
+<div class="card">
+    <h2>領収書・証憑ファイル</h2>
+
+    <form
+        method="post"
+        action="{% url 'expenses:upload_attachment' expense.id %}"
+        enctype="multipart/form-data"
+        class="inline-form"
+    >
+        {% csrf_token %}
+
+        <input type="file" name="attachment" required>
+        <input type="text" name="uploaded_by" placeholder="アップロード者" class="input-short">
+        <button type="submit">添付する</button>
+    </form>
+
+    {% if attachments %}
+        <div class="table-wrap" style="margin-top: 14px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>添付ID</th>
+                        <th>ファイル名</th>
+                        <th>アップロード者</th>
+                        <th>日時</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attachment in attachments %}
+                    <tr>
+                        <td>{{ attachment.id }}</td>
+                        <td>
+                            <a href="{{ attachment.file_url }}" target="_blank">
+                                {{ attachment.original_filename }}
+                            </a>
+                        </td>
+                        <td>{{ attachment.uploaded_by }}</td>
+                        <td>{{ attachment.uploaded_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">領収書・証憑ファイルはまだありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>承認・精算処理</h2>
+
+    <form method="post" action="{% url 'expenses:update_status' expense.id %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>処理</label><br>
+            <select name="status" class="input-middle">
+                {% for status in status_choices %}
+                    <option value="{{ status }}" {% if expense.status == status %}selected{% endif %}>
+                        {{ status }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>処理者</label><br>
+            <input type="text" name="actor" placeholder="例：部長" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>コメント</label><br>
+            <textarea name="comment" rows="4" class="input-full"></textarea>
+        </div>
+
+        <p>
+            <button type="submit">保存</button>
+        </p>
+    </form>
+</div>
+
+<div class="card">
+    <h2>処理履歴</h2>
+
+    {% if histories %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>履歴ID</th>
+                        <th>処理</th>
+                        <th>処理者</th>
+                        <th>コメント</th>
+                        <th>日時</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for history in histories %}
+                    <tr>
+                        <td>{{ history.id }}</td>
+                        <td>{{ history.action }}</td>
+                        <td>{{ history.actor }}</td>
+                        <td>{{ history.comment }}</td>
+                        <td>{{ history.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>処理履歴はありません。</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

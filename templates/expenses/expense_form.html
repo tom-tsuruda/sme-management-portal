@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}経費申請作成{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>経費申請作成</h2>
+    <p>経費精算・旅費精算・交通費・購買立替などを申請します。</p>
+
+    <p>
+        <a href="{% url 'expenses:expense_list' %}">← 経費・旅費精算へ戻る</a>
+    </p>
+</div>
+
+<div class="card">
+    <form
+        method="post"
+        action="{% url 'expenses:expense_create' %}"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>申請種別</label><br>
+            <select name="expense_type" class="input-middle">
+                {% for expense_type in expense_type_choices %}
+                    <option value="{{ expense_type }}">{{ expense_type }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>件名</label><br>
+            <input type="text" name="title" required class="input-long" placeholder="例：東京出張交通費">
+        </div>
+
+        <div class="form-row">
+            <label>申請者</label><br>
+            <input type="text" name="applicant" class="input-middle" placeholder="例：山田太郎">
+        </div>
+
+        <div class="form-row">
+            <label>部署</label><br>
+            <input type="text" name="department" class="input-middle" placeholder="例：営業部">
+        </div>
+
+        <div class="form-row">
+            <label>利用日</label><br>
+            <input type="date" name="expense_date" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>分類</label><br>
+            <select name="category" class="input-middle">
+                {% for category in expense_category_choices %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>金額</label><br>
+            <input type="text" name="amount" class="amount-input" placeholder="例：12,000">
+        </div>
+
+        <div class="form-row">
+            <label>支払方法</label><br>
+            <select name="payment_method" class="input-middle">
+                {% for payment_method in payment_method_choices %}
+                    <option value="{{ payment_method }}">{{ payment_method }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>承認者</label><br>
+            <input type="text" name="approver" class="input-middle" placeholder="例：部長">
+        </div>
+
+        <div class="form-row">
+            <label>内容・目的</label><br>
+            <textarea name="description" rows="6" class="input-full" placeholder="例：東京出張に伴う新幹線代"></textarea>
+        </div>
+
+        <div class="form-row">
+            <label>領収書・証憑添付</label><br>
+            <input type="file" name="attachment">
+        </div>
+
+        <p>
+            <button type="submit">申請する</button>
+        </p>
+    </form>
+</div>
+{% endblock %}

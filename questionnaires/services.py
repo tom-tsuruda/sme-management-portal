@@ -98,3 +98,64 @@ def save_answer_history(diagnosis_id, answers):
         df.to_excel(writer, sheet_name="answers", index=False)
 
     return True
+
+def load_answer_history():
+    """
+    questionnaire_answer_history.xlsx の answers シートを読み込み、
+    回答履歴データとして返す。
+    """
+    excel_path = get_answer_history_excel_path()
+
+    if not excel_path.exists():
+        return []
+
+    df = pd.read_excel(excel_path, sheet_name="answers")
+    df = df.fillna("")
+
+    return df.to_dict(orient="records")
+
+
+def load_diagnosis_summaries():
+    """
+    診断IDごとのサマリーを返す。
+    """
+    records = load_answer_history()
+
+    summaries = {}
+
+    for row in records:
+        diagnosis_id = row.get("diagnosis_id", "")
+
+        if not diagnosis_id:
+            continue
+
+        if diagnosis_id not in summaries:
+            summaries[diagnosis_id] = {
+                "diagnosis_id": diagnosis_id,
+                "answered_at": row.get("answered_at", ""),
+                "answer_count": 0,
+                "generated_task_count": 0,
+                "problem_count": 0,
+            }
+
+        summaries[diagnosis_id]["answer_count"] += 1
+
+        if row.get("generated_task_id"):
+            summaries[diagnosis_id]["generated_task_count"] += 1
+
+        if row.get("answer") in ["未整備", "不明", "未見直し"]:
+            summaries[diagnosis_id]["problem_count"] += 1
+
+    return list(summaries.values())
+
+
+def load_answers_by_diagnosis_id(diagnosis_id):
+    """
+    指定した診断IDの回答履歴を返す。
+    """
+    records = load_answer_history()
+
+    return [
+        row for row in records
+        if str(row.get("diagnosis_id")) == str(diagnosis_id)
+    ]

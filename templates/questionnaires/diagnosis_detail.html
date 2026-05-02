@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}回答結果{% endblock %}
+{% block title %}診断結果詳細{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>回答結果</h2>
-    <p>質問票への回答結果と、抽出された要対応タスクを表示します。</p>
+    <h2>診断結果詳細</h2>
     <p class="count-text">診断ID：{{ diagnosis_id }}</p>
+
+    <p>
+        <a href="{% url 'questionnaires:diagnosis_history' %}">← 診断履歴へ戻る</a>
+    </p>
 </div>
 
 <h2>回答一覧</h2>
@@ -15,7 +18,6 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>カテゴリ</th>
                 <th>質問</th>
                 <th>回答</th>
@@ -27,27 +29,26 @@
         <tbody>
             {% for a in answers %}
             <tr>
-                <td>{{ a.id }}</td>
                 <td>{{ a.category }}</td>
                 <td>{{ a.question_text }}</td>
                 <td>{{ a.answer }}</td>
                 <td>
                     {% if a.related_task_id %}
-                    <a href="{% url 'tasks:task_detail' a.related_task_id %}">
+                        <a href="{% url 'tasks:task_detail' a.related_task_id %}">
                             {{ a.related_task_id }}
                         </a>
                     {% endif %}
                 </td>
                 <td>
                     {% if a.generated_task_id %}
-                        <a href="/tasks/?q={{ a.generated_task_id }}">
+                        <a href="{% url 'tasks:task_detail' a.generated_task_id %}">
                             {{ a.generated_task_id }}
-                        </a><a href="{% url 'tasks:task_detail' a.generated_task_id %}"></a>
+                        </a>
                     {% endif %}
                 </td>
                 <td>
                     {% if a.related_document_id %}
-                    <a href="{% url 'documents:document_detail' a.related_document_id %}">
+                        <a href="{% url 'documents:document_detail' a.related_document_id %}">
                             {{ a.related_document_id }}
                         </a>
                     {% endif %}
@@ -55,7 +56,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7">回答データがありません。</td>
+                <td colspan="6">回答データがありません。</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -83,9 +84,11 @@
                 {% for task in action_tasks %}
                 <tr>
                     <td>
-                        <a href="/tasks/?q={{ task.id }}">{{ task.id }}</a>
+                        <a href="{% url 'tasks:task_detail' task.id %}">
+                            {{ task.id }}
+                        </a>
                     </td>
-                    <td>{{ task.task_name }}</td><a href="{% url 'tasks:task_detail' task.id %}">{{ task.id }}</a>
+                    <td>{{ task.task_name }}</td>
                     <td>{{ task.category }}</td>
                     <td>{{ task.owner }}</td>
                     <td>{{ task.due_date }}</td>
@@ -103,7 +106,7 @@
                     </td>
                     <td>
                         {% if task.related_document_id %}
-                        <a href="{% url 'documents:document_detail' task.related_document_id %}">
+                            <a href="{% url 'documents:document_detail' task.related_document_id %}">
                                 {{ task.related_document_id }}
                             </a>
                         {% endif %}
@@ -115,7 +118,7 @@
     </div>
 {% else %}
     <div class="card">
-        <p>要対応タスクはありません。</p>
+        <p>この診断に紐づく要対応タスクはありません。</p>
     </div>
 {% endif %}
 {% endblock %}

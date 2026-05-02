@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}文書詳細{% endblock %}
+
+{% block content %}
+<div class="card">
+    <p>
+        <a href="{% url 'documents:document_list' %}">← 文書台帳へ戻る</a>
+    </p>
+
+    {% if document %}
+        <h2>文書詳細</h2>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td>{{ document.id }}</td>
+                </tr>
+                <tr>
+                    <th>カテゴリ</th>
+                    <td>{{ document.category }}</td>
+                </tr>
+                <tr>
+                    <th>文書名</th>
+                    <td>{{ document.document_name }}</td>
+                </tr>
+                <tr>
+                    <th>必須度</th>
+                    <td>{{ document.required_level }}</td>
+                </tr>
+                <tr>
+                    <th>主管部署</th>
+                    <td>{{ document.owner_dept }}</td>
+                </tr>
+                <tr>
+                    <th>状態</th>
+                    <td>{{ document.status }}</td>
+                </tr>
+                <tr>
+                    <th>最新版</th>
+                    <td>{{ document.latest_version }}</td>
+                </tr>
+                <tr>
+                    <th>次回確認日</th>
+                    <td>{{ document.next_review_date }}</td>
+                </tr>
+                <tr>
+                    <th>備考</th>
+                    <td>{{ document.note }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <h2>文書が見つかりません</h2>
+        <p>指定された文書IDのデータがありません。</p>
+    {% endif %}
+</div>
+
+{% if document %}
+<div class="card">
+    <h2>ステータス更新</h2>
+
+    <form method="post" action="{% url 'documents:update_status' document.id %}" class="inline-form">
+        {% csrf_token %}
+        <select name="status">
+            {% for status in status_choices %}
+                <option value="{{ status }}" {% if document.status == status %}selected{% endif %}>
+                    {{ status }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">更新</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>この文書から整備タスクを作成</h2>
+
+    <form method="post" action="{% url 'documents:create_task_from_document' document.id %}" class="task-create-form">
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="task_name"
+            value="{{ document.document_name }}を整備する"
+            placeholder="タスク名"
+        >
+
+        <input
+            type="text"
+            name="owner"
+            placeholder="担当者"
+        >
+
+        <input
+            type="date"
+            name="due_date"
+        >
+
+        <select name="priority">
+            <option value="高">高</option>
+            <option value="中" selected>中</option>
+            <option value="低">低</option>
+        </select>
+
+        <button type="submit">タスク作成</button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

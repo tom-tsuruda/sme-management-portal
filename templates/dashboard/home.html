@@ -6,7 +6,7 @@
 <div class="card">
     <h2>ポータルTOP</h2>
     <p>ExcelローカルDB版 Django ポータルです。</p>
-    <p>文書台帳、タスク管理、質問票をここから確認できます。</p>
+    <p>文書台帳、タスク管理、質問票、診断履歴をここから確認できます。</p>
 </div>
 
 <div class="summary-grid">
@@ -16,25 +16,174 @@
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">未整備文書</div>
-        <div class="summary-number danger">{{ not_ready_documents }}</div>
-    </div>
-
-    <div class="summary-card">
-        <div class="summary-label">タスク件数</div>
-        <div class="summary-number">{{ total_tasks }}</div>
+        <div class="summary-label">未整備・要確認文書</div>
+        <div class="summary-number danger">{{ not_ready_document_count }}</div>
     </div>
 
     <div class="summary-card">
         <div class="summary-label">要対応タスク</div>
-        <div class="summary-number warning">{{ action_tasks }}</div>
+        <div class="summary-number warning">{{ action_task_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">高優先度タスク</div>
+        <div class="summary-number danger">{{ high_priority_task_count }}</div>
     </div>
 </div>
 
 <div class="menu-list">
-    <a class="menu-item" href="/documents/">文書台帳</a>
-    <a class="menu-item" href="/tasks/">タスク管理</a>
-    <a class="menu-item" href="/questionnaires/">質問票</a>
-    <a class="menu-item" href="#">申請・承認（後で作成）</a>
+    <a class="menu-item" href="{% url 'documents:document_list' %}">文書台帳</a>
+    <a class="menu-item" href="{% url 'tasks:task_list' %}">タスク管理</a>
+    <a class="menu-item" href="{% url 'questionnaires:question_list' %}">質問票</a>
+    <a class="menu-item" href="{% url 'questionnaires:diagnosis_history' %}">診断履歴</a>
+    <a class="menu-item" href="{% url 'workflows:request_list' %}">申請・承認</a>
+    <a class="menu-item" href="{% url 'expenses:expense_list' %}">経費・旅費精算</a>
+</div>
+
+<div class="card">
+    <h2>未整備・要確認文書</h2>
+
+    {% if not_ready_documents %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>文書名</th>
+                        <th>カテゴリ</th>
+                        <th>主管部署</th>
+                        <th>状態</th>
+                        <th>次回確認日</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in not_ready_documents %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'documents:document_detail' doc.id %}">
+                                {{ doc.id }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'documents:document_detail' doc.id %}">
+                                {{ doc.document_name }}
+                            </a>
+                        </td>
+                        <td>{{ doc.category }}</td>
+                        <td>{{ doc.owner_dept }}</td>
+                        <td>{{ doc.status }}</td>
+                        <td>{{ doc.next_review_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="{% url 'documents:document_list' %}?q=未整備">文書台帳で確認する</a>
+        </p>
+    {% else %}
+        <p>未整備・要確認の文書はありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>要対応タスク</h2>
+
+    {% if action_tasks %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>タスク名</th>
+                        <th>カテゴリ</th>
+                        <th>担当</th>
+                        <th>期限</th>
+                        <th>状態</th>
+                        <th>優先度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in action_tasks %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'tasks:task_detail' task.id %}">
+                                {{ task.id }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'tasks:task_detail' task.id %}">
+                                {{ task.task_name }}
+                            </a>
+                        </td>
+                        <td>{{ task.category }}</td>
+                        <td>{{ task.owner }}</td>
+                        <td>{{ task.due_date }}</td>
+                        <td>{{ task.status }}</td>
+                        <td>
+                            {% if task.priority == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif task.priority == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif task.priority == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ task.priority }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="{% url 'tasks:task_list' %}">タスク管理で確認する</a>
+        </p>
+    {% else %}
+        <p>要対応タスクはありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>最新診断履歴</h2>
+
+    {% if latest_diagnoses %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>診断ID</th>
+                        <th>回答日時</th>
+                        <th>回答数</th>
+                        <th>要対応数</th>
+                        <th>自動生成タスク数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for diagnosis in latest_diagnoses %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'questionnaires:diagnosis_detail' diagnosis.diagnosis_id %}">
+                                {{ diagnosis.diagnosis_id }}
+                            </a>
+                        </td>
+                        <td>{{ diagnosis.answered_at }}</td>
+                        <td>{{ diagnosis.answer_count }}</td>
+                        <td>{{ diagnosis.problem_count }}</td>
+                        <td>{{ diagnosis.generated_task_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="{% url 'questionnaires:diagnosis_history' %}">診断履歴をすべて見る</a>
+        </p>
+    {% else %}
+        <p>診断履歴はまだありません。</p>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}タスク詳細{% endblock %}
+
+{% block content %}
+<div class="card">
+    <p>
+        <a href="{% url 'tasks:task_list' %}">← タスク管理へ戻る</a>
+    </p>
+
+    {% if task %}
+        <h2>タスク詳細</h2>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td>{{ task.id }}</td>
+                </tr>
+                <tr>
+                    <th>タスク名</th>
+                    <td>{{ task.task_name }}</td>
+                </tr>
+                <tr>
+                    <th>カテゴリ</th>
+                    <td>{{ task.category }}</td>
+                </tr>
+                <tr>
+                    <th>担当</th>
+                    <td>{{ task.owner }}</td>
+                </tr>
+                <tr>
+                    <th>期限</th>
+                    <td>{{ task.due_date }}</td>
+                </tr>
+                <tr>
+                    <th>状態</th>
+                    <td>{{ task.status }}</td>
+                </tr>
+                <tr>
+                    <th>優先度</th>
+                    <td>
+                        {% if task.priority == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif task.priority == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif task.priority == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ task.priority }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>関連文書ID</th>
+                    <td>
+                        {% if task.related_document_id %}
+                            <a href="{% url 'documents:document_detail' task.related_document_id %}">
+                                {{ task.related_document_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <h2>タスクが見つかりません</h2>
+        <p>指定されたタスクIDのデータがありません。</p>
+    {% endif %}
+</div>
+
+{% if task %}
+<div class="card">
+    <h2>ステータス更新</h2>
+
+    <form method="post" action="{% url 'tasks:update_status_from_detail' task.id %}" class="inline-form">
+        {% csrf_token %}
+
+        <select name="status">
+            {% for status in status_choices %}
+                <option value="{{ status }}" {% if task.status == status %}selected{% endif %}>
+                    {{ status }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">更新</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>関連文書</h2>
+
+    {% if related_document %}
+        <p>
+            <strong>{{ related_document.document_name }}</strong>
+        </p>
+        <p>
+            カテゴリ：{{ related_document.category }}
+        </p>
+        <p>
+            状態：{{ related_document.status }}
+        </p>
+        <p>
+            <a href="{% url 'documents:document_detail' related_document.id %}">
+                関連文書の詳細を見る
+            </a>
+        </p>
+    {% elif task.related_document_id %}
+        <p>関連文書IDはありますが、文書台帳に該当データが見つかりません。</p>
+    {% else %}
+        <p>このタスクに関連文書は設定されていません。</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

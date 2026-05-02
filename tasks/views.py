@@ -2,8 +2,18 @@ from urllib.parse import urlencode
 
 from django.shortcuts import redirect, render
 
-from .services import load_tasks, update_task_status
-from .services import add_task, load_tasks, update_task_status
+from documents.services import find_document_by_id
+
+from .services import add_task, find_task_by_id, load_tasks, update_task_status
+
+
+TASK_STATUS_CHOICES = [
+    "未着手",
+    "進行中",
+    "完了",
+    "要対応",
+]
+
 
 def create_task(request):
     """
@@ -30,6 +40,8 @@ def create_task(request):
             )
 
     return redirect("/tasks/")
+
+
 def task_list(request):
     all_tasks = load_tasks()
     tasks = all_tasks
@@ -64,6 +76,23 @@ def task_list(request):
     })
 
 
+def task_detail(request, task_id):
+    """
+    タスク詳細画面を表示する。
+    """
+    task = find_task_by_id(task_id)
+    related_document = None
+
+    if task and task.get("related_document_id"):
+        related_document = find_document_by_id(task.get("related_document_id"))
+
+    return render(request, "tasks/task_detail.html", {
+        "task": task,
+        "related_document": related_document,
+        "status_choices": TASK_STATUS_CHOICES,
+    })
+
+
 def update_status(request):
     """
     タスク一覧画面から状態を更新する。
@@ -81,3 +110,16 @@ def update_status(request):
             return redirect(f"/tasks/?{query}")
 
     return redirect("/tasks/")
+
+
+def update_status_from_detail(request, task_id):
+    """
+    タスク詳細画面から状態を更新する。
+    """
+    if request.method == "POST":
+        status = request.POST.get("status", "")
+
+        if task_id and status:
+            update_task_status(task_id, status)
+
+    return redirect("tasks:task_detail", task_id=task_id)

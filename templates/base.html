@@ -4,17 +4,41 @@
     <meta charset="UTF-8">
     <title>{% block title %}中小企業・経営ポータル{% endblock %}</title>
     <style>
+        :root {
+            --font-main: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+            --color-bg: #f5f7fa;
+            --color-text: #222;
+            --color-header: #1f2937;
+            --color-nav: #374151;
+            --color-primary: #2563eb;
+            --color-primary-dark: #1d4ed8;
+            --color-border: #cbd5e1;
+            --color-table-border: #d1d5db;
+            --color-table-header: #e5e7eb;
+            --color-muted: #6b7280;
+            --color-danger: #dc2626;
+            --color-warning: #d97706;
+            --color-success: #059669;
+            --shadow-card: 0 2px 8px rgba(0,0,0,0.08);
+            --radius-card: 12px;
+            --radius-input: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+            font-family: var(--font-main);
             margin: 0;
-            background: #f5f7fa;
-            color: #222;
+            background: var(--color-bg);
+            color: var(--color-text);
             font-size: 14px;
             line-height: 1.7;
         }
 
         header {
-            background: #1f2937;
+            background: var(--color-header);
             color: white;
         }
 
@@ -31,7 +55,7 @@
         }
 
         nav {
-            background: #374151;
+            background: var(--color-nav);
         }
 
         .nav-inner {
@@ -58,34 +82,36 @@
             padding: 28px 72px 48px;
         }
 
-        .card {
-            background: white;
-            padding: 20px 22px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 22px;
+        a {
+            color: var(--color-primary);
         }
 
-        h2 {
-            margin-top: 0;
-            margin-bottom: 12px;
-            border-left: 5px solid #2563eb;
-            padding-left: 10px;
-            font-size: 18px;
-            letter-spacing: 0.02em;
+        a:hover {
+            color: var(--color-primary-dark);
         }
 
         p {
             margin-top: 8px;
             margin-bottom: 8px;
         }
-	a {
-	    color: #2563eb;
-	}
 
-	a:hover {
-	    color: #1d4ed8;
-	}
+        h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-left: 5px solid var(--color-primary);
+            padding-left: 10px;
+            font-size: 18px;
+            letter-spacing: 0.02em;
+        }
+
+        .card {
+            background: white;
+            padding: 20px 22px;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            margin-bottom: 22px;
+        }
+
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -96,13 +122,13 @@
         .summary-card {
             background: white;
             padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
         }
 
         .summary-label {
             font-size: 13px;
-            color: #6b7280;
+            color: var(--color-muted);
             margin-bottom: 8px;
         }
 
@@ -113,11 +139,11 @@
         }
 
         .summary-number.danger {
-            color: #dc2626;
+            color: var(--color-danger);
         }
 
         .summary-number.warning {
-            color: #d97706;
+            color: var(--color-warning);
         }
 
         .table-wrap {
@@ -125,6 +151,7 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 22px;
         }
 
         table {
@@ -136,13 +163,14 @@
         }
 
         th {
-            background: #e5e7eb;
+            background: var(--color-table-header);
             font-weight: bold;
             white-space: nowrap;
         }
 
-        th, td {
-            border: 1px solid #d1d5db;
+        th,
+        td {
+            border: 1px solid var(--color-table-border);
             padding: 8px 10px;
             text-align: left;
             vertical-align: middle;
@@ -151,37 +179,158 @@
         tr:nth-child(even) td {
             background: #fafafa;
         }
+
+        input,
+        textarea,
+        select,
+        button {
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        input,
+        textarea,
+        select {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-input);
+            padding: 7px 9px;
+            background: white;
+            color: var(--color-text);
+        }
+
+        textarea {
+            line-height: 1.7;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        label {
+            font-weight: bold;
+            color: #374151;
+        }
+
+        button,
+        .button-link {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-input);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        button:hover,
+        .button-link:hover {
+            background: var(--color-primary-dark);
+            color: white;
+            text-decoration: none;
+        }
+
+        .button-secondary {
+            background: #6b7280;
+        }
+
+        .button-secondary:hover {
+            background: #4b5563;
+        }
+
+        .button-danger {
+            background: var(--color-danger);
+        }
+
+        .button-danger:hover {
+            background: #b91c1c;
+        }
+
+        .form-table {
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .form-row {
+            margin-bottom: 14px;
+        }
+
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            width: 100%;
+            max-width: 520px;
+            margin-top: 4px;
+        }
+
+        .form-row textarea {
+            max-width: 100%;
+        }
+
+        .input-short {
+            width: 180px;
+            max-width: 100%;
+        }
+
+        .input-middle {
+            width: 320px;
+            max-width: 100%;
+        }
+
+        .input-long {
+            width: 520px;
+            max-width: 100%;
+        }
+
+        .input-full {
+            width: 100%;
+        }
+
+        .amount-input {
+            text-align: right;
+            width: 180px;
+            max-width: 100%;
+        }
+
+        .amount-text {
+            text-align: right;
+            white-space: nowrap;
+        }
+
         .search-form {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-top: 14px;
+            flex-wrap: wrap;
         }
-        .count-text {
-            color: #6b7280;
-            font-size: 13px;
-            margin-top: 10px;
+
+        .search-form input {
+            width: 360px;
+            max-width: 100%;
+            padding: 8px 10px;
         }
+
         .inline-form {
             display: flex;
             align-items: center;
             gap: 6px;
             margin: 0;
+            flex-wrap: wrap;
         }
 
-        .small-button {
-            padding: 5px 9px;
-            font-size: 12px;
-        }
-        .search-form input {
-            width: 360px;
-            max-width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 13px;
-        }
         .task-create-form {
             display: flex;
             flex-wrap: wrap;
@@ -189,16 +338,19 @@
             margin-top: 10px;
         }
 
-        .task-create-form input,
-        .task-create-form select {
-            padding: 7px 9px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-family: inherit;
+        .count-text {
+            color: var(--color-muted);
             font-size: 13px;
+            margin-top: 10px;
         }
+
+        .small-button {
+            padding: 5px 9px;
+            font-size: 12px;
+        }
+
         .clear-link {
-            color: #2563eb;
+            color: var(--color-primary);
             text-decoration: none;
             font-weight: bold;
             font-size: 13px;
@@ -207,72 +359,73 @@
         .clear-link:hover {
             text-decoration: underline;
         }
-        button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        select {
-            font-family: inherit;
-            font-size: 13px;
-            padding: 5px 7px;
-        }
 
         .menu-list {
             display: grid;
             grid-template-columns: repeat(2, minmax(220px, 1fr));
             gap: 14px;
             margin-top: 18px;
+            margin-bottom: 22px;
         }
 
         .menu-item {
             display: block;
             background: white;
             padding: 18px;
-            border-radius: 12px;
+            border-radius: var(--radius-card);
             text-decoration: none;
             color: #111827;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow-card);
             font-weight: bold;
             font-size: 14px;
         }
 
         .menu-item:hover {
             background: #eff6ff;
+            color: #111827;
+        }
+
+        .badge-high,
+        .badge-middle,
+        .badge-low,
+        .badge-status {
+            color: white;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
         }
 
         .badge-high {
-            color: white;
-            background: #dc2626;
-            padding: 3px 7px;
-            border-radius: 4px;
-            font-size: 12px;
+            background: var(--color-danger);
         }
 
         .badge-middle {
-            color: white;
-            background: #d97706;
-            padding: 3px 7px;
-            border-radius: 4px;
-            font-size: 12px;
+            background: var(--color-warning);
         }
 
         .badge-low {
-            color: white;
-            background: #059669;
-            padding: 3px 7px;
-            border-radius: 4px;
-            font-size: 12px;
+            background: var(--color-success);
+        }
+
+        .badge-status {
+            background: #6b7280;
+        }
+
+        .text-muted {
+            color: var(--color-muted);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .nowrap {
+            white-space: nowrap;
         }
 
         @media (max-width: 768px) {
@@ -295,6 +448,20 @@
                 display: inline-block;
                 margin-bottom: 6px;
             }
+
+            .search-form {
+                align-items: stretch;
+            }
+
+            .search-form input {
+                width: 100%;
+            }
+
+            .form-row input,
+            .form-row textarea,
+            .form-row select {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -311,6 +478,8 @@
             <a href="/documents/">文書台帳</a>
             <a href="/tasks/">タスク管理</a>
             <a href="/questionnaires/">質問票</a>
+            <a href="/workflows/">申請・承認</a>
+            <a href="/expenses/">経費・旅費</a>
         </div>
     </nav>
 

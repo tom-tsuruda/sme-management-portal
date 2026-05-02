@@ -1,0 +1,187 @@
+from django.shortcuts import render
+
+# Create your views here.
+from django.shortcuts import redirect, render
+
+from core.formatters import normalize_amount
+
+from .services import (
+    create_expense,
+    find_attachments_by_expense_id,
+    find_expense_by_id,
+    find_histories_by_expense_id,
+    load_expenses,
+    save_expense_attachment,
+    update_expense_status,
+)
+
+
+EXPENSE_TYPE_CHOICES = [
+    "経費精算",
+    "旅費精算",
+    "交通費",
+    "購買立替",
+    "その他",
+]
+
+EXPENSE_CATEGORY_CHOICES = [
+    "交通費",
+    "宿泊費",
+    "接待交際費",
+    "会議費",
+    "消耗品費",
+    "通信費",
+    "研修費",
+    "その他",
+]
+
+PAYMENT_METHOD_CHOICES = [
+    "現金",
+    "クレジットカード",
+    "電子マネー",
+    "銀行振込",
+    "立替",
+    "その他",
+]
+
+EXPENSE_STATUS_CHOICES = [
+    "申請中",
+    "承認済",
+    "差戻し",
+    "却下",
+    "精算済",
+]
+
+
+def expense_list(request):
+    all_expenses = load_expenses()
+    expenses = all_expenses
+
+    keyword = request.GET.get("q", "").strip()
+
+    if keyword:
+        filtered_expenses = []
+
+        for expense in expenses:
+            target_text = " ".join([
+                str(expense.get("id", "")),
+                str(expense.get("expense_type", "")),
+                str(expense.get("title", "")),
+                str(expense.get("applicant", "")),
+                str(expense.get("department", "")),
+                str(expense.get("expense_date", "")),
+                str(expense.get("category", "")),
+                str(expense.get("amount", "")),
+                str(expense.get("payment_method", "")),
+                str(expense.get("status", "")),
+                str(expense.get("approver", "")),
+            ])
+
+            if keyword.lower() in target_text.lower():
+                filtered_expenses.append(expense)
+
+        expenses = filtered_expenses
+
+    return render(request, "expenses/expense_list.html", {
+        "expenses": expenses,
+        "keyword": keyword,
+        "total_count": len(all_expenses),
+        "display_count": len(expenses),
+    })
+
+
+def expense_create(request):
+    if request.method == "POST":
+        expense_type = request.POST.get("expense_type", "").strip()
+        title = request.POST.get("title", "").strip()
+        applicant = request.POST.get("applicant", "").strip()
+        department = request.POST.get("department", "").strip()
+        expense_date = request.POST.get("expense_date", "").strip()
+        category = request.POST.get("category", "").strip()
+        amount = normalize_amount(request.POST.get("amount", ""))
+        payment_method = request.POST.get("payment_method", "").strip()
+        approver = request.POST.get("approver", "").strip()
+        description = request.POST.get("description", "").strip()
+
+        if title:
+            expense_id = create_expense(
+                expense_type=expense_type,
+                title=title,
+                applicant=applicant,
+                department=department,
+                expense_date=expense_date,
+                category=category,
+                amount=amount,
+                payment_method=payment_method,
+                approver=approver,
+                description=description,
+            )
+
+            uploaded_file = request.FILES.get("attachment")
+            uploaded_by = applicant or "未設定"
+
+            if uploaded_file:
+                save_expense_attachment(
+                    expense_id=expense_id,
+                    uploaded_file=uploaded_file,
+                    uploaded_by=uploaded_by,
+                )
+
+            return redirect("expenses:expense_detail", expense_id=expense_id)
+
+    return render(request, "expenses/expense_form.html", {
+        "expense_type_choices": EXPENSE_TYPE_CHOICES,
+        "expense_category_choices": EXPENSE_CATEGORY_CHOICES,
+        "payment_method_choices": PAYMENT_METHOD_CHOICES,
+    })
+
+
+def expense_detail(request, expense_id):
+    expense = find_expense_by_id(expense_id)
+    attachments = find_attachments_by_expense_id(expense_id)
+    histories = find_histories_by_expense_id(expense_id)
+
+    return render(request, "expenses/expense_detail.html", {
+        "expense": expense,
+        "attachments": attachments,
+        "histories": histories,
+        "status_choices": EXPENSE_STATUS_CHOICES,
+    })
+
+
+def update_status(request, expense_id):
+    if request.method == "POST":
+        status = request.POST.get("status", "").strip()
+        actor = request.POST.get("actor", "").strip()
+        comment = request.POST.get("comment", "").strip()
+
+        if not actor:
+            actor = "承認者"
+
+        if status:
+            update_expense_status(
+                expense_id=expense_id,
+                new_status=status,
+                actor=actor,
+                comment=comment,
+            )
+
+    return redirect("expenses:expense_detail", expense_id=expense_id)
+
+
+def upload_attachment(request, expense_id):
+    if request.method == "POST":
+        uploaded_file = request.FILES.get("attachment")
+        uploaded_by = request.POST.get("uploaded_by", "").strip()
+
+        if not uploaded_by:
+            uploaded_by = "未設定"
+
+        if uploaded_file:
+            save_expense_attachment(
+                expense_id=expense_id,
+                uploaded_file=uploaded_file,
+                uploaded_by=uploaded_by,
+            )
+
+    return redirect("expenses:expense_detail", expense_id=expense_id)

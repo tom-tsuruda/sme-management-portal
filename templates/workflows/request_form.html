@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}申請作成{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>申請作成</h2>
+    <p>稟議・経費・出張・購買・契約審査などの申請を作成します。</p>
+
+    <p>
+        <a href="{% url 'workflows:request_list' %}">← 申請一覧へ戻る</a>
+    </p>
+</div>
+
+<div class="card">
+    <form method="post" action="{% url 'workflows:request_create' %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>申請種別</label><br>
+            <select name="request_type" class="input-middle">
+                {% for request_type in request_type_choices %}
+                    <option value="{{ request_type }}">{{ request_type }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>件名</label><br>
+            <input type="text" name="title" required class="input-long">
+        </div>
+
+        <div class="form-row">
+            <label>申請者</label><br>
+            <input type="text" name="applicant" placeholder="例：山田太郎" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>部署</label><br>
+            <input type="text" name="department" placeholder="例：営業部" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>金額</label><br>
+            <input type="text" name="amount" placeholder="例：50,000" class="amount-input">
+        </div>
+
+        <div class="form-row">
+            <label>承認者</label><br>
+            <input type="text" name="approver" placeholder="例：部長" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>申請内容</label><br>
+            <textarea name="description" rows="8" class="input-full"></textarea>
+        </div>
+
+        <p>
+            <button type="submit">申請する</button>
+        </p>
+    </form>
+</div>
+{% endblock %}

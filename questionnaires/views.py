@@ -1,8 +1,14 @@
 from django.shortcuts import render
 
-from .services import generate_diagnosis_id, load_questions, save_answer_history
-from tasks.services import add_task, find_task_by_id
+from .services import (
+    generate_diagnosis_id,
+    load_answers_by_diagnosis_id,
+    load_diagnosis_summaries,
+    load_questions,
+    save_answer_history,
+)
 
+from tasks.services import add_task, find_task_by_id
 
 def question_list(request):
     all_questions = load_questions()
@@ -104,6 +110,46 @@ def answer_questions(request):
         save_answer_history(diagnosis_id, answers)
 
     return render(request, "questionnaires/answer_result.html", {
+        "diagnosis_id": diagnosis_id,
+        "answers": answers,
+        "action_tasks": action_tasks,
+    })
+
+def diagnosis_history(request):
+    """
+    診断履歴一覧を表示する。
+    """
+    summaries = load_diagnosis_summaries()
+
+    summaries = sorted(
+        summaries,
+        key=lambda x: x.get("answered_at", ""),
+        reverse=True,
+    )
+
+    return render(request, "questionnaires/diagnosis_history.html", {
+        "summaries": summaries,
+    })
+
+
+def diagnosis_detail(request, diagnosis_id):
+    """
+    診断IDごとの回答結果を表示する。
+    """
+    answers = load_answers_by_diagnosis_id(diagnosis_id)
+
+    action_tasks = []
+
+    for answer in answers:
+        task_id = answer.get("generated_task_id") or answer.get("related_task_id")
+
+        if task_id:
+            task = find_task_by_id(task_id)
+
+            if task:
+                action_tasks.append(task)
+
+    return render(request, "questionnaires/diagnosis_detail.html", {
         "diagnosis_id": diagnosis_id,
         "answers": answers,
         "action_tasks": action_tasks,

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}診断履歴{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>診断履歴</h2>
+    <p>過去に実施した質問票診断の履歴を確認します。</p>
+
+    <p>
+        <a href="{% url 'questionnaires:question_list' %}">← 質問票へ戻る</a>
+    </p>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>診断ID</th>
+                <th>回答日時</th>
+                <th>回答数</th>
+                <th>要対応数</th>
+                <th>自動生成タスク数</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for summary in summaries %}
+            <tr>
+                <td>
+                    <a href="{% url 'questionnaires:diagnosis_detail' summary.diagnosis_id %}">
+                        {{ summary.diagnosis_id }}
+                    </a>
+                </td>
+                <td>{{ summary.answered_at }}</td>
+                <td>{{ summary.answer_count }}</td>
+                <td>{{ summary.problem_count }}</td>
+                <td>{{ summary.generated_task_count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">診断履歴がありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
