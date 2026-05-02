@@ -25,6 +25,11 @@
     <p class="count-text">
         全{{ total_count }}件中 {{ display_count }}件を表示
     </p>
+    <p>
+        <a class="button-link" href="{% url 'expenses:export_csv' %}">
+            会計連携CSVを出力
+        </a>
+    </p>
 </div>
 
 <div class="table-wrap">

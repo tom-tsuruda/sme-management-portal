@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}社員詳細{% endblock %}
+
+{% block content %}
+<h2>社員詳細</h2>
+
+{% if employee %}
+<div class="card">
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ employee.id }}</td>
+        </tr>
+        <tr>
+            <th>社員コード</th>
+            <td>{{ employee.employee_code }}</td>
+        </tr>
+        <tr>
+            <th>社員名</th>
+            <td>{{ employee.employee_name }}</td>
+        </tr>
+        <tr>
+            <th>部署</th>
+            <td>{{ employee.department_name }}</td>
+        </tr>
+        <tr>
+            <th>役職</th>
+            <td>{{ employee.position_name }}</td>
+        </tr>
+        <tr>
+            <th>メール</th>
+            <td>{{ employee.email }}</td>
+        </tr>
+        <tr>
+            <th>ロール</th>
+            <td>{{ employee.role }}</td>
+        </tr>
+        <tr>
+            <th>上長</th>
+            <td>{{ employee.supervisor_name }}</td>
+        </tr>
+        <tr>
+            <th>承認者</th>
+            <td>{{ employee.is_approver }}</td>
+        </tr>
+        <tr>
+            <th>有効</th>
+            <td>{{ employee.is_active }}</td>
+        </tr>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>社員データが見つかりません。</p>
+</div>
+{% endif %}
+
+<p>
+    <a href="{% url 'organizations:employee_list' %}">社員一覧へ戻る</a>
+</p>
+{% endblock %}

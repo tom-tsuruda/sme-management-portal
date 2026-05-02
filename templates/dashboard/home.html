@@ -5,9 +5,90 @@
 {% block content %}
 <div class="card">
     <h2>ポータルTOP</h2>
-    <p>ExcelローカルDB版 Django ポータルです。</p>
-    <p>文書台帳、タスク管理、質問票、診断履歴をここから確認できます。</p>
+    <p>ExcelローカルDB版 Django 経営管理ポータルです。</p>
+    <p>
+        文書台帳、タスク管理、質問票、申請承認、経費精算、組織マスタ、製造管理、経営指標、ガバナンスをここから確認できます。
+    </p>
 </div>
+
+{% if latest_monthly_kpi %}
+<div class="card">
+    <h2>最新 経営KPI</h2>
+    <p class="text-muted">
+        対象月：{{ latest_monthly_kpi.year_month }}
+    </p>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">売上高</div>
+        <div class="summary-number">{{ latest_monthly_kpi.sales_amount_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">粗利率</div>
+        <div class="summary-number warning">{{ latest_monthly_kpi.gross_profit_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">営業利益率</div>
+        <div class="summary-number danger">{{ latest_monthly_kpi.operating_profit_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">現預金</div>
+        <div class="summary-number">{{ latest_monthly_kpi.cash_balance_display }}</div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <h2>最新 経営KPI</h2>
+    <p>経営KPIデータはまだありません。</p>
+    <p>
+        <a href="{% url 'kpi:kpi_home' %}">経営指標ダッシュボードを確認する</a>
+    </p>
+</div>
+{% endif %}
+
+{% if latest_manufacturing_kpi %}
+<div class="card">
+    <h2>最新 製造KPI</h2>
+    <p class="text-muted">
+        対象月：{{ latest_manufacturing_kpi.year_month }}　
+        部署：{{ latest_manufacturing_kpi.department }}
+    </p>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">生産数量</div>
+        <div class="summary-number">{{ latest_manufacturing_kpi.production_volume }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">不良率</div>
+        <div class="summary-number danger">{{ latest_manufacturing_kpi.defect_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">歩留まり</div>
+        <div class="summary-number warning">{{ latest_manufacturing_kpi.yield_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">設備稼働率</div>
+        <div class="summary-number">{{ latest_manufacturing_kpi.equipment_availability_display }}</div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <h2>最新 製造KPI</h2>
+    <p>製造KPIデータはまだありません。</p>
+    <p>
+        <a href="{% url 'kpi:manufacturing_kpi_list' %}">製造KPIを確認する</a>
+    </p>
+</div>
+{% endif %}
 
 <div class="summary-grid">
     <div class="summary-card">
@@ -31,6 +112,72 @@
     </div>
 </div>
 
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">承認待ち申請</div>
+        <div class="summary-number warning">{{ approval_waiting_request_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">差戻し申請</div>
+        <div class="summary-number danger">{{ returned_request_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">申請中経費</div>
+        <div class="summary-number warning">{{ expense_applying_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">差戻し経費</div>
+        <div class="summary-number danger">{{ expense_returned_count }}</div>
+    </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">製造管理項目</div>
+        <div class="summary-number">{{ manufacturing_total_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">製造 未整備</div>
+        <div class="summary-number danger">{{ manufacturing_not_ready_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">製造 要確認</div>
+        <div class="summary-number warning">{{ manufacturing_need_check_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">製造 高リスク</div>
+        <div class="summary-number danger">{{ manufacturing_high_risk_count }}</div>
+    </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">ガバナンス項目</div>
+        <div class="summary-number">{{ governance_total_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">法定必須級</div>
+        <div class="summary-number danger">{{ governance_required_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">ガバナンス 未整備</div>
+        <div class="summary-number danger">{{ governance_not_ready_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">ガバナンス 高リスク</div>
+        <div class="summary-number danger">{{ governance_high_risk_count }}</div>
+    </div>
+</div>
+
 <div class="menu-list">
     <a class="menu-item" href="{% url 'documents:document_list' %}">文書台帳</a>
     <a class="menu-item" href="{% url 'tasks:task_list' %}">タスク管理</a>
@@ -38,6 +185,75 @@
     <a class="menu-item" href="{% url 'questionnaires:diagnosis_history' %}">診断履歴</a>
     <a class="menu-item" href="{% url 'workflows:request_list' %}">申請・承認</a>
     <a class="menu-item" href="{% url 'expenses:expense_list' %}">経費・旅費精算</a>
+    <a class="menu-item" href="{% url 'organizations:organization_home' %}">組織マスタ</a>
+    <a class="menu-item" href="{% url 'manufacturing:management_item_list' %}">製造管理</a>
+    <a class="menu-item" href="{% url 'kpi:kpi_home' %}">経営指標</a>
+    <a class="menu-item" href="{% url 'governance:governance_item_list' %}">ガバナンス</a>
+</div>
+
+<div class="card">
+    <h2>ガバナンス 要対応項目</h2>
+
+    {% if latest_governance_items %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>カテゴリ</th>
+                        <th>文書・台帳名</th>
+                        <th>重要度</th>
+                        <th>主管部署</th>
+                        <th>担当者</th>
+                        <th>状態</th>
+                        <th>リスク</th>
+                        <th>次回確認日</th>
+                        <th>詳細</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in latest_governance_items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.item_name }}</td>
+                        <td>{{ item.required_level }}</td>
+                        <td>{{ item.owner_department }}</td>
+                        <td>{{ item.owner }}</td>
+                        <td>
+                            <span class="badge-status">{{ item.status }}</span>
+                        </td>
+                        <td>
+                            {% if item.risk_level == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif item.risk_level == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif item.risk_level == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ item.risk_level }}
+                            {% endif %}
+                        </td>
+                        <td>{{ item.next_review_date }}</td>
+                        <td>
+                            <a href="{% url 'governance:governance_item_detail' item.id %}">
+                                詳細
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="{% url 'governance:governance_item_list' %}">
+                ガバナンス文書台帳で確認する
+            </a>
+        </p>
+    {% else %}
+        <p>ガバナンスの要対応項目はありません。</p>
+    {% endif %}
 </div>
 
 <div class="card">
@@ -143,6 +359,69 @@
         </p>
     {% else %}
         <p>要対応タスクはありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>製造管理 要対応項目</h2>
+
+    {% if latest_manufacturing_items %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>領域</th>
+                        <th>管理項目</th>
+                        <th>担当部署</th>
+                        <th>担当者</th>
+                        <th>リスク</th>
+                        <th>状態</th>
+                        <th>次回確認日</th>
+                        <th>詳細</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in latest_manufacturing_items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.area }}</td>
+                        <td>{{ item.item_name }}</td>
+                        <td>{{ item.owner_department }}</td>
+                        <td>{{ item.owner }}</td>
+                        <td>
+                            {% if item.risk_level == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif item.risk_level == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif item.risk_level == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ item.risk_level }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge-status">{{ item.status }}</span>
+                        </td>
+                        <td>{{ item.next_check_date }}</td>
+                        <td>
+                            <a href="{% url 'manufacturing:management_item_detail' item.id %}">
+                                詳細
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="{% url 'manufacturing:management_item_list' %}">
+                製造管理一覧で確認する
+            </a>
+        </p>
+    {% else %}
+        <p>製造管理の要対応項目はありません。</p>
     {% endif %}
 </div>
 

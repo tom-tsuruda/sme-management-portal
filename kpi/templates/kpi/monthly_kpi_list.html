@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}月次経営KPI{% endblock %}
+
+{% block content %}
+<h2>月次経営KPI</h2>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="年月・コメントで検索">
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'kpi:monthly_kpi_list' %}">クリア</a>
+    </form>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>年月</th>
+                <th>売上高</th>
+                <th>粗利</th>
+                <th>粗利率</th>
+                <th>営業利益</th>
+                <th>営業利益率</th>
+                <th>現預金</th>
+                <th>売掛金</th>
+                <th>買掛金</th>
+                <th>詳細</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in kpis %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.year_month }}</td>
+                <td class="amount-text">{{ row.sales_amount_display }}</td>
+                <td class="amount-text">{{ row.gross_profit_display }}</td>
+                <td>{{ row.gross_profit_rate_display }}</td>
+                <td class="amount-text">{{ row.operating_profit_display }}</td>
+                <td>{{ row.operating_profit_rate_display }}</td>
+                <td class="amount-text">{{ row.cash_balance_display }}</td>
+                <td class="amount-text">{{ row.accounts_receivable_display }}</td>
+                <td class="amount-text">{{ row.accounts_payable_display }}</td>
+                <td>
+                    <a href="{% url 'kpi:monthly_kpi_detail' row.id %}">詳細</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11" class="text-center">月次経営KPIがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a href="{% url 'kpi:kpi_home' %}">経営指標ダッシュボードへ戻る</a>
+</p>
+{% endblock %}

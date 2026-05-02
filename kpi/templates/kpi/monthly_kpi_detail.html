@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}月次経営KPI詳細{% endblock %}
+
+{% block content %}
+<h2>月次経営KPI詳細</h2>
+
+{% if kpi %}
+<div class="card">
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ kpi.id }}</td>
+        </tr>
+        <tr>
+            <th>年月</th>
+            <td>{{ kpi.year_month }}</td>
+        </tr>
+        <tr>
+            <th>売上高</th>
+            <td class="amount-text">{{ kpi.sales_amount_display }}</td>
+        </tr>
+        <tr>
+            <th>粗利</th>
+            <td class="amount-text">{{ kpi.gross_profit_display }}</td>
+        </tr>
+        <tr>
+            <th>粗利率</th>
+            <td>{{ kpi.gross_profit_rate_display }}</td>
+        </tr>
+        <tr>
+            <th>営業利益</th>
+            <td class="amount-text">{{ kpi.operating_profit_display }}</td>
+        </tr>
+        <tr>
+            <th>営業利益率</th>
+            <td>{{ kpi.operating_profit_rate_display }}</td>
+        </tr>
+        <tr>
+            <th>現預金</th>
+            <td class="amount-text">{{ kpi.cash_balance_display }}</td>
+        </tr>
+        <tr>
+            <th>売掛金</th>
+            <td class="amount-text">{{ kpi.accounts_receivable_display }}</td>
+        </tr>
+        <tr>
+            <th>買掛金</th>
+            <td class="amount-text">{{ kpi.accounts_payable_display }}</td>
+        </tr>
+        <tr>
+            <th>経費合計</th>
+            <td class="amount-text">{{ kpi.expense_total_display }}</td>
+        </tr>
+        <tr>
+            <th>新規受注件数</th>
+            <td>{{ kpi.new_orders }}</td>
+        </tr>
+        <tr>
+            <th>受注残高</th>
+            <td class="amount-text">{{ kpi.order_backlog_display }}</td>
+        </tr>
+        <tr>
+            <th>コメント</th>
+            <td>{{ kpi.comment }}</td>
+        </tr>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>月次経営KPIが見つかりません。</p>
+</div>
+{% endif %}
+
+<p>
+    <a href="{% url 'kpi:monthly_kpi_list' %}">月次経営KPI一覧へ戻る</a>
+</p>
+{% endblock %}

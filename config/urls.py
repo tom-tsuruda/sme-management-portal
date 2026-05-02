@@ -11,6 +11,10 @@ urlpatterns = [
     path("questionnaires/", include("questionnaires.urls")),
     path("workflows/", include("workflows.urls")),
     path("expenses/", include("expenses.urls")),
+    path("organizations/", include("organizations.urls")),
+    path("manufacturing/", include("manufacturing.urls")),
+    path("kpi/", include("kpi.urls")),
+    path("governance/", include("governance.urls")),
 ]
 
 if settings.DEBUG:

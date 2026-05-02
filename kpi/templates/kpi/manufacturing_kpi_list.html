@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}製造KPI{% endblock %}
+
+{% block content %}
+<h2>製造KPI</h2>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="年月・部署・コメントで検索">
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'kpi:manufacturing_kpi_list' %}">クリア</a>
+    </form>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>年月</th>
+                <th>部署</th>
+                <th>生産数量</th>
+                <th>不良数</th>
+                <th>不良率</th>
+                <th>歩留まり</th>
+                <th>納期遵守率</th>
+                <th>設備稼働率</th>
+                <th>停止時間</th>
+                <th>詳細</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in kpis %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.year_month }}</td>
+                <td>{{ row.department }}</td>
+                <td>{{ row.production_volume }}</td>
+                <td>{{ row.defect_count }}</td>
+                <td>{{ row.defect_rate_display }}</td>
+                <td>{{ row.yield_rate_display }}</td>
+                <td>{{ row.on_time_delivery_rate_display }}</td>
+                <td>{{ row.equipment_availability_display }}</td>
+                <td>{{ row.downtime_hours }}</td>
+                <td>
+                    <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">詳細</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11" class="text-center">製造KPIがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a href="{% url 'kpi:kpi_home' %}">経営指標ダッシュボードへ戻る</a>
+</p>
+{% endblock %}

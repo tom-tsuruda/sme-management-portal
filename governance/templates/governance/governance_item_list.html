@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}ガバナンス文書台帳{% endblock %}
+
+{% block content %}
+<h2>ガバナンス文書台帳</h2>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">管理項目数</div>
+        <div class="summary-number">{{ total_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">法定必須級</div>
+        <div class="summary-number danger">{{ required_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">未整備</div>
+        <div class="summary-number danger">{{ not_ready_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">要確認</div>
+        <div class="summary-number warning">{{ need_check_count }}</div>
+    </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">要改定</div>
+        <div class="summary-number warning">{{ need_revision_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">期限超過</div>
+        <div class="summary-number danger">{{ overdue_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">高リスク</div>
+        <div class="summary-number danger">{{ high_risk_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">表示件数</div>
+        <div class="summary-number">{{ display_count }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="文書名・カテゴリ・担当部署・備考で検索">
+
+        <select name="category">
+            <option value="">すべてのカテゴリ</option>
+            {% for category_name in categories %}
+                <option value="{{ category_name }}" {% if category == category_name %}selected{% endif %}>
+                    {{ category_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="status">
+            <option value="">すべての状態</option>
+            {% for status_name in status_choices %}
+                <option value="{{ status_name }}" {% if status == status_name %}selected{% endif %}>
+                    {{ status_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'governance:governance_item_list' %}">クリア</a>
+    </form>
+
+    <p class="count-text">
+        全{{ total_count }}件中 {{ display_count }}件を表示
+    </p>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>カテゴリ</th>
+                <th>文書・台帳名</th>
+                <th>重要度</th>
+                <th>主管部署</th>
+                <th>担当者</th>
+                <th>状態</th>
+                <th>リスク</th>
+                <th>次回確認日</th>
+                <th>詳細</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.item_name }}</td>
+                <td>{{ item.required_level }}</td>
+                <td>{{ item.owner_department }}</td>
+                <td>{{ item.owner }}</td>
+                <td>
+                    <span class="badge-status">{{ item.status }}</span>
+                </td>
+                <td>
+                    {% if item.risk_level == "高" %}
+                        <span class="badge-high">高</span>
+                    {% elif item.risk_level == "中" %}
+                        <span class="badge-middle">中</span>
+                    {% elif item.risk_level == "低" %}
+                        <span class="badge-low">低</span>
+                    {% else %}
+                        {{ item.risk_level }}
+                    {% endif %}
+                </td>
+                <td>{{ item.next_review_date }}</td>
+                <td>
+                    <a href="{% url 'governance:governance_item_detail' item.id %}">
+                        詳細
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="text-center">ガバナンス文書データがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

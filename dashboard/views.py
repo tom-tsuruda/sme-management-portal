@@ -3,11 +3,24 @@ from django.shortcuts import render
 from documents.services import load_documents
 from tasks.services import load_tasks
 from questionnaires.services import load_diagnosis_summaries
+from workflows.services import load_requests
+from expenses.services import load_expenses
+from manufacturing.services import load_management_items
+from kpi.services import get_latest_monthly_kpi, get_latest_manufacturing_kpi
+from governance.services import load_governance_items
 
 
 def home(request):
     documents = load_documents()
     tasks = load_tasks()
+    diagnosis_summaries = load_diagnosis_summaries()
+    workflow_requests = load_requests()
+    expenses = load_expenses()
+    manufacturing_items = load_management_items()
+    governance_items = load_governance_items()
+
+    latest_monthly_kpi = get_latest_monthly_kpi()
+    latest_manufacturing_kpi = get_latest_manufacturing_kpi()
 
     not_ready_statuses = [
         "未整備",
@@ -43,12 +56,115 @@ def home(request):
         if task.get("priority") == "高"
     ]
 
-    diagnosis_summaries = load_diagnosis_summaries()
     latest_diagnoses = sorted(
         diagnosis_summaries,
         key=lambda x: x.get("answered_at", ""),
         reverse=True,
     )[:5]
+
+    approval_waiting_requests = [
+        item for item in workflow_requests
+        if item.get("status") == "承認待ち"
+    ]
+
+    returned_requests = [
+        item for item in workflow_requests
+        if item.get("status") == "差戻し"
+    ]
+
+    approved_requests = [
+        item for item in workflow_requests
+        if item.get("status") == "承認済"
+    ]
+
+    expense_applying = [
+        item for item in expenses
+        if item.get("status") == "申請中"
+    ]
+
+    expense_returned = [
+        item for item in expenses
+        if item.get("status") == "差戻し"
+    ]
+
+    expense_approved = [
+        item for item in expenses
+        if item.get("status") == "承認済"
+    ]
+
+    expense_settled = [
+        item for item in expenses
+        if item.get("status") == "精算済"
+    ]
+
+    manufacturing_not_ready = [
+        item for item in manufacturing_items
+        if item.get("status") == "未整備"
+    ]
+
+    manufacturing_need_check = [
+        item for item in manufacturing_items
+        if item.get("status") == "要確認"
+    ]
+
+    manufacturing_need_improvement = [
+        item for item in manufacturing_items
+        if item.get("status") == "要改善"
+    ]
+
+    manufacturing_overdue = [
+        item for item in manufacturing_items
+        if item.get("status") == "期限超過"
+    ]
+
+    manufacturing_high_risk = [
+        item for item in manufacturing_items
+        if item.get("risk_level") == "高"
+    ]
+
+    manufacturing_action_items = [
+        item for item in manufacturing_items
+        if item.get("status") in ["未整備", "要確認", "要改善", "期限超過"]
+    ]
+
+    latest_manufacturing_items = manufacturing_action_items[:5]
+
+    governance_not_ready = [
+        item for item in governance_items
+        if item.get("status") == "未整備"
+    ]
+
+    governance_need_check = [
+        item for item in governance_items
+        if item.get("status") == "要確認"
+    ]
+
+    governance_need_revision = [
+        item for item in governance_items
+        if item.get("status") == "要改定"
+    ]
+
+    governance_overdue = [
+        item for item in governance_items
+        if item.get("status") == "期限超過"
+    ]
+
+    governance_high_risk = [
+        item for item in governance_items
+        if item.get("risk_level") == "高"
+    ]
+
+    governance_required = [
+        item for item in governance_items
+        if item.get("required_level") in ["法定必須", "法定必須級"]
+    ]
+
+    governance_action_items = [
+        item for item in governance_items
+        if item.get("status") in ["未整備", "要確認", "要改定", "期限超過"]
+    ]
+
+    latest_governance_items = governance_action_items[:5]
 
     context = {
         "total_documents": total_documents,
@@ -59,6 +175,37 @@ def home(request):
         "not_ready_documents": not_ready_documents[:5],
         "action_tasks": action_tasks[:5],
         "latest_diagnoses": latest_diagnoses,
+
+        "total_request_count": len(workflow_requests),
+        "approval_waiting_request_count": len(approval_waiting_requests),
+        "returned_request_count": len(returned_requests),
+        "approved_request_count": len(approved_requests),
+
+        "total_expense_count": len(expenses),
+        "expense_applying_count": len(expense_applying),
+        "expense_returned_count": len(expense_returned),
+        "expense_approved_count": len(expense_approved),
+        "expense_settled_count": len(expense_settled),
+
+        "manufacturing_total_count": len(manufacturing_items),
+        "manufacturing_not_ready_count": len(manufacturing_not_ready),
+        "manufacturing_need_check_count": len(manufacturing_need_check),
+        "manufacturing_need_improvement_count": len(manufacturing_need_improvement),
+        "manufacturing_overdue_count": len(manufacturing_overdue),
+        "manufacturing_high_risk_count": len(manufacturing_high_risk),
+        "latest_manufacturing_items": latest_manufacturing_items,
+
+        "governance_total_count": len(governance_items),
+        "governance_not_ready_count": len(governance_not_ready),
+        "governance_need_check_count": len(governance_need_check),
+        "governance_need_revision_count": len(governance_need_revision),
+        "governance_overdue_count": len(governance_overdue),
+        "governance_high_risk_count": len(governance_high_risk),
+        "governance_required_count": len(governance_required),
+        "latest_governance_items": latest_governance_items,
+
+        "latest_monthly_kpi": latest_monthly_kpi,
+        "latest_manufacturing_kpi": latest_manufacturing_kpi,
     }
 
     return render(request, "dashboard/home.html", context)

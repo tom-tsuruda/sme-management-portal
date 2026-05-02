@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}役職一覧{% endblock %}
+
+{% block content %}
+<h2>役職一覧</h2>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="役職名・コード・説明で検索">
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'organizations:position_list' %}">クリア</a>
+    </form>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>役職コード</th>
+                <th>役職名</th>
+                <th>ランク</th>
+                <th>承認上限額</th>
+                <th>説明</th>
+                <th>有効</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pos in positions %}
+            <tr>
+                <td>{{ pos.id }}</td>
+                <td>{{ pos.position_code }}</td>
+                <td>{{ pos.position_name }}</td>
+                <td>{{ pos.rank }}</td>
+                <td class="amount-text">{{ pos.approval_limit_amount }}</td>
+                <td>{{ pos.description }}</td>
+                <td>{{ pos.is_active }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">役職データがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a href="{% url 'organizations:organization_home' %}">組織マスタへ戻る</a>
+</p>
+{% endblock %}

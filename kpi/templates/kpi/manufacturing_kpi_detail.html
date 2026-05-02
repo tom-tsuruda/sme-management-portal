@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}製造KPI詳細{% endblock %}
+
+{% block content %}
+<h2>製造KPI詳細</h2>
+
+{% if kpi %}
+<div class="card">
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ kpi.id }}</td>
+        </tr>
+        <tr>
+            <th>年月</th>
+            <td>{{ kpi.year_month }}</td>
+        </tr>
+        <tr>
+            <th>部署</th>
+            <td>{{ kpi.department }}</td>
+        </tr>
+        <tr>
+            <th>生産数量</th>
+            <td>{{ kpi.production_volume }}</td>
+        </tr>
+        <tr>
+            <th>不良数</th>
+            <td>{{ kpi.defect_count }}</td>
+        </tr>
+        <tr>
+            <th>不良率</th>
+            <td>{{ kpi.defect_rate_display }}</td>
+        </tr>
+        <tr>
+            <th>歩留まり</th>
+            <td>{{ kpi.yield_rate_display }}</td>
+        </tr>
+        <tr>
+            <th>納期遵守率</th>
+            <td>{{ kpi.on_time_delivery_rate_display }}</td>
+        </tr>
+        <tr>
+            <th>設備稼働率</th>
+            <td>{{ kpi.equipment_availability_display }}</td>
+        </tr>
+        <tr>
+            <th>設備停止時間</th>
+            <td>{{ kpi.downtime_hours }}</td>
+        </tr>
+        <tr>
+            <th>労災件数</th>
+            <td>{{ kpi.accident_count }}</td>
+        </tr>
+        <tr>
+            <th>ヒヤリハット件数</th>
+            <td>{{ kpi.near_miss_count }}</td>
+        </tr>
+        <tr>
+            <th>品質クレーム件数</th>
+            <td>{{ kpi.quality_claim_count }}</td>
+        </tr>
+        <tr>
+            <th>エネルギー使用量</th>
+            <td>{{ kpi.energy_usage }}</td>
+        </tr>
+        <tr>
+            <th>コメント</th>
+            <td>{{ kpi.comment }}</td>
+        </tr>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>製造KPIが見つかりません。</p>
+</div>
+{% endif %}
+
+<p>
+    <a href="{% url 'kpi:manufacturing_kpi_list' %}">製造KPI一覧へ戻る</a>
+</p>
+{% endblock %}

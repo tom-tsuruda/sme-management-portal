@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     "questionnaires",
     "workflows",
     "expenses",
+    "organizations",
+    "manufacturing",
+    "kpi",
+    "governance",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}組織マスタ{% endblock %}
+
+{% block content %}
+<h2>組織マスタ</h2>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">部署数</div>
+        <div class="summary-number">{{ department_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">役職数</div>
+        <div class="summary-number">{{ position_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">社員数</div>
+        <div class="summary-number">{{ employee_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">承認者数</div>
+        <div class="summary-number">{{ approver_count }}</div>
+    </div>
+</div>
+
+<div class="menu-list">
+    <a class="menu-item" href="{% url 'organizations:department_list' %}">
+        部署一覧
+    </a>
+
+    <a class="menu-item" href="{% url 'organizations:position_list' %}">
+        役職一覧
+    </a>
+
+    <a class="menu-item" href="{% url 'organizations:employee_list' %}">
+        社員一覧
+    </a>
+</div>
+
+<div class="card">
+    <p>
+        この画面では、部署・役職・社員マスタを確認できます。
+        初期MVPでは <code>data/organization_master.xlsx</code> を正データとして利用します。
+    </p>
+</div>
+{% endblock %}

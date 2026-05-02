@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}経営指標{% endblock %}
+
+{% block content %}
+<h2>経営指標ダッシュボード</h2>
+
+<div class="card">
+    <p>
+        月次の経営指標・製造指標を確認できます。
+        初期MVPでは <code>data/kpi_data.xlsx</code> を正データとして利用します。
+    </p>
+</div>
+
+{% if latest_monthly_kpi %}
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">対象月</div>
+        <div class="summary-number">{{ latest_monthly_kpi.year_month }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">売上高</div>
+        <div class="summary-number">{{ latest_monthly_kpi.sales_amount_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">粗利率</div>
+        <div class="summary-number warning">{{ latest_monthly_kpi.gross_profit_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">営業利益率</div>
+        <div class="summary-number danger">{{ latest_monthly_kpi.operating_profit_rate_display }}</div>
+    </div>
+</div>
+{% endif %}
+
+{% if latest_manufacturing_kpi %}
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">生産数量</div>
+        <div class="summary-number">{{ latest_manufacturing_kpi.production_volume }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">不良率</div>
+        <div class="summary-number danger">{{ latest_manufacturing_kpi.defect_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">歩留まり</div>
+        <div class="summary-number warning">{{ latest_manufacturing_kpi.yield_rate_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">設備稼働率</div>
+        <div class="summary-number">{{ latest_manufacturing_kpi.equipment_availability_display }}</div>
+    </div>
+</div>
+{% endif %}
+
+<div class="menu-list">
+    <a class="menu-item" href="{% url 'kpi:monthly_kpi_list' %}">
+        月次経営KPI
+    </a>
+
+    <a class="menu-item" href="{% url 'kpi:manufacturing_kpi_list' %}">
+        製造KPI
+    </a>
+</div>
+
+<div class="card">
+    <h2>最新 月次経営KPI</h2>
+
+    {% if monthly_kpis %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>年月</th>
+                    <th>売上高</th>
+                    <th>粗利</th>
+                    <th>粗利率</th>
+                    <th>営業利益</th>
+                    <th>営業利益率</th>
+                    <th>現預金</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in monthly_kpis %}
+                <tr>
+                    <td>{{ row.year_month }}</td>
+                    <td class="amount-text">{{ row.sales_amount_display }}</td>
+                    <td class="amount-text">{{ row.gross_profit_display }}</td>
+                    <td>{{ row.gross_profit_rate_display }}</td>
+                    <td class="amount-text">{{ row.operating_profit_display }}</td>
+                    <td>{{ row.operating_profit_rate_display }}</td>
+                    <td class="amount-text">{{ row.cash_balance_display }}</td>
+                    <td>
+                        <a href="{% url 'kpi:monthly_kpi_detail' row.id %}">
+                            詳細
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>月次経営KPIはありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>最新 製造KPI</h2>
+
+    {% if manufacturing_kpis %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>年月</th>
+                    <th>部署</th>
+                    <th>生産数量</th>
+                    <th>不良率</th>
+                    <th>歩留まり</th>
+                    <th>納期遵守率</th>
+                    <th>設備稼働率</th>
+                    <th>労災</th>
+                    <th>品質クレーム</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in manufacturing_kpis %}
+                <tr>
+                    <td>{{ row.year_month }}</td>
+                    <td>{{ row.department }}</td>
+                    <td>{{ row.production_volume }}</td>
+                    <td>{{ row.defect_rate_display }}</td>
+                    <td>{{ row.yield_rate_display }}</td>
+                    <td>{{ row.on_time_delivery_rate_display }}</td>
+                    <td>{{ row.equipment_availability_display }}</td>
+                    <td>{{ row.accident_count }}</td>
+                    <td>{{ row.quality_claim_count }}</td>
+                    <td>
+                        <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
+                            詳細
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>製造KPIはありません。</p>
+    {% endif %}
+</div>
+{% endblock %}

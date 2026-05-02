@@ -1,6 +1,6 @@
-from django.shortcuts import render
+import csv
 
-# Create your views here.
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from core.formatters import normalize_amount
@@ -185,3 +185,51 @@ def upload_attachment(request, expense_id):
             )
 
     return redirect("expenses:expense_detail", expense_id=expense_id)
+
+def export_csv(request):
+    expenses = load_expenses()
+
+    export_statuses = ["承認済", "精算済"]
+
+    target_expenses = [
+        expense for expense in expenses
+        if expense.get("status") in export_statuses
+    ]
+
+    response = HttpResponse(content_type="text/csv; charset=utf-8-sig")
+    response["Content-Disposition"] = 'attachment; filename="expense_export.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "申請ID",
+        "経費区分",
+        "件名",
+        "申請者",
+        "部署",
+        "日付",
+        "カテゴリ",
+        "金額",
+        "支払方法",
+        "ステータス",
+        "承認者",
+        "摘要",
+    ])
+
+    for expense in target_expenses:
+        writer.writerow([
+            expense.get("id", ""),
+            expense.get("expense_type", ""),
+            expense.get("title", ""),
+            expense.get("applicant", ""),
+            expense.get("department", ""),
+            expense.get("expense_date", ""),
+            expense.get("category", ""),
+            expense.get("amount", ""),
+            expense.get("payment_method", ""),
+            expense.get("status", ""),
+            expense.get("approver", ""),
+            expense.get("description", ""),
+        ])
+
+    return response

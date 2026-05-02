@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}製造管理項目詳細{% endblock %}
+
+{% block content %}
+<h2>製造管理項目詳細</h2>
+
+{% if item %}
+<div class="card">
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ item.id }}</td>
+        </tr>
+        <tr>
+            <th>領域</th>
+            <td>{{ item.area }}</td>
+        </tr>
+        <tr>
+            <th>カテゴリ</th>
+            <td>{{ item.category }}</td>
+        </tr>
+        <tr>
+            <th>管理項目</th>
+            <td>{{ item.item_name }}</td>
+        </tr>
+        <tr>
+            <th>説明</th>
+            <td>{{ item.description }}</td>
+        </tr>
+        <tr>
+            <th>担当部署</th>
+            <td>{{ item.owner_department }}</td>
+        </tr>
+        <tr>
+            <th>担当者</th>
+            <td>{{ item.owner }}</td>
+        </tr>
+        <tr>
+            <th>確認頻度</th>
+            <td>{{ item.check_frequency }}</td>
+        </tr>
+        <tr>
+            <th>関連文書ID</th>
+            <td>{{ item.required_document_id }}</td>
+        </tr>
+        <tr>
+            <th>関連法令・規格</th>
+            <td>{{ item.related_law_or_standard }}</td>
+        </tr>
+        <tr>
+            <th>リスク</th>
+            <td>{{ item.risk_level }}</td>
+        </tr>
+        <tr>
+            <th>状態</th>
+            <td>{{ item.status }}</td>
+        </tr>
+        <tr>
+            <th>最終確認日</th>
+            <td>{{ item.last_checked_at }}</td>
+        </tr>
+        <tr>
+            <th>次回確認日</th>
+            <td>{{ item.next_check_date }}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>状態更新</h2>
+
+    <form method="post" action="{% url 'manufacturing:update_status' item.id %}" class="inline-form">
+        {% csrf_token %}
+        <select name="status">
+            {% for status in status_choices %}
+                <option value="{{ status }}" {% if item.status == status %}selected{% endif %}>
+                    {{ status }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">更新</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>タスク作成</h2>
+
+    <p class="text-muted">
+        この管理項目について、未整備・改善・確認タスクを作成できます。
+    </p>
+
+    <form method="post" action="{% url 'manufacturing:create_task_from_management_item' item.id %}" class="task-create-form">
+        {% csrf_token %}
+        <input type="text" name="task_name" class="input-long" placeholder="{{ item.item_name }}を整備・確認する">
+        <input type="text" name="owner" class="input-middle" value="{{ item.owner }}" placeholder="担当者">
+        <input type="date" name="due_date" class="input-short">
+        <select name="priority">
+            <option value="高" {% if item.risk_level == "高" %}selected{% endif %}>高</option>
+            <option value="中" {% if item.risk_level != "高" %}selected{% endif %}>中</option>
+            <option value="低">低</option>
+        </select>
+        <button type="submit">タスク作成</button>
+    </form>
+</div>
+
+{% else %}
+<div class="card">
+    <p>製造管理項目が見つかりません。</p>
+</div>
+{% endif %}
+
+<p>
+    <a href="{% url 'manufacturing:management_item_list' %}">製造管理一覧へ戻る</a>
+</p>
+{% endblock %}

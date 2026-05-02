@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}社員一覧{% endblock %}
+
+{% block content %}
+<h2>社員一覧</h2>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="社員名・部署・役職・メールで検索">
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'organizations:employee_list' %}">クリア</a>
+    </form>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>社員コード</th>
+                <th>社員名</th>
+                <th>部署</th>
+                <th>役職</th>
+                <th>メール</th>
+                <th>ロール</th>
+                <th>承認者</th>
+                <th>詳細</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td>{{ emp.id }}</td>
+                <td>{{ emp.employee_code }}</td>
+                <td>{{ emp.employee_name }}</td>
+                <td>{{ emp.department_name }}</td>
+                <td>{{ emp.position_name }}</td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.role }}</td>
+                <td>{{ emp.is_approver }}</td>
+                <td>
+                    <a href="{% url 'organizations:employee_detail' emp.id %}">詳細</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center">社員データがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a href="{% url 'organizations:organization_home' %}">組織マスタへ戻る</a>
+</p>
+{% endblock %}

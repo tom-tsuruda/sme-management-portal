@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}部署一覧{% endblock %}
+
+{% block content %}
+<h2>部署一覧</h2>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="部署名・コード・説明で検索">
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'organizations:department_list' %}">クリア</a>
+    </form>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>部署コード</th>
+                <th>部署名</th>
+                <th>上位部署ID</th>
+                <th>責任者ID</th>
+                <th>説明</th>
+                <th>有効</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dept in departments %}
+            <tr>
+                <td>{{ dept.id }}</td>
+                <td>{{ dept.department_code }}</td>
+                <td>{{ dept.department_name }}</td>
+                <td>{{ dept.parent_department_id }}</td>
+                <td>{{ dept.manager_employee_id }}</td>
+                <td>{{ dept.description }}</td>
+                <td>{{ dept.is_active }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">部署データがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a href="{% url 'organizations:organization_home' %}">組織マスタへ戻る</a>
+</p>
+{% endblock %}
