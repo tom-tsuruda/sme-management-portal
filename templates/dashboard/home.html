@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}ポータルTOP{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>ポータルTOP</h2>
+    <p>ExcelローカルDB版 Django ポータルです。</p>
+    <p>文書台帳、タスク管理、質問票をここから確認できます。</p>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">文書件数</div>
+        <div class="summary-number">{{ total_documents }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">未整備文書</div>
+        <div class="summary-number danger">{{ not_ready_documents }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">タスク件数</div>
+        <div class="summary-number">{{ total_tasks }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">要対応タスク</div>
+        <div class="summary-number warning">{{ action_tasks }}</div>
+    </div>
+</div>
+
+<div class="menu-list">
+    <a class="menu-item" href="/documents/">文書台帳</a>
+    <a class="menu-item" href="/tasks/">タスク管理</a>
+    <a class="menu-item" href="/questionnaires/">質問票</a>
+    <a class="menu-item" href="#">申請・承認（後で作成）</a>
+</div>
+{% endblock %}

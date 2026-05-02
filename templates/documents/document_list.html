@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}文書台帳{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>文書台帳</h2>
+    <p>規程・契約書・ガバナンス文書を管理します。</p>
+
+    <form method="get" action="/documents/" class="search-form">
+        <input
+            type="text"
+            name="q"
+            value="{{ keyword }}"
+            placeholder="文書名・カテゴリ・状態・主管部署で検索"
+        >
+        <button type="submit">検索</button>
+        <a class="clear-link" href="/documents/">クリア</a>
+    </form>
+    <p class="count-text">
+        全{{ total_count }}件中 {{ display_count }}件を表示
+    </p>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>カテゴリ</th>
+                <th>文書名</th>
+                <th>必須度</th>
+                <th>主管部署</th>
+                <th>状態</th>
+                <th>版数</th>
+                <th>次回確認日</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in documents %}
+            <tr>
+                <td>{{ doc.id }}</td>
+                <td>{{ doc.category }}</td>
+                <td>{{ doc.document_name }}</td>
+                <td>{{ doc.required_level }}</td>
+                <td>{{ doc.owner_dept }}</td>
+                <td>{{ doc.status }}</td>
+                <td>{{ doc.latest_version }}</td>
+                <td>{{ doc.next_review_date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">該当する文書データがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

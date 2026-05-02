@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}タスク管理{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>タスク管理</h2>
+    <p>未整備文書・確認事項・期限付きタスクを管理します。</p>
+
+    <form method="get" action="/tasks/" class="search-form">
+        <input
+            type="text"
+            name="q"
+            value="{{ keyword }}"
+            placeholder="タスク名・カテゴリ・担当・状態・優先度で検索"
+        >
+        <button type="submit">検索</button>
+        <a class="clear-link" href="/tasks/">クリア</a>
+    </form>
+
+    <p class="count-text">
+        全{{ total_count }}件中 {{ display_count }}件を表示
+    </p>
+</div>
+
+<div class="card">
+    <h2>新規タスク追加</h2>
+
+    <form method="post" action="/tasks/create/" class="task-create-form">
+        {% csrf_token %}
+
+        <input type="text" placeholder="タスクID（自動採番）" disabled>
+        <input type="text" name="task_name" placeholder="タスク名" required>
+        <input type="text" name="category" placeholder="カテゴリ">
+        <input type="text" name="owner" placeholder="担当">
+        <input type="date" name="due_date">
+
+        <select name="status">
+            <option value="未着手">未着手</option>
+            <option value="進行中">進行中</option>
+            <option value="完了">完了</option>
+            <option value="要対応">要対応</option>
+        </select>
+
+        <select name="priority">
+            <option value="高">高</option>
+            <option value="中" selected>中</option>
+            <option value="低">低</option>
+        </select>
+
+        <input type="text" name="related_document_id" placeholder="関連文書ID">
+
+        <button type="submit">追加</button>
+    </form>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>タスク名</th>
+                <th>カテゴリ</th>
+                <th>担当</th>
+                <th>期限</th>
+                <th>状態</th>
+                <th>優先度</th>
+                <th>関連文書ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.task_name }}</td>
+                <td>{{ task.category }}</td>
+                <td>{{ task.owner }}</td>
+                <td>{{ task.due_date }}</td>
+
+                <td>
+                    <form method="post" action="/tasks/update-status/" class="inline-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                        <input type="hidden" name="keyword" value="{{ keyword }}">
+
+                        <select name="status">
+                            <option value="未着手" {% if task.status == "未着手" %}selected{% endif %}>未着手</option>
+                            <option value="進行中" {% if task.status == "進行中" %}selected{% endif %}>進行中</option>
+                            <option value="完了" {% if task.status == "完了" %}selected{% endif %}>完了</option>
+                            <option value="要対応" {% if task.status == "要対応" %}selected{% endif %}>要対応</option>
+                        </select>
+
+                        <button type="submit" class="small-button">保存</button>
+                    </form>
+                </td>
+
+                <td>
+                    {% if task.priority == "高" %}
+                        <span class="badge-high">高</span>
+                    {% elif task.priority == "中" %}
+                        <span class="badge-middle">中</span>
+                    {% elif task.priority == "低" %}
+                        <span class="badge-low">低</span>
+                    {% else %}
+                        {{ task.priority }}
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if task.related_document_id %}
+                        <a href="/documents/?q={{ task.related_document_id }}">
+                            {{ task.related_document_id }}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">該当するタスクデータがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

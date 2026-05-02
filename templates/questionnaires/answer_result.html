@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}回答結果{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>回答結果</h2>
+    <p>質問票への回答結果と、抽出された要対応タスクを表示します。</p>
+    <p class="count-text">診断ID：{{ diagnosis_id }}</p>
+</div>
+
+<h2>回答一覧</h2>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>カテゴリ</th>
+                <th>質問</th>
+                <th>回答</th>
+                <th>関連タスク</th>
+                <th>自動生成タスク</th>
+                <th>関連文書</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in answers %}
+            <tr>
+                <td>{{ a.id }}</td>
+                <td>{{ a.category }}</td>
+                <td>{{ a.question_text }}</td>
+                <td>{{ a.answer }}</td>
+                <td>
+                    {% if a.related_task_id %}
+                        <a href="/tasks/?q={{ a.related_task_id }}">
+                            {{ a.related_task_id }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if a.generated_task_id %}
+                        <a href="/tasks/?q={{ a.generated_task_id }}">
+                            {{ a.generated_task_id }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if a.related_document_id %}
+                        <a href="/documents/?q={{ a.related_document_id }}">
+                            {{ a.related_document_id }}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">回答データがありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2>要対応タスク</h2>
+
+{% if action_tasks %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>タスク名</th>
+                    <th>カテゴリ</th>
+                    <th>担当</th>
+                    <th>期限</th>
+                    <th>状態</th>
+                    <th>優先度</th>
+                    <th>関連文書ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in action_tasks %}
+                <tr>
+                    <td>
+                        <a href="/tasks/?q={{ task.id }}">{{ task.id }}</a>
+                    </td>
+                    <td>{{ task.task_name }}</td>
+                    <td>{{ task.category }}</td>
+                    <td>{{ task.owner }}</td>
+                    <td>{{ task.due_date }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>
+                        {% if task.priority == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif task.priority == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif task.priority == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ task.priority }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.related_document_id %}
+                            <a href="/documents/?q={{ task.related_document_id }}">
+                                {{ task.related_document_id }}
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="card">
+        <p>要対応タスクはありません。</p>
+    </div>
+{% endif %}
+{% endblock %}

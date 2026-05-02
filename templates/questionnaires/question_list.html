@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}質問票{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>質問票</h2>
+    <p>回答内容に応じて、要対応タスクを自動抽出します。</p>
+
+    <form method="get" action="/questionnaires/" class="search-form">
+        <input
+            type="text"
+            name="q"
+            value="{{ keyword }}"
+            placeholder="カテゴリ・質問文・選択肢・関連IDで検索"
+        >
+        <button type="submit">検索</button>
+        <a class="clear-link" href="/questionnaires/">クリア</a>
+    </form>
+    <p class="count-text">
+        全{{ total_count }}件中 {{ display_count }}件を表示
+    </p>
+</div>
+
+<form method="post" action="/questionnaires/answer/">
+    {% csrf_token %}
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>カテゴリ</th>
+                    <th>質問</th>
+                    <th>回答</th>
+                    <th>関連タスク</th>
+                    <th>関連文書</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                <tr>
+                    <td>{{ q.id }}</td>
+                    <td>{{ q.category }}</td>
+                    <td>{{ q.question_text }}</td>
+                    <td>
+                        <select name="{{ q.id }}">
+                            <option value="">選択してください</option>
+                            <option value="{{ q.option_a }}">{{ q.option_a }}</option>
+                            <option value="{{ q.option_b }}">{{ q.option_b }}</option>
+                            <option value="{{ q.option_c }}">{{ q.option_c }}</option>
+                        </select>
+                    </td>
+                    <td>
+                        {% if q.related_task_id %}
+                            <a href="/tasks/?q={{ q.related_task_id }}">
+                                {{ q.related_task_id }}
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if q.related_document_id %}
+                            <a href="/documents/?q={{ q.related_document_id }}">
+                                {{ q.related_document_id }}
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">該当する質問データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p>
+        <button type="submit">回答を送信</button>
+    </p>
+</form>
+{% endblock %}
