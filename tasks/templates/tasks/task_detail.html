@@ -9,6 +9,12 @@
     </p>
 
     {% if task %}
+        <p>
+            <a href="{% url 'tasks:edit_task' task.id %}">
+                このタスクを編集する
+            </a>
+        </p>
+
         <h2>タスク詳細</h2>
 
         <table>
@@ -31,11 +37,29 @@
                 </tr>
                 <tr>
                     <th>期限</th>
-                    <td>{{ task.due_date }}</td>
+                    <td>
+                        {% if task.due_date %}
+                            {{ task.due_date }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <th>状態</th>
-                    <td>{{ task.status }}</td>
+                    <td>
+                        {% if task.status == "未着手" %}
+                            <span class="badge-middle">未着手</span>
+                        {% elif task.status == "進行中" %}
+                            <span class="badge-middle">進行中</span>
+                        {% elif task.status == "要対応" %}
+                            <span class="badge-high">要対応</span>
+                        {% elif task.status == "完了" %}
+                            <span class="badge-low">完了</span>
+                        {% else %}
+                            {{ task.status }}
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <th>優先度</th>

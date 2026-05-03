@@ -11,8 +11,51 @@ from .services import (
     save_answer_history,
 )
 
-from tasks.services import add_task, find_task_by_id
+from tasks.services import add_task, find_task_by_id, load_tasks
 
+OPEN_TASK_STATUSES = [
+    "未着手",
+    "進行中",
+    "要対応",
+    "確認中",
+    "差戻し",
+]
+
+
+def normalize_text(value):
+    return str(value or "").strip()
+
+
+def find_existing_open_task(task_name, category, related_document_id=""):
+    """
+    診断から同じ改善タスクを何度も作らないため、
+    同じタスク名・カテゴリ・関連文書IDの未完了タスクを探す。
+    """
+    task_name = normalize_text(task_name)
+    category = normalize_text(category)
+    related_document_id = normalize_text(related_document_id)
+
+    for task in load_tasks():
+        existing_task_name = normalize_text(task.get("task_name", ""))
+        existing_category = normalize_text(task.get("category", ""))
+        existing_related_document_id = normalize_text(task.get("related_document_id", ""))
+        existing_status = normalize_text(task.get("status", ""))
+
+        if existing_status not in OPEN_TASK_STATUSES:
+            continue
+
+        if existing_task_name != task_name:
+            continue
+
+        if existing_category != category:
+            continue
+
+        if existing_related_document_id != related_document_id:
+            continue
+
+        return task
+
+    return None
 
 def question_list(request):
     all_questions = load_questions()
@@ -70,17 +113,16 @@ def answer_questions(request):
     action_tasks = []
     diagnosis_id = generate_diagnosis_id()
 
-    if request.method == "POST":
-        problem_count = 0
-        generated_task_count = 0
+    problem_count = 0
+    generated_task_count = 0
 
+    if request.method == "POST":
         for q in questions:
             q_id = q.get("id")
             answer = request.POST.get(q_id, "")
 
             related_task_id = q.get("related_task_id", "")
             related_document_id = q.get("related_document_id", "")
-            generated_task_id = ""
 
             answer_row = {
                 "id": q_id,
@@ -89,7 +131,7 @@ def answer_questions(request):
                 "answer": answer,
                 "related_task_id": related_task_id,
                 "related_document_id": related_document_id,
-                "generated_task_id": generated_task_id,
+                "generated_task_id": "",
             }
 
             if answer in PROBLEM_ANSWERS:
@@ -127,40 +169,66 @@ def answer_questions(request):
                     if new_task_priority not in ["高", "中", "低"]:
                         new_task_priority = "中"
 
-                    new_task_id = add_task(
+                    existing_task = find_existing_open_task(
                         task_name=new_task_name,
                         category=new_task_category,
-                        owner=new_task_owner,
-                        due_date="",
-                        status="未着手",
-                        priority=new_task_priority,
                         related_document_id=related_document_id,
                     )
 
-                    if new_task_id:
-                        generated_task_count += 1
-                        generated_task_id = new_task_id
-                        answer_row["generated_task_id"] = new_task_id
-
-                        new_task = find_task_by_id(new_task_id)
-
-                        if new_task:
-                            action_tasks.append(new_task)
+                    if existing_task:
+                        existing_task_id = existing_task.get("id", "")
+                        answer_row["generated_task_id"] = existing_task_id
+                        action_tasks.append(existing_task)
 
                         create_notification(
-                            title="診断結果からタスクが作成されました",
+                            title="診断結果から既存タスクに紐づけました",
                             message=(
                                 f"診断ID：{diagnosis_id}。"
                                 f"質問「{q.get('question_text', '')}」への回答が"
-                                f"「{answer}」だったため、改善タスクを作成しました。"
-                                f"タスクID：{new_task_id}。"
+                                f"「{answer}」だったため、既存の未完了タスクに紐づけました。"
+                                f"タスクID：{existing_task_id}。"
                             ),
                             target_user=new_task_owner or "管理者",
                             category="診断質問票",
                             priority=new_task_priority,
                             related_type="tasks",
-                            related_id=new_task_id,
+                            related_id=existing_task_id,
                         )
+
+                    else:
+                        new_task_id = add_task(
+                            task_name=new_task_name,
+                            category=new_task_category,
+                            owner=new_task_owner,
+                            due_date="",
+                            status="未着手",
+                            priority=new_task_priority,
+                            related_document_id=related_document_id,
+                        )
+
+                        if new_task_id:
+                            generated_task_count += 1
+                            answer_row["generated_task_id"] = new_task_id
+
+                            new_task = find_task_by_id(new_task_id)
+
+                            if new_task:
+                                action_tasks.append(new_task)
+
+                            create_notification(
+                                title="診断結果からタスクが作成されました",
+                                message=(
+                                    f"診断ID：{diagnosis_id}。"
+                                    f"質問「{q.get('question_text', '')}」への回答が"
+                                    f"「{answer}」だったため、改善タスクを作成しました。"
+                                    f"タスクID：{new_task_id}。"
+                                ),
+                                target_user=new_task_owner or "管理者",
+                                category="診断質問票",
+                                priority=new_task_priority,
+                                related_type="tasks",
+                                related_id=new_task_id,
+                            )
 
             answers.append(answer_row)
 
@@ -195,12 +263,50 @@ def answer_questions(request):
                 related_id=diagnosis_id,
             )
 
+    grouped_answers = {}
+
+    answered_count = 0
+    not_applicable_count = 0
+    unanswered_count = 0
+    summary_problem_count = 0
+    summary_generated_task_count = 0
+
+    for answer_row in answers:
+        category = answer_row.get("category", "") or "未分類"
+
+        if category not in grouped_answers:
+            grouped_answers[category] = []
+
+        grouped_answers[category].append(answer_row)
+
+        answer_value = answer_row.get("answer", "")
+
+        if answer_value:
+            answered_count += 1
+
+        if answer_value in PROBLEM_ANSWERS:
+            summary_problem_count += 1
+
+        if answer_value == "対象外":
+            not_applicable_count += 1
+
+        if not answer_value:
+            unanswered_count += 1
+
+        if answer_row.get("generated_task_id"):
+            summary_generated_task_count += 1
+
     return render(request, "questionnaires/answer_result.html", {
         "diagnosis_id": diagnosis_id,
         "answers": answers,
+        "grouped_answers": grouped_answers,
         "action_tasks": action_tasks,
+        "answered_count": answered_count,
+        "problem_count": summary_problem_count,
+        "generated_task_count": summary_generated_task_count,
+        "not_applicable_count": not_applicable_count,
+        "unanswered_count": unanswered_count,
     })
-
 
 def diagnosis_history(request):
     summaries = load_diagnosis_summaries()

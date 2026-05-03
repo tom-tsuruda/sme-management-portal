@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}タスク編集{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>タスク編集</h2>
+    <p class="count-text">タスクID：{{ task.id }}</p>
+
+    <p>
+        <a href="{% url 'tasks:task_detail' task.id %}">← タスク詳細へ戻る</a>
+    </p>
+</div>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+
+        <p>
+            <label>タスク名</label><br>
+            <input
+                type="text"
+                name="task_name"
+                value="{{ task.task_name }}"
+                style="width: 100%;"
+                required
+            >
+        </p>
+
+        <p>
+            <label>カテゴリ</label><br>
+            <input
+                type="text"
+                name="category"
+                value="{{ task.category }}"
+                style="width: 100%;"
+            >
+        </p>
+
+        <p>
+            <label>担当者マスタから選択</label><br>
+            <select name="owner_employee_id">
+                <option value="">選択しない</option>
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}">
+                        {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label>担当者名</label><br>
+            <input
+                type="text"
+                name="owner"
+                value="{{ task.owner }}"
+                style="width: 100%;"
+            >
+        </p>
+
+        <p>
+            <label>期限</label><br>
+            <input
+                type="text"
+                name="due_date"
+                value="{{ task.due_date }}"
+                placeholder="例：2026-05-31"
+                style="width: 100%;"
+            >
+        </p>
+
+        <p>
+            <label>状態</label><br>
+            <select name="status">
+                {% for status in status_choices %}
+                    <option value="{{ status }}" {% if task.status == status %}selected{% endif %}>
+                        {{ status }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label>優先度</label><br>
+            <select name="priority">
+                {% for priority in priority_choices %}
+                    <option value="{{ priority }}" {% if task.priority == priority %}selected{% endif %}>
+                        {{ priority }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label>関連文書ID</label><br>
+            <input
+                type="text"
+                name="related_document_id"
+                value="{{ task.related_document_id }}"
+                style="width: 100%;"
+            >
+        </p>
+
+        <p>
+            <button type="submit">更新する</button>
+        </p>
+    </form>
+</div>
+{% endblock %}

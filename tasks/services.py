@@ -240,3 +240,75 @@ def add_task(task_name, category, owner, due_date, status, priority, related_doc
         df.to_excel(writer, sheet_name="tasks", index=False)
 
     return new_id
+
+def update_task(
+    task_id,
+    task_name,
+    category,
+    owner,
+    due_date,
+    status,
+    priority,
+    related_document_id,
+):
+    """
+    task_data.xlsx の指定タスクを更新する。
+    更新できたら True、対象がなければ False を返す。
+    """
+    excel_path = get_task_excel_path()
+
+    if not excel_path.exists():
+        return False
+
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="tasks",
+        dtype=str,
+    )
+    df = df.fillna("")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
+
+    required_columns = [
+        "id",
+        "task_name",
+        "category",
+        "owner",
+        "due_date",
+        "status",
+        "priority",
+        "related_document_id",
+    ]
+
+    for column in required_columns:
+        if column not in df.columns:
+            df[column] = ""
+
+    target_index = df.index[df["id"].astype(str) == str(task_id)].tolist()
+
+    if not target_index:
+        return False
+
+    backup_task_excel()
+
+    index = target_index[0]
+
+    df.loc[index, "task_name"] = str(task_name)
+    df.loc[index, "category"] = str(category)
+    df.loc[index, "owner"] = str(owner)
+    df.loc[index, "due_date"] = str(due_date)
+    df.loc[index, "status"] = str(status)
+    df.loc[index, "priority"] = str(priority)
+    df.loc[index, "related_document_id"] = str(related_document_id)
+
+    if "updated_at" in df.columns:
+        df.loc[index, "updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        df.to_excel(writer, sheet_name="tasks", index=False)
+
+    return True
