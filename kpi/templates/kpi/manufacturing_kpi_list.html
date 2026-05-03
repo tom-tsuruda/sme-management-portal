@@ -1,10 +1,13 @@
 {% extends "base.html" %}
+{% load format_filters %}
 
 {% block title %}製造KPI{% endblock %}
 
 {% block content %}
 <h2>製造KPI</h2>
-
+<p>
+    <a href="{% url 'kpi:manufacturing_kpi_create' %}">＋ 製造KPIを登録</a>
+</p>
 <div class="card">
     <form method="get" class="search-form">
         <input type="text" name="q" value="{{ keyword }}" placeholder="年月・部署・コメントで検索">
@@ -36,13 +39,13 @@
                 <td>{{ row.id }}</td>
                 <td>{{ row.year_month }}</td>
                 <td>{{ row.department }}</td>
-                <td>{{ row.production_volume }}</td>
-                <td>{{ row.defect_count }}</td>
+                <td>{{ row.production_volume|amount }}</td>
+                <td>{{ row.defect_count|amount }}</td>
                 <td>{{ row.defect_rate_display }}</td>
                 <td>{{ row.yield_rate_display }}</td>
                 <td>{{ row.on_time_delivery_rate_display }}</td>
                 <td>{{ row.equipment_availability_display }}</td>
-                <td>{{ row.downtime_hours }}</td>
+                <td>{{ row.downtime_hours|amount }}</td>
                 <td>
                     <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">詳細</a>
                 </td>

@@ -1,120 +1,124 @@
 {% extends "base.html" %}
+{% load format_filters %}
 
 {% block title %}ポータルTOP{% endblock %}
 
 {% block content %}
 <div class="card">
     <h2>ポータルTOP</h2>
-    <p>ExcelローカルDB版 Django 経営管理ポータルです。</p>
     <p>
-        文書台帳、タスク管理、質問票、申請承認、経費精算、組織マスタ、製造管理、経営指標、ガバナンス、通知をここから確認できます。
+        経営指標、文書、タスク、申請、経費、製造管理、製造インシデント、
+        ガバナンス、通知を一覧できます。
     </p>
 </div>
 
 {% if latest_monthly_kpi %}
 <div class="card">
     <h2>最新 経営KPI</h2>
-    <p class="text-muted">
-        対象月：{{ latest_monthly_kpi.year_month }}
-    </p>
-</div>
+    <p>対象月：{{ latest_monthly_kpi.year_month }}</p>
 
-<div class="summary-grid">
-    <div class="summary-card">
-        <div class="summary-label">売上高</div>
-        <div class="summary-number">{{ latest_monthly_kpi.sales_amount_display }}</div>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">売上高</div>
+            <div class="summary-number">
+                {{ latest_monthly_kpi.sales_amount|amount }}
+                <small>{{ latest_monthly_kpi.sales_amount_diff_display }}</small>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-label">粗利率</div>
+            <div class="summary-number warning">
+                {{ latest_monthly_kpi.gross_profit_rate_display }}
+                <small>{{ latest_monthly_kpi.gross_profit_rate_diff_display }}</small>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-label">営業利益率</div>
+            <div class="summary-number danger">
+                {{ latest_monthly_kpi.operating_profit_rate_display }}
+                <small>{{ latest_monthly_kpi.operating_profit_rate_diff_display }}</small>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-label">現預金</div>
+            <div class="summary-number">
+                {{ latest_monthly_kpi.cash_balance|amount }}
+                <small>{{ latest_monthly_kpi.cash_balance_diff_display }}</small>
+            </div>
+        </div>
     </div>
-
-    <div class="summary-card">
-        <div class="summary-label">粗利率</div>
-        <div class="summary-number warning">{{ latest_monthly_kpi.gross_profit_rate_display }}</div>
-    </div>
-
-    <div class="summary-card">
-        <div class="summary-label">営業利益率</div>
-        <div class="summary-number danger">{{ latest_monthly_kpi.operating_profit_rate_display }}</div>
-    </div>
-
-    <div class="summary-card">
-        <div class="summary-label">現預金</div>
-        <div class="summary-number">{{ latest_monthly_kpi.cash_balance_display }}</div>
-    </div>
-</div>
-{% else %}
-<div class="card">
-    <h2>最新 経営KPI</h2>
-    <p>経営KPIデータはまだありません。</p>
-    <p>
-        <a href="{% url 'kpi:kpi_home' %}">経営指標ダッシュボードを確認する</a>
-    </p>
 </div>
 {% endif %}
 
 {% if latest_manufacturing_kpi %}
 <div class="card">
     <h2>最新 製造KPI</h2>
-    <p class="text-muted">
-        対象月：{{ latest_manufacturing_kpi.year_month }}　
-        部署：{{ latest_manufacturing_kpi.department }}
-    </p>
-</div>
+    <p>対象月：{{ latest_manufacturing_kpi.year_month }}</p>
 
-<div class="summary-grid">
-    <div class="summary-card">
-        <div class="summary-label">生産数量</div>
-        <div class="summary-number">{{ latest_manufacturing_kpi.production_volume }}</div>
-    </div>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">生産数量</div>
+            <div class="summary-number">
+                {{ latest_manufacturing_kpi.production_volume|amount }}
+                <small>{{ latest_manufacturing_kpi.production_volume_diff_display }}</small>
+            </div>
+        </div>
 
-    <div class="summary-card">
-        <div class="summary-label">不良率</div>
-        <div class="summary-number danger">{{ latest_manufacturing_kpi.defect_rate_display }}</div>
-    </div>
+        <div class="summary-card">
+            <div class="summary-label">不良率</div>
+            <div class="summary-number danger">
+                {{ latest_manufacturing_kpi.defect_rate_display }}
+                <small>{{ latest_manufacturing_kpi.defect_rate_diff_display }}</small>
+            </div>
+        </div>
 
-    <div class="summary-card">
-        <div class="summary-label">歩留まり</div>
-        <div class="summary-number warning">{{ latest_manufacturing_kpi.yield_rate_display }}</div>
-    </div>
+        <div class="summary-card">
+            <div class="summary-label">歩留まり</div>
+            <div class="summary-number warning">
+                {{ latest_manufacturing_kpi.yield_rate_display }}
+                <small>{{ latest_manufacturing_kpi.yield_rate_diff_display }}</small>
+            </div>
+        </div>
 
-    <div class="summary-card">
-        <div class="summary-label">設備稼働率</div>
-        <div class="summary-number">{{ latest_manufacturing_kpi.equipment_availability_display }}</div>
+        <div class="summary-card">
+            <div class="summary-label">設備稼働率</div>
+            <div class="summary-number">
+                {{ latest_manufacturing_kpi.equipment_availability_display }}
+                <small>{{ latest_manufacturing_kpi.equipment_availability_diff_display }}</small>
+            </div>
+        </div>
     </div>
-</div>
-{% else %}
-<div class="card">
-    <h2>最新 製造KPI</h2>
-    <p>製造KPIデータはまだありません。</p>
-    <p>
-        <a href="{% url 'kpi:manufacturing_kpi_list' %}">製造KPIを確認する</a>
-    </p>
 </div>
 {% endif %}
 
 <div class="summary-grid">
     <div class="summary-card">
-        <div class="summary-label">文書件数</div>
+        <div class="summary-label">文書台帳</div>
         <div class="summary-number">{{ total_documents }}</div>
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">未整備・要確認文書</div>
+        <div class="summary-label">未整備文書</div>
         <div class="summary-number danger">{{ not_ready_document_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">タスク</div>
+        <div class="summary-number">{{ total_tasks }}</div>
     </div>
 
     <div class="summary-card">
         <div class="summary-label">要対応タスク</div>
         <div class="summary-number warning">{{ action_task_count }}</div>
     </div>
-
-    <div class="summary-card">
-        <div class="summary-label">高優先度タスク</div>
-        <div class="summary-number danger">{{ high_priority_task_count }}</div>
-    </div>
 </div>
 
 <div class="summary-grid">
     <div class="summary-card">
-        <div class="summary-label">承認待ち申請</div>
+        <div class="summary-label">承認待ち</div>
         <div class="summary-number warning">{{ approval_waiting_request_count }}</div>
     </div>
 
@@ -141,39 +145,40 @@
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">製造 未整備</div>
+        <div class="summary-label">未整備</div>
         <div class="summary-number danger">{{ manufacturing_not_ready_count }}</div>
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">製造 要確認</div>
+        <div class="summary-label">要確認</div>
         <div class="summary-number warning">{{ manufacturing_need_check_count }}</div>
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">製造 高リスク</div>
+        <div class="summary-label">高リスク</div>
         <div class="summary-number danger">{{ manufacturing_high_risk_count }}</div>
     </div>
-    <div class="summary-grid">
-        <div class="summary-card">
-            <div class="summary-label">製造管理の要対応項目はありません。</div>
-            <div class="summary-number">{{ manufacturing_incident_total_count }}</div>
-        </div>
-    
-        <div class="summary-card">
-            <div class="summary-label">未整備</div>
-            <div class="summary-number danger">{{ manufacturing_incident_high_count }}</div>
-        </div>
-    
-        <div class="summary-card">
-            <div class="summary-label">要確認</div>
-            <div class="summary-number warning">{{ manufacturing_incident_open_count }}</div>
-        </div>
-    
-        <div class="summary-card">
-            <div class="summary-label">高リスク</div>
-            <div class="summary-number danger">{{ manufacturing_incident_critical_open_count }}</div>
-        </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">製造インシデント</div>
+        <div class="summary-number">{{ manufacturing_incident_total_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">重大/高</div>
+        <div class="summary-number danger">{{ manufacturing_incident_high_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">未対応</div>
+        <div class="summary-number warning">{{ manufacturing_incident_open_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">重大未対応</div>
+        <div class="summary-number danger">{{ manufacturing_incident_critical_open_count }}</div>
     </div>
 </div>
 
@@ -211,7 +216,7 @@
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">高優先度 未読通知</div>
+        <div class="summary-label">高優先度 未読</div>
         <div class="summary-number danger">{{ high_priority_unread_notification_count }}</div>
     </div>
 
@@ -228,61 +233,47 @@
 
     {% if latest_notifications %}
     <div class="table-wrap scroll-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>状態</th>
-                        <th>優先度</th>
-                        <th>カテゴリ</th>
-                        <th>タイトル</th>
-                        <th>対象者</th>
-                        <th>作成日時</th>
-                        <th>詳細</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for notification in latest_notifications %}
-                    <tr>
-                        <td>{{ notification.id }}</td>
-                        <td>
-                            {% if notification.is_read == "1" %}
-                                <span class="badge-status">既読</span>
-                            {% else %}
-                                <span class="badge-middle">未読</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if notification.priority == "高" %}
-                                <span class="badge-high">高</span>
-                            {% elif notification.priority == "中" %}
-                                <span class="badge-middle">中</span>
-                            {% elif notification.priority == "低" %}
-                                <span class="badge-low">低</span>
-                            {% else %}
-                                {{ notification.priority }}
-                            {% endif %}
-                        </td>
-                        <td>{{ notification.category }}</td>
-                        <td>{{ notification.title }}</td>
-                        <td>{{ notification.target_user }}</td>
-                        <td>{{ notification.created_at }}</td>
-                        <td>
-                            <a href="{% url 'notifications:notification_detail' notification.id %}">
-                                詳細
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <p>
-            <a href="{% url 'notifications:notification_list' %}">
-                通知一覧で確認する
-            </a>
-        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>状態</th>
+                    <th>優先度</th>
+                    <th>カテゴリ</th>
+                    <th>タイトル</th>
+                    <th>対象者</th>
+                    <th>作成日時</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notification in latest_notifications %}
+                <tr>
+                    <td>{{ notification.id }}</td>
+                    <td>{{ notification.is_read }}</td>
+                    <td>
+                        {% if notification.priority == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif notification.priority == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif notification.priority == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ notification.priority }}
+                        {% endif %}
+                    </td>
+                    <td>{{ notification.category }}</td>
+                    <td>{{ notification.title }}</td>
+                    <td>{{ notification.target_user }}</td>
+                    <td>{{ notification.created_at }}</td>
+                    <td>
+                        <a href="{% url 'notifications:notification_detail' notification.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
         <p>通知はありません。</p>
     {% endif %}
@@ -293,169 +284,47 @@
 
     {% if latest_governance_items %}
     <div class="table-wrap scroll-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>カテゴリ</th>
-                        <th>文書・台帳名</th>
-                        <th>重要度</th>
-                        <th>主管部署</th>
-                        <th>担当者</th>
-                        <th>状態</th>
-                        <th>リスク</th>
-                        <th>次回確認日</th>
-                        <th>詳細</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in latest_governance_items %}
-                    <tr>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.category }}</td>
-                        <td>{{ item.item_name }}</td>
-                        <td>{{ item.required_level }}</td>
-                        <td>{{ item.owner_department }}</td>
-                        <td>{{ item.owner }}</td>
-                        <td>
-                            <span class="badge-status">{{ item.status }}</span>
-                        </td>
-                        <td>
-                            {% if item.risk_level == "高" %}
-                                <span class="badge-high">高</span>
-                            {% elif item.risk_level == "中" %}
-                                <span class="badge-middle">中</span>
-                            {% elif item.risk_level == "低" %}
-                                <span class="badge-low">低</span>
-                            {% else %}
-                                {{ item.risk_level }}
-                            {% endif %}
-                        </td>
-                        <td>{{ item.next_review_date }}</td>
-                        <td>
-                            <a href="{% url 'governance:governance_item_detail' item.id %}">
-                                詳細
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <p>
-            <a href="{% url 'governance:governance_item_list' %}">
-                ガバナンス文書台帳で確認する
-            </a>
-        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>カテゴリ</th>
+                    <th>文書・台帳名</th>
+                    <th>重要度</th>
+                    <th>状態</th>
+                    <th>リスク</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in latest_governance_items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.required_level }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>
+                        {% if item.risk_level == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif item.risk_level == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif item.risk_level == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ item.risk_level }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'governance:governance_item_detail' item.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-        <p>ガバナンスの要対応項目はありません。</p>
-    {% endif %}
-</div>
-
-<div class="card">
-    <h2>未整備・要確認文書</h2>
-
-    {% if not_ready_documents %}
-    <div class="table-wrap scroll-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>文書名</th>
-                        <th>カテゴリ</th>
-                        <th>主管部署</th>
-                        <th>状態</th>
-                        <th>次回確認日</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for doc in not_ready_documents %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'documents:document_detail' doc.id %}">
-                                {{ doc.id }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'documents:document_detail' doc.id %}">
-                                {{ doc.document_name }}
-                            </a>
-                        </td>
-                        <td>{{ doc.category }}</td>
-                        <td>{{ doc.owner_dept }}</td>
-                        <td>{{ doc.status }}</td>
-                        <td>{{ doc.next_review_date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <p>
-            <a href="{% url 'documents:document_list' %}?q=未整備">文書台帳で確認する</a>
-        </p>
-    {% else %}
-        <p>未整備・要確認の文書はありません。</p>
-    {% endif %}
-</div>
-
-<div class="card">
-    <h2>要対応タスク</h2>
-
-    {% if action_tasks %}
-    <div class="table-wrap scroll-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>タスク名</th>
-                        <th>カテゴリ</th>
-                        <th>担当</th>
-                        <th>期限</th>
-                        <th>状態</th>
-                        <th>優先度</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for task in action_tasks %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'tasks:task_detail' task.id %}">
-                                {{ task.id }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'tasks:task_detail' task.id %}">
-                                {{ task.task_name }}
-                            </a>
-                        </td>
-                        <td>{{ task.category }}</td>
-                        <td>{{ task.owner }}</td>
-                        <td>{{ task.due_date }}</td>
-                        <td>{{ task.status }}</td>
-                        <td>
-                            {% if task.priority == "高" %}
-                                <span class="badge-high">高</span>
-                            {% elif task.priority == "中" %}
-                                <span class="badge-middle">中</span>
-                            {% elif task.priority == "低" %}
-                                <span class="badge-low">低</span>
-                            {% else %}
-                                {{ task.priority }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <p>
-            <a href="{% url 'tasks:task_list' %}">タスク管理で確認する</a>
-        </p>
-    {% else %}
-        <p>要対応タスクはありません。</p>
+        <p>ガバナンス要対応項目はありません。</p>
     {% endif %}
 </div>
 
@@ -464,135 +333,202 @@
 
     {% if latest_manufacturing_items %}
     <div class="table-wrap scroll-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>領域</th>
-                        <th>管理項目</th>
-                        <th>担当部署</th>
-                        <th>担当者</th>
-                        <th>リスク</th>
-                        <th>状態</th>
-                        <th>次回確認日</th>
-                        <th>詳細</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in latest_manufacturing_items %}
-                    <tr>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.area }}</td>
-                        <td>{{ item.item_name }}</td>
-                        <td>{{ item.owner_department }}</td>
-                        <td>{{ item.owner }}</td>
-                        <td>
-                            {% if item.risk_level == "高" %}
-                                <span class="badge-high">高</span>
-                            {% elif item.risk_level == "中" %}
-                                <span class="badge-middle">中</span>
-                            {% elif item.risk_level == "低" %}
-                                <span class="badge-low">低</span>
-                            {% else %}
-                                {{ item.risk_level }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="badge-status">{{ item.status }}</span>
-                        </td>
-                        <td>{{ item.next_check_date }}</td>
-                        <td>
-                            <a href="{% url 'manufacturing:management_item_detail' item.id %}">
-                                詳細
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h2>製造インシデント 最新状況</h2>
-        
-            {% if latest_manufacturing_incidents %}
-            <div class="table-wrap scroll-list">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>発生日</th>
-                                <th>領域</th>
-                                <th>タイトル</th>
-                                <th>重大度</th>
-                                <th>担当者</th>
-                                <th>状態</th>
-                                <th>関連タスク</th>
-                                <th>詳細</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for incident in latest_manufacturing_incidents %}
-                            <tr>
-                                <td>{{ incident.id }}</td>
-                                <td>{{ incident.incident_date }}</td>
-                                <td>{{ incident.area }}</td>
-                                <td>{{ incident.title }}</td>
-                                <td>
-                                    {% if incident.severity == "重大" or incident.severity == "高" %}
-                                        <span class="badge-high">{{ incident.severity }}</span>
-                                    {% elif incident.severity == "中" %}
-                                        <span class="badge-middle">{{ incident.severity }}</span>
-                                    {% elif incident.severity == "低" %}
-                                        <span class="badge-low">{{ incident.severity }}</span>
-                                    {% else %}
-                                        {{ incident.severity }}
-                                    {% endif %}
-                                </td>
-                                <td>{{ incident.owner }}</td>
-                                <td>
-                                    <span class="badge-status">{{ incident.status }}</span>
-                                </td>
-                                <td>
-                                    {% if incident.related_task_id %}
-                                        <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
-                                            {{ incident.related_task_id }}
-                                        </a>
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'manufacturing:incident_detail' incident.id %}">
-                                        詳細
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-        
-                <p>
-                    <a href="{% url 'manufacturing:incident_list' %}">
-                        製造インシデント一覧で確認する
-                    </a>
-                </p>
-            {% else %}
-                <p>製造インシデントはまだありません。</p>
-                <p>
-                    <a href="{% url 'manufacturing:incident_create' %}">
-                        インシデントを登録する
-                    </a>
-                </p>
-            {% endif %}
-        </div>
-        <p>
-            <a href="{% url 'manufacturing:management_item_list' %}">
-                製造管理一覧で確認する
-            </a>
-        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>領域</th>
+                    <th>管理項目</th>
+                    <th>担当部署</th>
+                    <th>担当者</th>
+                    <th>リスク</th>
+                    <th>状態</th>
+                    <th>次回確認日</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in latest_manufacturing_items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.area }}</td>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.owner_department }}</td>
+                    <td>{{ item.owner }}</td>
+                    <td>
+                        {% if item.risk_level == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif item.risk_level == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif item.risk_level == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ item.risk_level }}
+                        {% endif %}
+                    </td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.next_check_date }}</td>
+                    <td>
+                        <a href="{% url 'manufacturing:management_item_detail' item.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
         <p>製造管理の要対応項目はありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>製造インシデント 最新状況</h2>
+
+    {% if latest_manufacturing_incidents %}
+    <div class="table-wrap scroll-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>発生日</th>
+                    <th>領域</th>
+                    <th>タイトル</th>
+                    <th>重大度</th>
+                    <th>担当者</th>
+                    <th>状態</th>
+                    <th>関連タスク</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incident in latest_manufacturing_incidents %}
+                <tr>
+                    <td>{{ incident.id }}</td>
+                    <td>{{ incident.incident_date }}</td>
+                    <td>{{ incident.area }}</td>
+                    <td>{{ incident.title }}</td>
+                    <td>
+                        {% if incident.severity == "重大" or incident.severity == "高" %}
+                            <span class="badge-high">{{ incident.severity }}</span>
+                        {% elif incident.severity == "中" %}
+                            <span class="badge-middle">{{ incident.severity }}</span>
+                        {% elif incident.severity == "低" %}
+                            <span class="badge-low">{{ incident.severity }}</span>
+                        {% else %}
+                            {{ incident.severity }}
+                        {% endif %}
+                    </td>
+                    <td>{{ incident.owner }}</td>
+                    <td>{{ incident.status }}</td>
+                    <td>
+                        {% if incident.related_task_id %}
+                            <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
+                                {{ incident.related_task_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'manufacturing:incident_detail' incident.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>製造インシデントはありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>未整備・要確認文書</h2>
+
+    {% if not_ready_documents %}
+    <div class="table-wrap scroll-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>文書名</th>
+                    <th>カテゴリ</th>
+                    <th>主管部署</th>
+                    <th>状態</th>
+                    <th>優先度</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in not_ready_documents %}
+                <tr>
+                    <td>{{ doc.id }}</td>
+                    <td>{{ doc.document_name }}</td>
+                    <td>{{ doc.category }}</td>
+                    <td>{{ doc.owner_department }}</td>
+                    <td>{{ doc.status }}</td>
+                    <td>{{ doc.priority }}</td>
+                    <td>
+                        <a href="{% url 'documents:document_detail' doc.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>未整備・要確認文書はありません。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>要対応タスク</h2>
+
+    {% if action_tasks %}
+    <div class="table-wrap scroll-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>タスク名</th>
+                    <th>カテゴリ</th>
+                    <th>担当</th>
+                    <th>期限</th>
+                    <th>状態</th>
+                    <th>優先度</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in action_tasks %}
+                <tr>
+                    <td>{{ task.id }}</td>
+                    <td>{{ task.task_name }}</td>
+                    <td>{{ task.category }}</td>
+                    <td>{{ task.owner }}</td>
+                    <td>{{ task.due_date }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>
+                        {% if task.priority == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif task.priority == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif task.priority == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ task.priority }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'tasks:task_detail' task.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>要対応タスクはありません。</p>
     {% endif %}
 </div>
 
@@ -601,39 +537,35 @@
 
     {% if latest_diagnoses %}
     <div class="table-wrap scroll-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>診断ID</th>
-                        <th>回答日時</th>
-                        <th>回答数</th>
-                        <th>要対応数</th>
-                        <th>自動生成タスク数</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for diagnosis in latest_diagnoses %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'questionnaires:diagnosis_detail' diagnosis.diagnosis_id %}">
-                                {{ diagnosis.diagnosis_id }}
-                            </a>
-                        </td>
-                        <td>{{ diagnosis.answered_at }}</td>
-                        <td>{{ diagnosis.answer_count }}</td>
-                        <td>{{ diagnosis.problem_count }}</td>
-                        <td>{{ diagnosis.generated_task_count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <p>
-            <a href="{% url 'questionnaires:diagnosis_history' %}">診断履歴をすべて見る</a>
-        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>診断ID</th>
+                    <th>診断名</th>
+                    <th>回答者</th>
+                    <th>結果</th>
+                    <th>回答日時</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for diagnosis in latest_diagnoses %}
+                <tr>
+                    <td>{{ diagnosis.diagnosis_id }}</td>
+                    <td>{{ diagnosis.questionnaire_title }}</td>
+                    <td>{{ diagnosis.answered_by }}</td>
+                    <td>{{ diagnosis.result_label }}</td>
+                    <td>{{ diagnosis.answered_at }}</td>
+                    <td>
+                        <a href="{% url 'questionnaires:diagnosis_detail' diagnosis.diagnosis_id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-        <p>診断履歴はまだありません。</p>
+        <p>診断履歴はありません。</p>
     {% endif %}
 </div>
 {% endblock %}

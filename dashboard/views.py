@@ -6,7 +6,10 @@ from questionnaires.services import load_diagnosis_summaries
 from workflows.services import load_requests
 from expenses.services import load_expenses
 from manufacturing.services import load_incidents, load_management_items
-from kpi.services import get_latest_monthly_kpi, get_latest_manufacturing_kpi
+from kpi.services import (
+    get_latest_manufacturing_kpi_with_comparison,
+    get_latest_monthly_kpi_with_comparison,
+)
 from governance.services import load_governance_items
 from notifications.services import load_notifications, load_unread_notifications
 
@@ -23,8 +26,8 @@ def home(request):
     notifications = load_notifications()
     unread_notifications = load_unread_notifications()
 
-    latest_monthly_kpi = get_latest_monthly_kpi()
-    latest_manufacturing_kpi = get_latest_manufacturing_kpi()
+    latest_monthly_kpi = get_latest_monthly_kpi_with_comparison()
+    latest_manufacturing_kpi = get_latest_manufacturing_kpi_with_comparison()
 
     not_ready_statuses = [
         "未整備",
@@ -41,14 +44,10 @@ def home(request):
         "要対応",
     ]
 
-    total_documents = len(documents)
-
     not_ready_documents = [
         doc for doc in documents
         if doc.get("status") in not_ready_statuses
     ]
-
-    total_tasks = len(tasks)
 
     action_tasks = [
         task for task in tasks
@@ -131,11 +130,9 @@ def home(request):
         if item.get("status") in ["未整備", "要確認", "要改善", "期限超過"]
     ]
 
-    latest_manufacturing_items = manufacturing_action_items[:20]
-
     manufacturing_incident_high = [
-    incident for incident in manufacturing_incidents
-    if incident.get("severity") in ["重大", "高"]
+        incident for incident in manufacturing_incidents
+        if incident.get("severity") in ["重大", "高"]
     ]
 
     manufacturing_incident_open = [
@@ -149,7 +146,7 @@ def home(request):
         and incident.get("status") in ["未対応", "対応中", "再発防止確認中"]
     ]
 
-    latest_manufacturing_incidents = manufacturing_incident_critical_open[:20]
+    latest_manufacturing_incidents = manufacturing_incidents[:20]
 
     governance_not_ready = [
         item for item in governance_items
@@ -186,23 +183,21 @@ def home(request):
         if item.get("status") in ["未整備", "要確認", "要改定", "期限超過"]
     ]
 
-    latest_governance_items = governance_action_items[:20]
-
     high_priority_unread_notifications = [
         notification for notification in unread_notifications
         if notification.get("priority") == "高"
     ]
 
-    latest_notifications = notifications[:20]
-
     context = {
-        "total_documents": total_documents,
+        "total_documents": len(documents),
         "not_ready_document_count": len(not_ready_documents),
-        "total_tasks": total_tasks,
+        "not_ready_documents": not_ready_documents[:20],
+
+        "total_tasks": len(tasks),
         "action_task_count": len(action_tasks),
         "high_priority_task_count": len(high_priority_tasks),
-        "not_ready_documents": not_ready_documents[:20],
         "action_tasks": action_tasks[:20],
+
         "latest_diagnoses": latest_diagnoses,
 
         "total_request_count": len(workflow_requests),
@@ -222,12 +217,8 @@ def home(request):
         "manufacturing_need_improvement_count": len(manufacturing_need_improvement),
         "manufacturing_overdue_count": len(manufacturing_overdue),
         "manufacturing_high_risk_count": len(manufacturing_high_risk),
-        "latest_manufacturing_items": latest_manufacturing_items,
-        "manufacturing_incident_total_count": len(manufacturing_incidents),
-        "manufacturing_incident_high_count": len(manufacturing_incident_high),
-        "manufacturing_incident_open_count": len(manufacturing_incident_open),
-        "manufacturing_incident_critical_open_count": len(manufacturing_incident_critical_open),
-        "latest_manufacturing_incidents": latest_manufacturing_incidents,
+        "latest_manufacturing_items": manufacturing_action_items[:20],
+
         "manufacturing_incident_total_count": len(manufacturing_incidents),
         "manufacturing_incident_high_count": len(manufacturing_incident_high),
         "manufacturing_incident_open_count": len(manufacturing_incident_open),
@@ -241,16 +232,15 @@ def home(request):
         "governance_overdue_count": len(governance_overdue),
         "governance_high_risk_count": len(governance_high_risk),
         "governance_required_count": len(governance_required),
-        "latest_governance_items": latest_governance_items,
+        "latest_governance_items": governance_action_items[:20],
 
         "notification_total_count": len(notifications),
         "unread_notification_count": len(unread_notifications),
         "high_priority_unread_notification_count": len(high_priority_unread_notifications),
-        "latest_notifications": latest_notifications,
+        "latest_notifications": notifications[:20],
 
         "latest_monthly_kpi": latest_monthly_kpi,
         "latest_manufacturing_kpi": latest_manufacturing_kpi,
-        
     }
 
     return render(request, "dashboard/home.html", context)

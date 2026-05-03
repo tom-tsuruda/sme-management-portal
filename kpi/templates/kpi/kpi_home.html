@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load format_filters %}
 
 {% block title %}経営指標{% endblock %}
 
@@ -21,7 +22,10 @@
 
     <div class="summary-card">
         <div class="summary-label">売上高</div>
-        <div class="summary-number">{{ latest_monthly_kpi.sales_amount_display }}</div>
+        <div class="summary-number">
+            {{ latest_monthly_kpi.sales_amount_display }}
+            <small>{{ latest_monthly_kpi.sales_amount_diff_display }}</small>
+        </div>
     </div>
 
     <div class="summary-card">
@@ -31,7 +35,10 @@
 
     <div class="summary-card">
         <div class="summary-label">営業利益率</div>
-        <div class="summary-number danger">{{ latest_monthly_kpi.operating_profit_rate_display }}</div>
+        <div class="summary-number danger">
+            {{ latest_monthly_kpi.operating_profit_rate_display }}
+            <small>{{ latest_monthly_kpi.operating_profit_rate_diff_display }}</small>
+        </div>
     </div>
 </div>
 {% endif %}
@@ -45,7 +52,10 @@
 
     <div class="summary-card">
         <div class="summary-label">不良率</div>
-        <div class="summary-number danger">{{ latest_manufacturing_kpi.defect_rate_display }}</div>
+        <div class="summary-number danger">
+            {{ latest_manufacturing_kpi.defect_rate_display }}
+            <small>{{ latest_manufacturing_kpi.defect_rate_diff_display }}</small>
+        </div>
     </div>
 
     <div class="summary-card">
@@ -55,7 +65,10 @@
 
     <div class="summary-card">
         <div class="summary-label">設備稼働率</div>
-        <div class="summary-number">{{ latest_manufacturing_kpi.equipment_availability_display }}</div>
+        <div class="summary-number">
+            {{ latest_manufacturing_kpi.equipment_availability_display }}
+            <small>{{ latest_manufacturing_kpi.equipment_availability_diff_display }}</small>
+        </div>
     </div>
 </div>
 {% endif %}
@@ -138,7 +151,7 @@
                 <tr>
                     <td>{{ row.year_month }}</td>
                     <td>{{ row.department }}</td>
-                    <td>{{ row.production_volume }}</td>
+                    <td>{{ row.production_volume|amount }}</td>
                     <td>{{ row.defect_rate_display }}</td>
                     <td>{{ row.yield_rate_display }}</td>
                     <td>{{ row.on_time_delivery_rate_display }}</td>

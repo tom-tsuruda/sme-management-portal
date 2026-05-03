@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}月次経営KPI登録{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>月次経営KPI登録</h2>
+    <p>売上・粗利・営業利益・現預金など、月次の経営指標を登録します。</p>
+
+    <p>
+        <a href="{% url 'kpi:monthly_kpi_list' %}">← 月次経営KPI一覧へ戻る</a>
+    </p>
+</div>
+
+<div class="card">
+    <form method="post" action="{% url 'kpi:monthly_kpi_create' %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>対象月</label><br>
+            <input type="month" name="year_month" class="input-middle" required>
+        </div>
+
+        <div class="form-row">
+            <label>売上高</label><br>
+            <input type="text" name="sales_amount" class="amount-input" placeholder="例：14800000">
+        </div>
+
+        <div class="form-row">
+            <label>粗利</label><br>
+            <input type="text" name="gross_profit" class="amount-input" placeholder="例：4900000">
+        </div>
+
+        <div class="form-row">
+            <label>営業利益</label><br>
+            <input type="text" name="operating_profit" class="amount-input" placeholder="例：1280000">
+        </div>
+
+        <div class="form-row">
+            <label>現預金</label><br>
+            <input type="text" name="cash_balance" class="amount-input" placeholder="例：9500000">
+        </div>
+
+        <div class="form-row">
+            <label>売掛金</label><br>
+            <input type="text" name="accounts_receivable" class="amount-input" placeholder="例：5200000">
+        </div>
+
+        <div class="form-row">
+            <label>買掛金</label><br>
+            <input type="text" name="accounts_payable" class="amount-input" placeholder="例：2900000">
+        </div>
+
+        <div class="form-row">
+            <label>経費合計</label><br>
+            <input type="text" name="expense_total" class="amount-input" placeholder="例：3620000">
+        </div>
+
+        <div class="form-row">
+            <label>新規受注件数</label><br>
+            <input type="text" name="new_orders" class="amount-input" placeholder="例：25">
+        </div>
+
+        <div class="form-row">
+            <label>受注残</label><br>
+            <input type="text" name="order_backlog" class="amount-input" placeholder="例：11100000">
+        </div>
+
+        <div class="form-row">
+            <label>コメント</label><br>
+            <textarea name="comment" rows="4" class="input-full" placeholder="例：受注好調。粗利率も改善。"></textarea>
+        </div>
+
+        <p>
+            <button type="submit">登録する</button>
+        </p>
+    </form>
+</div>
+{% endblock %}

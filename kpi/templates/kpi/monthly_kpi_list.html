@@ -4,7 +4,9 @@
 
 {% block content %}
 <h2>月次経営KPI</h2>
-
+<p>
+    <a href="{% url 'kpi:monthly_kpi_create' %}">＋ 月次経営KPIを登録</a>
+</p>
 <div class="card">
     <form method="get" class="search-form">
         <input type="text" name="q" value="{{ keyword }}" placeholder="年月・コメントで検索">

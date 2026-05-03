@@ -7,6 +7,79 @@
 
 {% if kpi %}
 <div class="card">
+    <h2>前月比較</h2>
+
+    {% if kpi.previous_year_month %}
+        <p>
+            比較対象：{{ kpi.previous_year_month }}　
+            {{ kpi.comparison_comment }}
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>現在値</th>
+                        <th>前月差</th>
+                        <th>前月比</th>
+                        <th>判定</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>売上高</td>
+                        <td>{{ kpi.sales_amount_display }}</td>
+                        <td>{{ kpi.sales_amount_diff_display }}</td>
+                        <td>{{ kpi.sales_amount_change_rate_display }}</td>
+                        <td><span class="badge-status">{{ kpi.sales_amount_trend }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>粗利率</td>
+                        <td>{{ kpi.gross_profit_rate_display }}</td>
+                        <td>{{ kpi.gross_profit_rate_diff_display }}</td>
+                        <td>-</td>
+                        <td><span class="badge-status">{{ kpi.gross_profit_rate_trend }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>営業利益率</td>
+                        <td>{{ kpi.operating_profit_rate_display }}</td>
+                        <td>{{ kpi.operating_profit_rate_diff_display }}</td>
+                        <td>-</td>
+                        <td><span class="badge-status">{{ kpi.operating_profit_rate_trend }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>現預金</td>
+                        <td>{{ kpi.cash_balance_display }}</td>
+                        <td>{{ kpi.cash_balance_diff_display }}</td>
+                        <td>-</td>
+                        <td><span class="badge-status">{{ kpi.cash_balance_trend }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>経費合計</td>
+                        <td>{{ kpi.expense_total_display }}</td>
+                        <td>{{ kpi.expense_total_diff_display }}</td>
+                        <td>-</td>
+                        <td><span class="badge-status">{{ kpi.expense_total_trend }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>受注残</td>
+                        <td>{{ kpi.order_backlog_display }}</td>
+                        <td>{{ kpi.order_backlog_diff_display }}</td>
+                        <td>-</td>
+                        <td><span class="badge-status">{{ kpi.order_backlog_trend }}</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>{{ kpi.comparison_comment }}</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>基本情報</h2>
+
     <table>
         <tr>
             <th>ID</th>
