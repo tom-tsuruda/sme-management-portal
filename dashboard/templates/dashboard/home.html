@@ -154,6 +154,27 @@
         <div class="summary-label">製造 高リスク</div>
         <div class="summary-number danger">{{ manufacturing_high_risk_count }}</div>
     </div>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">製造管理の要対応項目はありません。</div>
+            <div class="summary-number">{{ manufacturing_incident_total_count }}</div>
+        </div>
+    
+        <div class="summary-card">
+            <div class="summary-label">未整備</div>
+            <div class="summary-number danger">{{ manufacturing_incident_high_count }}</div>
+        </div>
+    
+        <div class="summary-card">
+            <div class="summary-label">要確認</div>
+            <div class="summary-number warning">{{ manufacturing_incident_open_count }}</div>
+        </div>
+    
+        <div class="summary-card">
+            <div class="summary-label">高リスク</div>
+            <div class="summary-number danger">{{ manufacturing_incident_critical_open_count }}</div>
+        </div>
+    </div>
 </div>
 
 <div class="summary-grid">
@@ -168,12 +189,12 @@
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">ガバナンス 未整備</div>
+        <div class="summary-label">未整備</div>
         <div class="summary-number danger">{{ governance_not_ready_count }}</div>
     </div>
 
     <div class="summary-card">
-        <div class="summary-label">ガバナンス 高リスク</div>
+        <div class="summary-label">高リスク</div>
         <div class="summary-number danger">{{ governance_high_risk_count }}</div>
     </div>
 </div>
@@ -202,25 +223,11 @@
     </div>
 </div>
 
-<div class="menu-list">
-    <a class="menu-item" href="{% url 'documents:document_list' %}">文書台帳</a>
-    <a class="menu-item" href="{% url 'tasks:task_list' %}">タスク管理</a>
-    <a class="menu-item" href="{% url 'questionnaires:question_list' %}">質問票</a>
-    <a class="menu-item" href="{% url 'questionnaires:diagnosis_history' %}">診断履歴</a>
-    <a class="menu-item" href="{% url 'workflows:request_list' %}">申請・承認</a>
-    <a class="menu-item" href="{% url 'expenses:expense_list' %}">経費・旅費精算</a>
-    <a class="menu-item" href="{% url 'organizations:organization_home' %}">組織マスタ</a>
-    <a class="menu-item" href="{% url 'manufacturing:management_item_list' %}">製造管理</a>
-    <a class="menu-item" href="{% url 'kpi:kpi_home' %}">経営指標</a>
-    <a class="menu-item" href="{% url 'governance:governance_item_list' %}">ガバナンス</a>
-    <a class="menu-item" href="{% url 'notifications:notification_list' %}">通知</a>
-</div>
-
 <div class="card">
     <h2>最新通知</h2>
 
     {% if latest_notifications %}
-        <div class="table-wrap">
+    <div class="table-wrap scroll-list">
             <table>
                 <thead>
                     <tr>
@@ -285,7 +292,7 @@
     <h2>ガバナンス 要対応項目</h2>
 
     {% if latest_governance_items %}
-        <div class="table-wrap">
+    <div class="table-wrap scroll-list">
             <table>
                 <thead>
                     <tr>
@@ -350,7 +357,7 @@
     <h2>未整備・要確認文書</h2>
 
     {% if not_ready_documents %}
-        <div class="table-wrap">
+    <div class="table-wrap scroll-list">
             <table>
                 <thead>
                     <tr>
@@ -397,7 +404,7 @@
     <h2>要対応タスク</h2>
 
     {% if action_tasks %}
-        <div class="table-wrap">
+    <div class="table-wrap scroll-list">
             <table>
                 <thead>
                     <tr>
@@ -456,7 +463,7 @@
     <h2>製造管理 要対応項目</h2>
 
     {% if latest_manufacturing_items %}
-        <div class="table-wrap">
+    <div class="table-wrap scroll-list">
             <table>
                 <thead>
                     <tr>
@@ -504,7 +511,81 @@
                 </tbody>
             </table>
         </div>
-
+        <div class="card">
+            <h2>製造インシデント 最新状況</h2>
+        
+            {% if latest_manufacturing_incidents %}
+            <div class="table-wrap scroll-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>発生日</th>
+                                <th>領域</th>
+                                <th>タイトル</th>
+                                <th>重大度</th>
+                                <th>担当者</th>
+                                <th>状態</th>
+                                <th>関連タスク</th>
+                                <th>詳細</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for incident in latest_manufacturing_incidents %}
+                            <tr>
+                                <td>{{ incident.id }}</td>
+                                <td>{{ incident.incident_date }}</td>
+                                <td>{{ incident.area }}</td>
+                                <td>{{ incident.title }}</td>
+                                <td>
+                                    {% if incident.severity == "重大" or incident.severity == "高" %}
+                                        <span class="badge-high">{{ incident.severity }}</span>
+                                    {% elif incident.severity == "中" %}
+                                        <span class="badge-middle">{{ incident.severity }}</span>
+                                    {% elif incident.severity == "低" %}
+                                        <span class="badge-low">{{ incident.severity }}</span>
+                                    {% else %}
+                                        {{ incident.severity }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ incident.owner }}</td>
+                                <td>
+                                    <span class="badge-status">{{ incident.status }}</span>
+                                </td>
+                                <td>
+                                    {% if incident.related_task_id %}
+                                        <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
+                                            {{ incident.related_task_id }}
+                                        </a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'manufacturing:incident_detail' incident.id %}">
+                                        詳細
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        
+                <p>
+                    <a href="{% url 'manufacturing:incident_list' %}">
+                        製造インシデント一覧で確認する
+                    </a>
+                </p>
+            {% else %}
+                <p>製造インシデントはまだありません。</p>
+                <p>
+                    <a href="{% url 'manufacturing:incident_create' %}">
+                        インシデントを登録する
+                    </a>
+                </p>
+            {% endif %}
+        </div>
         <p>
             <a href="{% url 'manufacturing:management_item_list' %}">
                 製造管理一覧で確認する
@@ -519,7 +600,7 @@
     <h2>最新診断履歴</h2>
 
     {% if latest_diagnoses %}
-        <div class="table-wrap">
+    <div class="table-wrap scroll-list">
             <table>
                 <thead>
                     <tr>

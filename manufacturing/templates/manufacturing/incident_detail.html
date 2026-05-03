@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}製造インシデント詳細{% endblock %}
+
+{% block content %}
+<div class="card">
+    <p>
+        <a href="{% url 'manufacturing:incident_list' %}">← インシデント一覧へ戻る</a>
+    </p>
+
+    {% if incident %}
+        <h2>製造インシデント詳細</h2>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <td>{{ incident.id }}</td>
+            </tr>
+            <tr>
+                <th>発生日</th>
+                <td>{{ incident.incident_date }}</td>
+            </tr>
+            <tr>
+                <th>領域</th>
+                <td>{{ incident.area }}</td>
+            </tr>
+            <tr>
+                <th>タイトル</th>
+                <td>{{ incident.title }}</td>
+            </tr>
+            <tr>
+                <th>内容</th>
+                <td>{{ incident.description }}</td>
+            </tr>
+            <tr>
+                <th>重大度</th>
+                <td>
+                    {% if incident.severity == "重大" or incident.severity == "高" %}
+                        <span class="badge-high">{{ incident.severity }}</span>
+                    {% elif incident.severity == "中" %}
+                        <span class="badge-middle">{{ incident.severity }}</span>
+                    {% elif incident.severity == "低" %}
+                        <span class="badge-low">{{ incident.severity }}</span>
+                    {% else %}
+                        {{ incident.severity }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>検出者</th>
+                <td>{{ incident.detected_by }}</td>
+            </tr>
+            <tr>
+                <th>担当者</th>
+                <td>{{ incident.owner }}</td>
+            </tr>
+            <tr>
+                <th>状態</th>
+                <td>{{ incident.status }}</td>
+            </tr>
+            <tr>
+                <th>是正処置</th>
+                <td>{{ incident.corrective_action }}</td>
+            </tr>
+            <tr>
+                <th>再発防止策</th>
+                <td>{{ incident.preventive_action }}</td>
+            </tr>
+            <tr>
+                <th>関連管理項目</th>
+                <td>
+                    {% if incident.related_management_item_id %}
+                        <a href="{% url 'manufacturing:management_item_detail' incident.related_management_item_id %}">
+                            {{ incident.related_management_item_id }}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>関連タスク</th>
+                <td>
+                    {% if incident.related_task_id %}
+                        <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
+                            {{ incident.related_task_id }}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>作成日時</th>
+                <td>{{ incident.created_at }}</td>
+            </tr>
+            <tr>
+                <th>更新日時</th>
+                <td>{{ incident.updated_at }}</td>
+            </tr>
+        </table>
+    {% else %}
+        <h2>インシデントが見つかりません</h2>
+        <p>指定されたインシデントIDのデータがありません。</p>
+    {% endif %}
+</div>
+{% endblock %}

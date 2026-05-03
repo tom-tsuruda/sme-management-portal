@@ -146,6 +146,128 @@
     </form>
 </div>
 
+<div class="card">
+    <h2>監視記録登録</h2>
+
+    <p class="text-muted">
+        この管理項目について、点検・確認・監視結果を記録します。
+    </p>
+
+    <form method="post" action="{% url 'manufacturing:create_monitoring_record' item.id %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>確認日</label><br>
+            <input type="date" name="checked_at" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>確認者</label><br>
+            <div class="inline-form">
+                <select name="checked_by_employee_id" class="input-middle">
+                    <option value="">社員マスタから選択</option>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input
+                    type="text"
+                    name="checked_by"
+                    class="input-middle"
+                    value="{{ item.owner }}"
+                    placeholder="または手入力"
+                >
+            </div>
+            <small>社員マスタを選択した場合は、選択した社員名が優先されます。</small>
+        </div>
+
+        <div class="form-row">
+            <label>結果</label><br>
+            <select name="result" class="input-middle">
+                {% for result in monitoring_result_choices %}
+                    <option value="{{ result }}">{{ result }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>スコア</label><br>
+            <input type="text" name="score" class="amount-input" placeholder="例：80">
+        </div>
+
+        <div class="form-row">
+            <label>コメント</label><br>
+            <textarea name="comment" rows="4" class="input-full" placeholder="確認結果・気づき・問題点など"></textarea>
+        </div>
+
+        <div class="form-row">
+            <label>証跡メモ</label><br>
+            <input type="text" name="evidence_file" class="input-long" placeholder="例：点検表ファイル名、保管場所、写真番号など">
+        </div>
+
+        <div class="form-row">
+            <label>次アクション</label><br>
+            <input type="text" name="next_action" class="input-long" placeholder="例：最新版SDSを確認する">
+        </div>
+
+        <p>
+            <button type="submit">監視記録を登録</button>
+        </p>
+    </form>
+</div>
+
+<div class="card">
+    <h2>監視記録履歴</h2>
+
+    {% if monitoring_records %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>確認日</th>
+                        <th>確認者</th>
+                        <th>結果</th>
+                        <th>スコア</th>
+                        <th>コメント</th>
+                        <th>証跡</th>
+                        <th>次アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in monitoring_records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.checked_at }}</td>
+                        <td>{{ record.checked_by }}</td>
+                        <td>
+                            {% if record.result == "要改善" or record.result == "NG" or record.result == "異常" %}
+                                <span class="badge-high">{{ record.result }}</span>
+                            {% elif record.result == "要確認" %}
+                                <span class="badge-middle">{{ record.result }}</span>
+                            {% elif record.result == "OK" %}
+                                <span class="badge-low">{{ record.result }}</span>
+                            {% else %}
+                                {{ record.result }}
+                            {% endif %}
+                        </td>
+                        <td>{{ record.score }}</td>
+                        <td>{{ record.comment }}</td>
+                        <td>{{ record.evidence_file }}</td>
+                        <td>{{ record.next_action }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>監視記録はまだありません。</p>
+    {% endif %}
+</div>
+
 {% else %}
 <div class="card">
     <p>製造管理項目が見つかりません。</p>

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}製造インシデント登録{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>製造インシデント登録</h2>
+    <p>品質不良、設備故障、ヒヤリハット、安全・環境・IT/OT異常などを登録します。</p>
+
+    <p>
+        <a href="{% url 'manufacturing:incident_list' %}">← インシデント一覧へ戻る</a>
+    </p>
+</div>
+
+<div class="card">
+    <form method="post" action="{% url 'manufacturing:incident_create' %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>領域</label><br>
+            <select name="area" class="input-middle">
+                {% for choice in area_choices %}
+                    <option value="{{ choice }}">{{ choice }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>発生日</label><br>
+            <input type="date" name="incident_date" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>タイトル</label><br>
+            <input type="text" name="title" required class="input-long" placeholder="例：出荷検査で寸法不良を検出">
+        </div>
+
+        <div class="form-row">
+            <label>内容</label><br>
+            <textarea name="description" rows="5" class="input-full" placeholder="発生内容、検出場所、影響範囲など"></textarea>
+        </div>
+
+        <div class="form-row">
+            <label>重大度</label><br>
+            <select name="severity" class="input-middle">
+                {% for choice in severity_choices %}
+                    <option value="{{ choice }}" {% if choice == "中" %}selected{% endif %}>
+                        {{ choice }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>検出者</label><br>
+            <div class="inline-form">
+                <select name="detected_by_employee_id" class="input-middle">
+                    <option value="">社員マスタから選択</option>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="detected_by" class="input-middle" placeholder="または手入力">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>担当者</label><br>
+            <div class="inline-form">
+                <select name="owner_employee_id" class="input-middle">
+                    <option value="">社員マスタから選択</option>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="owner" class="input-middle" placeholder="または手入力">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>状態</label><br>
+            <select name="status" class="input-middle">
+                {% for choice in status_choices %}
+                    <option value="{{ choice }}" {% if choice == "未対応" %}selected{% endif %}>
+                        {{ choice }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>関連管理項目</label><br>
+            <select name="related_management_item_id" class="input-long">
+                <option value="">選択なし</option>
+                {% for item in management_items %}
+                    <option value="{{ item.id }}">
+                        {{ item.id }}：{{ item.area }} / {{ item.item_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>是正処置</label><br>
+            <textarea name="corrective_action" rows="4" class="input-full" placeholder="発生原因に対する直接対応"></textarea>
+        </div>
+
+        <div class="form-row">
+            <label>再発防止策</label><br>
+            <textarea name="preventive_action" rows="4" class="input-full" placeholder="再発防止のための仕組み・教育・標準化など"></textarea>
+        </div>
+
+        <div class="form-row">
+            <label>タスク自動作成</label><br>
+            <label>
+                <input type="checkbox" name="create_task" value="1">
+                このインシデント対応タスクを作成する
+            </label>
+        </div>
+
+        <div class="form-row">
+            <label>タスク期限</label><br>
+            <input type="date" name="due_date" class="input-middle">
+        </div>
+
+        <p>
+            <button type="submit">登録する</button>
+        </p>
+    </form>
+</div>
+{% endblock %}

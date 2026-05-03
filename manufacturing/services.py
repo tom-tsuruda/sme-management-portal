@@ -27,6 +27,37 @@ MANAGEMENT_ITEM_COLUMNS = [
     "updated_at",
 ]
 
+MONITORING_RECORD_COLUMNS = [
+    "id",
+    "management_item_id",
+    "checked_at",
+    "checked_by",
+    "result",
+    "score",
+    "comment",
+    "evidence_file",
+    "next_action",
+    "created_at",
+    "updated_at",
+]
+
+INCIDENT_COLUMNS = [
+    "id",
+    "area",
+    "incident_date",
+    "title",
+    "description",
+    "severity",
+    "detected_by",
+    "owner",
+    "status",
+    "corrective_action",
+    "preventive_action",
+    "related_management_item_id",
+    "related_task_id",
+    "created_at",
+    "updated_at",
+]
 
 def get_manufacturing_excel_path():
     return Path(settings.BASE_DIR) / "data" / "manufacturing_master.xlsx"
@@ -430,6 +461,14 @@ def ensure_manufacturing_excel():
             writer, sheet_name="management_items", index=False
         )
 
+        pd.DataFrame(columns=MONITORING_RECORD_COLUMNS).to_excel(
+            writer, sheet_name="monitoring_records", index=False
+        )
+
+        pd.DataFrame(columns=INCIDENT_COLUMNS).to_excel(
+            writer, sheet_name="incidents", index=False
+        )
+
 
 def format_japanese_date(value):
     if value == "" or value is None:
@@ -473,22 +512,339 @@ def read_management_items_df():
 
     return df
 
-def write_management_items_df(df):
+def read_monitoring_records_df():
+    ensure_manufacturing_excel()
     excel_path = get_manufacturing_excel_path()
 
-    df = df.copy()
+    try:
+        df = pd.read_excel(
+            excel_path,
+            sheet_name="monitoring_records",
+            dtype=str,
+        )
+        df = df.fillna("")
+    except Exception:
+        df = pd.DataFrame(columns=MONITORING_RECORD_COLUMNS)
 
-    for column in MANAGEMENT_ITEM_COLUMNS:
+    for column in MONITORING_RECORD_COLUMNS:
         if column not in df.columns:
             df[column] = ""
 
-    df = df[MANAGEMENT_ITEM_COLUMNS].copy()
+    df = df[MONITORING_RECORD_COLUMNS].copy()
 
-    for column in MANAGEMENT_ITEM_COLUMNS:
+    for column in MONITORING_RECORD_COLUMNS:
         df[column] = df[column].astype(str)
 
+    return df
+
+
+def write_monitoring_records_df(monitoring_df):
+    excel_path = get_manufacturing_excel_path()
+
+    management_df = read_management_items_df()
+    incident_df = read_incidents_df()
+
+    monitoring_df = monitoring_df.copy()
+
+    for column in MONITORING_RECORD_COLUMNS:
+        if column not in monitoring_df.columns:
+            monitoring_df[column] = ""
+
+    monitoring_df = monitoring_df[MONITORING_RECORD_COLUMNS].copy()
+
+    for column in MONITORING_RECORD_COLUMNS:
+        monitoring_df[column] = monitoring_df[column].astype(str)
+
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
-        df.to_excel(writer, sheet_name="management_items", index=False)
+        management_df.to_excel(writer, sheet_name="management_items", index=False)
+        monitoring_df.to_excel(writer, sheet_name="monitoring_records", index=False)
+        incident_df.to_excel(writer, sheet_name="incidents", index=False)
+
+
+def generate_next_monitoring_record_id(df):
+    if "id" not in df.columns or df.empty:
+        return "REC-001"
+
+    max_number = 0
+
+    for value in df["id"].dropna():
+        text = str(value).strip()
+
+        if text.startswith("REC-"):
+            try:
+                number = int(text.replace("REC-", ""))
+                max_number = max(max_number, number)
+            except ValueError:
+                continue
+
+    return f"REC-{max_number + 1:03d}"
+
+
+def normalize_monitoring_record(record):
+    for key in ["checked_at", "created_at", "updated_at"]:
+        if key in record:
+            record[key] = format_japanese_date(record.get(key, ""))
+
+    return record
+
+
+def load_monitoring_records():
+    df = read_monitoring_records_df()
+    records = df.to_dict(orient="records")
+
+    for record in records:
+        normalize_monitoring_record(record)
+
+    return records
+
+
+def find_monitoring_records_by_item_id(item_id):
+    records = load_monitoring_records()
+
+    return [
+        record for record in records
+        if str(record.get("management_item_id")) == str(item_id)
+    ]
+
+
+def create_monitoring_record(
+    management_item_id,
+    checked_at,
+    checked_by,
+    result,
+    score,
+    comment,
+    evidence_file,
+    next_action,
+):
+    monitoring_df = read_monitoring_records_df()
+    management_df = read_management_items_df()
+
+    backup_manufacturing_excel()
+
+    record_id = generate_next_monitoring_record_id(monitoring_df)
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    new_row = {
+        "id": record_id,
+        "management_item_id": management_item_id,
+        "checked_at": checked_at,
+        "checked_by": checked_by,
+        "result": result,
+        "score": score,
+        "comment": comment,
+        "evidence_file": evidence_file,
+        "next_action": next_action,
+        "created_at": now_text,
+        "updated_at": now_text,
+    }
+
+    monitoring_df = pd.concat(
+        [monitoring_df, pd.DataFrame([new_row])],
+        ignore_index=True,
+    )
+
+    target_index = management_df.index[
+        management_df["id"].astype(str) == str(management_item_id)
+    ].tolist()
+
+    if target_index:
+        management_df.loc[target_index[0], "last_checked_at"] = checked_at or now_text
+        management_df.loc[target_index[0], "updated_at"] = now_text
+
+        if result in ["要確認", "要改善", "NG", "異常"]:
+            management_df.loc[target_index[0], "status"] = "要改善"
+        elif result in ["OK", "良好", "問題なし"]:
+            management_df.loc[target_index[0], "status"] = "整備済"
+
+    with pd.ExcelWriter(get_manufacturing_excel_path(), engine="openpyxl", mode="w") as writer:
+        management_df.to_excel(writer, sheet_name="management_items", index=False)
+        monitoring_df.to_excel(writer, sheet_name="monitoring_records", index=False)
+
+    return record_id
+
+def read_incidents_df():
+    ensure_manufacturing_excel()
+    excel_path = get_manufacturing_excel_path()
+
+    try:
+        df = pd.read_excel(
+            excel_path,
+            sheet_name="incidents",
+            dtype=str,
+        )
+        df = df.fillna("")
+    except Exception:
+        df = pd.DataFrame(columns=INCIDENT_COLUMNS)
+
+    for column in INCIDENT_COLUMNS:
+        if column not in df.columns:
+            df[column] = ""
+
+    df = df[INCIDENT_COLUMNS].copy()
+
+    for column in INCIDENT_COLUMNS:
+        df[column] = df[column].astype(str)
+
+    return df
+
+
+def write_incidents_df(incident_df):
+    excel_path = get_manufacturing_excel_path()
+
+    management_df = read_management_items_df()
+    monitoring_df = read_monitoring_records_df()
+
+    incident_df = incident_df.copy()
+
+    for column in INCIDENT_COLUMNS:
+        if column not in incident_df.columns:
+            incident_df[column] = ""
+
+    incident_df = incident_df[INCIDENT_COLUMNS].copy()
+
+    for column in INCIDENT_COLUMNS:
+        incident_df[column] = incident_df[column].astype(str)
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        management_df.to_excel(writer, sheet_name="management_items", index=False)
+        monitoring_df.to_excel(writer, sheet_name="monitoring_records", index=False)
+        incident_df.to_excel(writer, sheet_name="incidents", index=False)
+
+
+def generate_next_incident_id(df):
+    if "id" not in df.columns or df.empty:
+        return "INC-001"
+
+    max_number = 0
+
+    for value in df["id"].dropna():
+        text = str(value).strip()
+
+        if text.startswith("INC-"):
+            try:
+                number = int(text.replace("INC-", ""))
+                max_number = max(max_number, number)
+            except ValueError:
+                continue
+
+    return f"INC-{max_number + 1:03d}"
+
+
+def normalize_incident(incident):
+    for key in ["incident_date", "created_at", "updated_at"]:
+        if key in incident:
+            incident[key] = format_japanese_date(incident.get(key, ""))
+
+    return incident
+
+
+def load_incidents():
+    df = read_incidents_df()
+    records = df.to_dict(orient="records")
+
+    for incident in records:
+        normalize_incident(incident)
+
+    return records
+
+
+def find_incident_by_id(incident_id):
+    incidents = load_incidents()
+
+    for incident in incidents:
+        if str(incident.get("id")) == str(incident_id):
+            return incident
+
+    return None
+
+
+def create_incident(
+    area,
+    incident_date,
+    title,
+    description,
+    severity,
+    detected_by,
+    owner,
+    status,
+    corrective_action,
+    preventive_action,
+    related_management_item_id,
+    create_task=False,
+    due_date="",
+):
+    incident_df = read_incidents_df()
+
+    backup_manufacturing_excel()
+
+    incident_id = generate_next_incident_id(incident_df)
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    related_task_id = ""
+
+    if create_task and title:
+        task_priority = "高" if severity in ["重大", "高"] else "中"
+
+        related_task_id = add_task(
+            task_name=f"インシデント対応：{title}",
+            category=f"製造インシデント：{area}",
+            owner=owner,
+            due_date=due_date,
+            status="未着手",
+            priority=task_priority,
+            related_document_id="",
+        ) or ""
+
+    new_row = {
+        "id": incident_id,
+        "area": area,
+        "incident_date": incident_date,
+        "title": title,
+        "description": description,
+        "severity": severity,
+        "detected_by": detected_by,
+        "owner": owner,
+        "status": status or "未対応",
+        "corrective_action": corrective_action,
+        "preventive_action": preventive_action,
+        "related_management_item_id": related_management_item_id,
+        "related_task_id": related_task_id,
+        "created_at": now_text,
+        "updated_at": now_text,
+    }
+
+    incident_df = pd.concat(
+        [incident_df, pd.DataFrame([new_row])],
+        ignore_index=True,
+    )
+
+    write_incidents_df(incident_df)
+
+    return incident_id, related_task_id
+
+
+def write_management_items_df(df):
+    excel_path = get_manufacturing_excel_path()
+
+    management_df = df.copy()
+
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        if column not in management_df.columns:
+            management_df[column] = ""
+
+    management_df = management_df[MANAGEMENT_ITEM_COLUMNS].copy()
+
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        management_df[column] = management_df[column].astype(str)
+
+    monitoring_df = read_monitoring_records_df()
+    incident_df = read_incidents_df()
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        management_df.to_excel(writer, sheet_name="management_items", index=False)
+        monitoring_df.to_excel(writer, sheet_name="monitoring_records", index=False)
+        incident_df.to_excel(writer, sheet_name="incidents", index=False)
 
 
 def normalize_management_item(item):

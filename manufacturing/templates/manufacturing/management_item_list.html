@@ -5,6 +5,12 @@
 {% block content %}
 <h2>製造管理</h2>
 
+<p>
+    <a href="{% url 'manufacturing:incident_list' %}">製造インシデント管理</a>
+    |
+    <a href="{% url 'manufacturing:incident_create' %}">インシデント登録</a>
+</p>
+
 <div class="summary-grid">
     <div class="summary-card">
         <div class="summary-label">管理項目数</div>
