@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 
 from documents.services import find_document_by_id
 from notifications.services import create_notification
+from organizations.services import find_employee_by_id, load_employees
 
 from .services import add_task, find_task_by_id, load_tasks, update_task_status
 
@@ -14,6 +15,15 @@ TASK_STATUS_CHOICES = [
     "完了",
     "要対応",
 ]
+
+
+def resolve_employee_name(employee_id, fallback=""):
+    employee = find_employee_by_id(employee_id) if employee_id else None
+
+    if employee:
+        return employee.get("employee_name", "")
+
+    return fallback
 
 
 def get_task_notification_priority(task, status):
@@ -41,7 +51,13 @@ def create_task(request):
     if request.method == "POST":
         task_name = request.POST.get("task_name", "").strip()
         category = request.POST.get("category", "").strip()
-        owner = request.POST.get("owner", "").strip()
+
+        owner_employee_id = request.POST.get("owner_employee_id", "").strip()
+        owner = resolve_employee_name(
+            owner_employee_id,
+            fallback=request.POST.get("owner", "").strip(),
+        )
+
         due_date = request.POST.get("due_date", "").strip()
         status = request.POST.get("status", "未着手").strip()
         priority = request.POST.get("priority", "中").strip()
@@ -81,6 +97,7 @@ def create_task(request):
 def task_list(request):
     all_tasks = load_tasks()
     tasks = all_tasks
+    employees = load_employees()
 
     keyword = request.GET.get("q", "").strip()
 
@@ -106,6 +123,7 @@ def task_list(request):
 
     return render(request, "tasks/task_list.html", {
         "tasks": tasks,
+        "employees": employees,
         "keyword": keyword,
         "total_count": len(all_tasks),
         "display_count": len(tasks),

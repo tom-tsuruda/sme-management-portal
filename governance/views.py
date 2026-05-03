@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 
 from notifications.services import create_notification
+from organizations.services import find_employee_by_id, load_employees
 
 from .services import (
     create_task_from_governance_item as create_governance_task,
@@ -19,6 +20,15 @@ GOVERNANCE_STATUS_CHOICES = [
     "期限超過",
     "対象外",
 ]
+
+
+def resolve_employee_name(employee_id, fallback=""):
+    employee = find_employee_by_id(employee_id) if employee_id else None
+
+    if employee:
+        return employee.get("employee_name", "")
+
+    return fallback
 
 
 def get_notification_priority(item, status):
@@ -148,9 +158,11 @@ def governance_item_list(request):
 
 def governance_item_detail(request, item_id):
     item = find_governance_item_by_id(item_id)
+    employees = load_employees()
 
     return render(request, "governance/governance_item_detail.html", {
         "item": item,
+        "employees": employees,
         "status_choices": GOVERNANCE_STATUS_CHOICES,
     })
 
@@ -191,7 +203,13 @@ def update_status(request, item_id):
 def create_task_from_governance_item(request, item_id):
     if request.method == "POST":
         task_name = request.POST.get("task_name", "").strip()
-        owner = request.POST.get("owner", "").strip()
+        owner_employee_id = request.POST.get("owner_employee_id", "").strip()
+
+        owner = resolve_employee_name(
+            owner_employee_id,
+            fallback=request.POST.get("owner", "").strip(),
+        )
+
         due_date = request.POST.get("due_date", "").strip()
         priority = request.POST.get("priority", "中").strip()
 

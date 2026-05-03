@@ -32,12 +32,36 @@
 
         <div class="form-row">
             <label>申請者</label><br>
-            <input type="text" name="applicant" placeholder="例：山田太郎" class="input-middle">
+            <div class="inline-form">
+                <select name="applicant_employee_id" class="input-middle">
+                    <option value="">社員マスタから選択</option>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="applicant" class="input-middle" placeholder="または手入力">
+            </div>
+            <small>社員マスタを選択した場合は、選択した社員名が優先されます。</small>
         </div>
 
         <div class="form-row">
             <label>部署</label><br>
-            <input type="text" name="department" placeholder="例：営業部" class="input-middle">
+            <div class="inline-form">
+                <select name="department_id" class="input-middle">
+                    <option value="">申請者の部署を使う / 部署マスタから選択</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}">
+                            {{ department.department_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="department" class="input-middle" placeholder="または手入力">
+            </div>
+            <small>部署未選択の場合は、申請者の所属部署を自動で使います。手入力も可能です。</small>
         </div>
 
         <div class="form-row">
@@ -47,7 +71,19 @@
 
         <div class="form-row">
             <label>承認者</label><br>
-            <input type="text" name="approver" placeholder="例：部長" class="input-middle">
+            <div class="inline-form">
+                <select name="approver_employee_id" class="input-middle">
+                    <option value="">承認者マスタから選択</option>
+                    {% for approver in approvers %}
+                        <option value="{{ approver.id }}">
+                            {{ approver.employee_name }}（{{ approver.department_name }} / {{ approver.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="approver" class="input-middle" placeholder="または手入力">
+            </div>
+            <small>承認者マスタを選択した場合は、選択した承認者名が優先されます。</small>
         </div>
 
         <div class="form-row">

@@ -18,21 +18,23 @@
             color: white;
         }
 
-.inline-form {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0;
-}
+        .inline-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            flex-wrap: wrap;
+        }
 
-.small-button {
-    padding: 5px 9px;
-    font-size: 12px;
-}
+        .small-button {
+            padding: 5px 9px;
+            font-size: 12px;
+        }
+
         .header-inner {
-            max-width: 1080px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 12px 72px;
+            padding: 12px 96px;
         }
 
         header h1 {
@@ -46,9 +48,9 @@
         }
 
         .nav-inner {
-            max-width: 1080px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 8px 72px;
+            padding: 8px 96px;
         }
 
         nav a {
@@ -57,6 +59,7 @@
             text-decoration: none;
             font-weight: bold;
             font-size: 14px;
+            display: inline-block;
         }
 
         nav a:hover {
@@ -64,9 +67,9 @@
         }
 
         main {
-            max-width: 1080px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 28px 72px 48px;
+            padding: 28px 96px 48px;
         }
 
         .card {
@@ -90,13 +93,15 @@
             margin-top: 8px;
             margin-bottom: 8px;
         }
-	a {
-	    color: #2563eb;
-	}
 
-	a:hover {
-	    color: #1d4ed8;
-	}
+        a {
+            color: #2563eb;
+        }
+
+        a:hover {
+            color: #1d4ed8;
+        }
+
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -162,17 +167,20 @@
         tr:nth-child(even) td {
             background: #fafafa;
         }
+
         .search-form {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-top: 14px;
         }
+
         .count-text {
             color: #6b7280;
             font-size: 13px;
             margin-top: 10px;
         }
+
         .search-form input {
             width: 360px;
             max-width: 100%;
@@ -193,6 +201,7 @@
         .clear-link:hover {
             text-decoration: underline;
         }
+
         button {
             background: #2563eb;
             color: white;
@@ -212,6 +221,49 @@
             font-family: inherit;
             font-size: 13px;
             padding: 5px 7px;
+        }
+
+        input,
+        textarea {
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .input-long {
+            width: 520px;
+            max-width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .input-middle {
+            width: 360px;
+            max-width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .input-full {
+            width: 100%;
+            max-width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .amount-input {
+            width: 180px;
+            max-width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
         }
 
         .menu-list {
@@ -261,6 +313,14 @@
             font-size: 12px;
         }
 
+        .badge-status {
+            color: white;
+            background: #4b5563;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
         @media (max-width: 768px) {
             .header-inner,
             .nav-inner,
@@ -297,6 +357,14 @@
             <a href="/documents/">文書台帳</a>
             <a href="/tasks/">タスク管理</a>
             <a href="/questionnaires/">質問票</a>
+            <a href="/questionnaires/history/">診断履歴</a>
+            <a href="/workflows/">申請・承認</a>
+            <a href="/expenses/">経費・旅費精算</a>
+            <a href="/organizations/">組織マスタ</a>
+            <a href="/manufacturing/">製造管理</a>
+            <a href="/kpi/">経営指標</a>
+            <a href="/governance/">ガバナンス</a>
+            <a href="/notifications/">通知</a>
         </div>
     </nav>
 

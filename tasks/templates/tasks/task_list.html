@@ -29,28 +29,65 @@
     <form method="post" action="/tasks/create/" class="task-create-form">
         {% csrf_token %}
 
-        <input type="text" placeholder="タスクID（自動採番）" disabled>
-        <input type="text" name="task_name" placeholder="タスク名" required>
-        <input type="text" name="category" placeholder="カテゴリ">
-        <input type="text" name="owner" placeholder="担当">
-        <input type="date" name="due_date">
+        <div class="form-row">
+            <label>タスク名</label><br>
+            <input type="text" name="task_name" class="input-long" placeholder="タスク名" required>
+        </div>
 
-        <select name="status">
-            <option value="未着手">未着手</option>
-            <option value="進行中">進行中</option>
-            <option value="完了">完了</option>
-            <option value="要対応">要対応</option>
-        </select>
+        <div class="form-row">
+            <label>カテゴリ</label><br>
+            <input type="text" name="category" class="input-middle" placeholder="カテゴリ">
+        </div>
 
-        <select name="priority">
-            <option value="高">高</option>
-            <option value="中" selected>中</option>
-            <option value="低">低</option>
-        </select>
+        <div class="form-row">
+            <label>担当</label><br>
+            <div class="inline-form">
+                <select name="owner_employee_id" class="input-middle">
+                    <option value="">社員マスタから選択</option>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
 
-        <input type="text" name="related_document_id" placeholder="関連文書ID">
+                <input type="text" name="owner" class="input-middle" placeholder="または手入力">
+            </div>
+            <small>社員マスタを選択した場合は、選択した社員名が優先されます。</small>
+        </div>
 
-        <button type="submit">追加</button>
+        <div class="form-row">
+            <label>期限</label><br>
+            <input type="date" name="due_date" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>状態</label><br>
+            <select name="status" class="input-middle">
+                <option value="未着手">未着手</option>
+                <option value="進行中">進行中</option>
+                <option value="完了">完了</option>
+                <option value="要対応">要対応</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>優先度</label><br>
+            <select name="priority" class="input-middle">
+                <option value="高">高</option>
+                <option value="中" selected>中</option>
+                <option value="低">低</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>関連文書ID</label><br>
+            <input type="text" name="related_document_id" class="input-middle" placeholder="関連文書ID">
+        </div>
+
+        <p>
+            <button type="submit">追加</button>
+        </p>
     </form>
 </div>
 

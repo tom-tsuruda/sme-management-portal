@@ -13,7 +13,12 @@ from .services import (
     save_request_attachment,
     update_request_status,
 )
-
+from organizations.services import (
+    find_department_by_id,
+    find_employee_by_id,
+    load_departments,
+    load_employees,
+)
 
 REQUEST_TYPE_CHOICES = [
     "稟議",
@@ -30,7 +35,53 @@ REQUEST_STATUS_CHOICES = [
     "差戻し",
     "却下",
 ]
+def is_active_approver(employee):
+    is_active = str(employee.get("is_active", "")).strip()
+    is_approver = str(employee.get("is_approver", "")).strip()
 
+    return is_active in ["1", "true", "True", "TRUE", "有効"] and is_approver in [
+        "1",
+        "true",
+        "True",
+        "TRUE",
+        "はい",
+        "○",
+    ]
+
+
+def get_workflow_master_context():
+    employees = load_employees()
+    departments = load_departments()
+    approvers = [employee for employee in employees if is_active_approver(employee)]
+
+    return {
+        "employees": employees,
+        "departments": departments,
+        "approvers": approvers,
+    }
+
+
+def resolve_employee_name(employee_id, fallback=""):
+    employee = find_employee_by_id(employee_id) if employee_id else None
+
+    if employee:
+        return employee.get("employee_name", "")
+
+    return fallback
+
+
+def resolve_department_name(department_id, applicant_employee_id="", fallback=""):
+    department = find_department_by_id(department_id) if department_id else None
+
+    if department:
+        return department.get("department_name", "")
+
+    applicant_employee = find_employee_by_id(applicant_employee_id) if applicant_employee_id else None
+
+    if applicant_employee and applicant_employee.get("department_name"):
+        return applicant_employee.get("department_name", "")
+
+    return fallback
 
 def request_list(request):
     all_requests = load_requests()
@@ -67,13 +118,34 @@ def request_list(request):
 
 
 def request_create(request):
+    master_context = get_workflow_master_context()
+
     if request.method == "POST":
         request_type = request.POST.get("request_type", "").strip()
         title = request.POST.get("title", "").strip()
-        applicant = request.POST.get("applicant", "").strip()
-        department = request.POST.get("department", "").strip()
+
+        applicant_employee_id = request.POST.get("applicant_employee_id", "").strip()
+        department_id = request.POST.get("department_id", "").strip()
+        approver_employee_id = request.POST.get("approver_employee_id", "").strip()
+
+        applicant = resolve_employee_name(
+            applicant_employee_id,
+            fallback=request.POST.get("applicant", "").strip(),
+        )
+
+        department = resolve_department_name(
+            department_id,
+            applicant_employee_id=applicant_employee_id,
+            fallback=request.POST.get("department", "").strip(),
+        )
+
         amount = normalize_amount(request.POST.get("amount", ""))
-        approver = request.POST.get("approver", "").strip()
+
+        approver = resolve_employee_name(
+            approver_employee_id,
+            fallback=request.POST.get("approver", "").strip(),
+        )
+
         description = request.POST.get("description", "").strip()
 
         if title:
@@ -102,9 +174,12 @@ def request_create(request):
 
             return redirect("workflows:request_detail", request_id=request_id)
 
-    return render(request, "workflows/request_form.html", {
+    context = {
         "request_type_choices": REQUEST_TYPE_CHOICES,
-    })
+    }
+    context.update(master_context)
+
+    return render(request, "workflows/request_form.html", context)
 
 
 def request_detail(request, request_id):

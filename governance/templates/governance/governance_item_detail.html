@@ -96,15 +96,57 @@
 
     <form method="post" action="{% url 'governance:create_task_from_governance_item' item.id %}" class="task-create-form">
         {% csrf_token %}
-        <input type="text" name="task_name" class="input-long" placeholder="{{ item.item_name }}を整備・確認する">
-        <input type="text" name="owner" class="input-middle" value="{{ item.owner }}" placeholder="担当者">
-        <input type="date" name="due_date" class="input-short">
-        <select name="priority">
-            <option value="高" {% if item.risk_level == "高" %}selected{% endif %}>高</option>
-            <option value="中" {% if item.risk_level != "高" %}selected{% endif %}>中</option>
-            <option value="低">低</option>
-        </select>
-        <button type="submit">タスク作成</button>
+
+        <div class="form-row">
+            <label>タスク名</label><br>
+            <input
+                type="text"
+                name="task_name"
+                class="input-long"
+                placeholder="{{ item.item_name }}を整備・確認する"
+            >
+        </div>
+
+        <div class="form-row">
+            <label>担当者</label><br>
+            <div class="inline-form">
+                <select name="owner_employee_id" class="input-middle">
+                    <option value="">社員マスタから選択</option>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input
+                    type="text"
+                    name="owner"
+                    class="input-middle"
+                    value="{{ item.owner }}"
+                    placeholder="または手入力"
+                >
+            </div>
+            <small>社員マスタを選択した場合は、選択した社員名が優先されます。</small>
+        </div>
+
+        <div class="form-row">
+            <label>期限</label><br>
+            <input type="date" name="due_date" class="input-middle">
+        </div>
+
+        <div class="form-row">
+            <label>優先度</label><br>
+            <select name="priority" class="input-middle">
+                <option value="高" {% if item.risk_level == "高" %}selected{% endif %}>高</option>
+                <option value="中" {% if item.risk_level != "高" %}selected{% endif %}>中</option>
+                <option value="低">低</option>
+            </select>
+        </div>
+
+        <p>
+            <button type="submit">タスク作成</button>
+        </p>
     </form>
 </div>
 
