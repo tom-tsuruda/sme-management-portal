@@ -14,54 +14,129 @@
 
 <h2>回答一覧</h2>
 
-<div class="table-wrap">
-    <table>
-        <thead>
-            <tr>
-                <th>カテゴリ</th>
-                <th>質問</th>
-                <th>回答</th>
-                <th>関連タスク</th>
-                <th>自動生成タスク</th>
-                <th>関連文書</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for a in answers %}
-            <tr>
-                <td>{{ a.category }}</td>
-                <td>{{ a.question_text }}</td>
-                <td>{{ a.answer }}</td>
-                <td>
-                    {% if a.related_task_id %}
-                        <a href="{% url 'tasks:task_detail' a.related_task_id %}">
-                            {{ a.related_task_id }}
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if a.generated_task_id %}
-                        <a href="{% url 'tasks:task_detail' a.generated_task_id %}">
-                            {{ a.generated_task_id }}
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if a.related_document_id %}
-                        <a href="{% url 'documents:document_detail' a.related_document_id %}">
-                            {{ a.related_document_id }}
-                        </a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">回答データがありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<style>
+.category-block {
+    margin-bottom: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #d5dbe3;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+.category-block summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    font-weight: 700;
+    background: #f1f5f9;
+    border-left: 5px solid #2563eb;
+}
+
+.category-block summary:hover {
+    background: #e8eef7;
+}
+
+.category-block .table-wrap {
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.answer-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: #e5e7eb;
+}
+
+.answer-badge.problem {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.answer-badge.ok {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.answer-badge.na {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+</style>
+
+{% for category, category_answers in grouped_answers.items %}
+<details class="category-block" open>
+    <summary>
+        {{ category }}（{{ category_answers|length }}件）
+    </summary>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>質問</th>
+                    <th>回答</th>
+                    <th>関連タスク</th>
+                    <th>自動生成タスク</th>
+                    <th>関連文書</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in category_answers %}
+                <tr>
+                    <td>{{ a.question_text }}</td>
+                    <td>
+                        {% if a.answer == "一部対応" or a.answer == "いいえ" or a.answer == "不明" or a.answer == "未整備" or a.answer == "未対応" or a.answer == "未見直し" or a.answer == "要確認" %}
+                            <span class="answer-badge problem">{{ a.answer }}</span>
+                        {% elif a.answer == "対象外" %}
+                            <span class="answer-badge na">{{ a.answer }}</span>
+                        {% elif a.answer == "はい" %}
+                            <span class="answer-badge ok">{{ a.answer }}</span>
+                        {% else %}
+                            <span class="answer-badge">{{ a.answer }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if a.related_task_id %}
+                            <a href="{% url 'tasks:task_detail' a.related_task_id %}">
+                                {{ a.related_task_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if a.generated_task_id %}
+                            <a href="{% url 'tasks:task_detail' a.generated_task_id %}">
+                                {{ a.generated_task_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if a.related_document_id %}
+                            <a href="{% url 'documents:document_detail' a.related_document_id %}">
+                                {{ a.related_document_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</details>
+{% empty %}
+<div class="card">
+    <p>回答データがありません。</p>
 </div>
+{% endfor %}
 
 <h2>要対応タスク</h2>
 

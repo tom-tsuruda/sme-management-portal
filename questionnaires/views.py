@@ -3,6 +3,7 @@ from django.shortcuts import render
 from notifications.services import create_notification
 
 from .services import (
+    PROBLEM_ANSWERS,
     generate_diagnosis_id,
     load_answers_by_diagnosis_id,
     load_diagnosis_summaries,
@@ -31,8 +32,12 @@ def question_list(request):
                 str(q.get("option_a", "")),
                 str(q.get("option_b", "")),
                 str(q.get("option_c", "")),
+                str(q.get("option_d", "")),
+                str(q.get("option_e", "")),
                 str(q.get("related_task_id", "")),
                 str(q.get("related_document_id", "")),
+                str(q.get("risk_level", "")),
+                str(q.get("recommended_task_name", "")),
             ])
 
             if keyword.lower() in target_text.lower():
@@ -40,8 +45,19 @@ def question_list(request):
 
         questions = filtered_questions
 
+    grouped_questions = {}
+
+    for q in questions:
+        category = q.get("category", "") or "未分類"
+
+        if category not in grouped_questions:
+            grouped_questions[category] = []
+
+        grouped_questions[category].append(q)
+
     return render(request, "questionnaires/question_list.html", {
         "questions": questions,
+        "grouped_questions": grouped_questions,
         "keyword": keyword,
         "total_count": len(all_questions),
         "display_count": len(questions),
@@ -53,12 +69,6 @@ def answer_questions(request):
     answers = []
     action_tasks = []
     diagnosis_id = generate_diagnosis_id()
-
-    problem_answers = [
-        "未整備",
-        "不明",
-        "未見直し",
-    ]
 
     if request.method == "POST":
         problem_count = 0
@@ -82,8 +92,9 @@ def answer_questions(request):
                 "generated_task_id": generated_task_id,
             }
 
-            if answer in problem_answers:
+            if answer in PROBLEM_ANSWERS:
                 problem_count += 1
+
                 task = None
 
                 if related_task_id:
@@ -92,14 +103,37 @@ def answer_questions(request):
                 if task:
                     action_tasks.append(task)
                 else:
-                    new_task_name = f"{q.get('category', '')}：{q.get('question_text', '')}"
+                    new_task_name = (
+                        q.get("recommended_task_name", "").strip()
+                        or f"{q.get('category', '')}：{q.get('question_text', '')}"
+                    )
+
+                    new_task_category = (
+                        q.get("recommended_task_category", "").strip()
+                        or q.get("category", "")
+                    )
+
+                    new_task_owner = (
+                        q.get("recommended_owner", "").strip()
+                        or "未設定"
+                    )
+
+                    new_task_priority = (
+                        q.get("priority", "").strip()
+                        or q.get("risk_level", "").strip()
+                        or "中"
+                    )
+
+                    if new_task_priority not in ["高", "中", "低"]:
+                        new_task_priority = "中"
+
                     new_task_id = add_task(
                         task_name=new_task_name,
-                        category=q.get("category", ""),
-                        owner="未設定",
+                        category=new_task_category,
+                        owner=new_task_owner,
                         due_date="",
                         status="未着手",
-                        priority="高",
+                        priority=new_task_priority,
                         related_document_id=related_document_id,
                     )
 
@@ -121,9 +155,9 @@ def answer_questions(request):
                                 f"「{answer}」だったため、改善タスクを作成しました。"
                                 f"タスクID：{new_task_id}。"
                             ),
-                            target_user="管理者",
+                            target_user=new_task_owner or "管理者",
                             category="診断質問票",
-                            priority="高",
+                            priority=new_task_priority,
                             related_type="tasks",
                             related_id=new_task_id,
                         )
@@ -196,8 +230,19 @@ def diagnosis_detail(request, diagnosis_id):
             if task:
                 action_tasks.append(task)
 
+    grouped_answers = {}
+
+    for answer in answers:
+        category = answer.get("category", "") or "未分類"
+
+        if category not in grouped_answers:
+            grouped_answers[category] = []
+
+        grouped_answers[category].append(answer)
+
     return render(request, "questionnaires/diagnosis_detail.html", {
         "diagnosis_id": diagnosis_id,
         "answers": answers,
+        "grouped_answers": grouped_answers,
         "action_tasks": action_tasks,
     })

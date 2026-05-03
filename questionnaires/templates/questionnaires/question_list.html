@@ -31,55 +31,200 @@
 <form method="post" action="/questionnaires/answer/">
     {% csrf_token %}
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>カテゴリ</th>
-                    <th>質問</th>
-                    <th>回答</th>
-                    <th>関連タスク</th>
-                    <th>関連文書</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in questions %}
-                <tr>
-                    <td>{{ q.id }}</td>
-                    <td>{{ q.category }}</td>
-                    <td>{{ q.question_text }}</td>
-                    <td>
-                        <select name="{{ q.id }}">
-                            <option value="">選択してください</option>
-                            <option value="{{ q.option_a }}">{{ q.option_a }}</option>
-                            <option value="{{ q.option_b }}">{{ q.option_b }}</option>
-                            <option value="{{ q.option_c }}">{{ q.option_c }}</option>
-                        </select>
-                    </td>
-                    <td>
-                        {% if q.related_task_id %}
-                            <a href="/tasks/?q={{ q.related_task_id }}">
-                                {{ q.related_task_id }}
-                            </a>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if q.related_document_id %}
-                            <a href="/documents/?q={{ q.related_document_id }}">
-                                {{ q.related_document_id }}
-                            </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6">該当する質問データがありません。</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <style>
+        .question-category-block {
+            margin-bottom: 18px;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #d5dbe3;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+        
+        .question-category-block summary {
+            cursor: pointer;
+            padding: 16px 20px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            background: #f1f5f9;
+            border-left: 6px solid #2563eb;
+            list-style: none;
+        }
+        
+        .question-category-block summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .question-category-block summary::before {
+            content: "▶";
+            display: inline-block;
+            margin-right: 10px;
+            transition: transform 0.2s ease;
+        }
+        
+        .question-category-block[open] summary::before {
+            transform: rotate(90deg);
+        }
+        
+        .question-category-block summary:hover {
+            background: #e8eef7;
+        }
+        
+        .question-category-meta {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+        
+        .question-category-block .table-wrap {
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        
+        .question-table th,
+        .question-table td {
+            vertical-align: top;
+        }
+        
+        .question-id {
+            font-weight: 700;
+            color: #334155;
+            white-space: nowrap;
+        }
+        
+        .question-answer-select {
+            min-width: 150px;
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #e5e7eb;
+        }
+        
+        .risk-badge.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .risk-badge.middle {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .risk-badge.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+        </style>
+        
+        {% for category, category_questions in grouped_questions.items %}
+        <details class="question-category-block">
+            <summary>
+                {{ category }}
+                <span class="question-category-meta">
+                    {{ category_questions|length }}問
+                </span>
+            </summary>
+        
+            <div class="table-wrap">
+                <table class="question-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>質問</th>
+                            <th>回答</th>
+                            <th>リスク</th>
+                            <th>推奨タスク</th>
+                            <th>関連文書</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in category_questions %}
+                        <tr>
+                            <td class="question-id">{{ q.id }}</td>
+                            <td>{{ q.question_text }}</td>
+                            <td>
+                                <select name="{{ q.id }}" class="question-answer-select">
+                                    <option value="">選択してください</option>
+        
+                                    {% if q.option_a %}
+                                        <option value="{{ q.option_a }}">{{ q.option_a }}</option>
+                                    {% else %}
+                                        <option value="はい">はい</option>
+                                    {% endif %}
+        
+                                    {% if q.option_b %}
+                                        <option value="{{ q.option_b }}">{{ q.option_b }}</option>
+                                    {% else %}
+                                        <option value="一部対応">一部対応</option>
+                                    {% endif %}
+        
+                                    {% if q.option_c %}
+                                        <option value="{{ q.option_c }}">{{ q.option_c }}</option>
+                                    {% else %}
+                                        <option value="いいえ">いいえ</option>
+                                    {% endif %}
+        
+                                    {% if q.option_d %}
+                                        <option value="{{ q.option_d }}">{{ q.option_d }}</option>
+                                    {% else %}
+                                        <option value="不明">不明</option>
+                                    {% endif %}
+        
+                                    {% if q.option_e %}
+                                        <option value="{{ q.option_e }}">{{ q.option_e }}</option>
+                                    {% else %}
+                                        <option value="対象外">対象外</option>
+                                    {% endif %}
+                                </select>
+                            </td>
+                            <td>
+                                {% if q.risk_level == "高" %}
+                                    <span class="risk-badge high">高</span>
+                                {% elif q.risk_level == "中" %}
+                                    <span class="risk-badge middle">中</span>
+                                {% elif q.risk_level == "低" %}
+                                    <span class="risk-badge low">低</span>
+                                {% else %}
+                                    <span class="risk-badge">{{ q.risk_level|default:"-" }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if q.recommended_task_name %}
+                                    {{ q.recommended_task_name }}
+                                {% elif q.related_task_id %}
+                                    <a href="/tasks/?q={{ q.related_task_id }}">
+                                        {{ q.related_task_id }}
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if q.related_document_id %}
+                                    <a href="/documents/?q={{ q.related_document_id }}">
+                                        {{ q.related_document_id }}
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+        {% empty %}
+        <div class="card">
+            <p>該当する質問データがありません。</p>
+        </div>
+        {% endfor %}
 
     <p>
         <button type="submit">回答を送信</button>

@@ -16,8 +16,31 @@ QUESTION_COLUMNS = [
     "option_a",
     "option_b",
     "option_c",
+    "option_d",
+    "option_e",
+    "risk_level",
+    "recommended_task_name",
+    "recommended_task_category",
+    "recommended_owner",
+    "recommended_due_date_days",
     "related_task_id",
     "related_document_id",
+    "related_app",
+    "related_item_type",
+    "task_trigger_answers",
+    "priority",
+    "sort_order",
+    "is_active",
+]
+
+PROBLEM_ANSWERS = [
+    "一部対応",
+    "いいえ",
+    "不明",
+    "未整備",
+    "未対応",
+    "未見直し",
+    "要確認",
 ]
 
 ANSWER_COLUMNS = [
@@ -292,8 +315,11 @@ def load_diagnosis_summaries():
 
         diagnosis_map[diagnosis_id]["answer_count"] += 1
 
-        if answer.get("answer") in ["いいえ", "未対応", "不明"]:
+        if answer.get("answer") in PROBLEM_ANSWERS:
             diagnosis_map[diagnosis_id]["problem_count"] += 1
+
+        if answer.get("generated_task_id"):
+            diagnosis_map[diagnosis_id]["generated_task_count"] += 1
 
     summaries = list(diagnosis_map.values())
 
