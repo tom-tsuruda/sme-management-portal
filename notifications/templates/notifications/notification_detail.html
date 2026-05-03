@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}通知詳細{% endblock %}
+
+{% block content %}
+<h2>通知詳細</h2>
+
+{% if notification %}
+<div class="card">
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ notification.id }}</td>
+        </tr>
+        <tr>
+            <th>タイトル</th>
+            <td>{{ notification.title }}</td>
+        </tr>
+        <tr>
+            <th>本文</th>
+            <td>{{ notification.message }}</td>
+        </tr>
+        <tr>
+            <th>対象者</th>
+            <td>{{ notification.target_user }}</td>
+        </tr>
+        <tr>
+            <th>カテゴリ</th>
+            <td>{{ notification.category }}</td>
+        </tr>
+        <tr>
+            <th>優先度</th>
+            <td>{{ notification.priority }}</td>
+        </tr>
+        <tr>
+            <th>関連種別</th>
+            <td>{{ notification.related_type }}</td>
+        </tr>
+        <tr>
+            <th>関連ID</th>
+            <td>{{ notification.related_id }}</td>
+        </tr>
+        <tr>
+            <th>既読</th>
+            <td>{{ notification.is_read }}</td>
+        </tr>
+        <tr>
+            <th>作成日時</th>
+            <td>{{ notification.created_at }}</td>
+        </tr>
+        <tr>
+            <th>既読日時</th>
+            <td>{{ notification.read_at }}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    {% if notification.is_read == "1" %}
+        <a class="button-link button-secondary" href="{% url 'notifications:mark_unread' notification.id %}">
+            未読に戻す
+        </a>
+    {% else %}
+        <a class="button-link" href="{% url 'notifications:mark_read' notification.id %}">
+            既読にする
+        </a>
+    {% endif %}
+</div>
+
+{% else %}
+<div class="card">
+    <p>通知が見つかりません。</p>
+</div>
+{% endif %}
+
+<p>
+    <a href="{% url 'notifications:notification_list' %}">通知一覧へ戻る</a>
+</p>
+{% endblock %}

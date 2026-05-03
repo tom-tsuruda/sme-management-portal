@@ -2,6 +2,8 @@ from django.shortcuts import redirect, render
 
 from core.formatters import normalize_amount
 
+from notifications.services import create_notification
+
 from .services import (
     create_request,
     find_attachments_by_request_id,
@@ -84,6 +86,20 @@ def request_create(request):
                 approver=approver,
                 description=description,
             )
+
+            create_notification(
+                title="承認待ち申請があります",
+                message=(
+                    f"{applicant}さんから「{title}」の申請が作成されました。"
+                    f"申請ID：{request_id}。申請・承認画面で内容を確認してください。"
+                ),
+                target_user=approver or "承認者",
+                category="申請承認",
+                priority="高",
+                related_type="workflows",
+                related_id=request_id,
+            )
+
             return redirect("workflows:request_detail", request_id=request_id)
 
     return render(request, "workflows/request_form.html", {
@@ -114,12 +130,79 @@ def update_status(request, request_id):
             actor = "承認者"
 
         if status:
-            update_request_status(
+            update_result = update_request_status(
                 request_id=request_id,
                 new_status=status,
                 actor=actor,
                 comment=comment,
             )
+
+            if update_result:
+                workflow_request = find_request_by_id(request_id)
+
+                if workflow_request:
+                    applicant = workflow_request.get("applicant", "")
+                    approver = workflow_request.get("approver", "")
+                    title = workflow_request.get("title", "")
+                    request_type = workflow_request.get("request_type", "")
+
+                    if status == "承認済":
+                        create_notification(
+                            title="申請が承認されました",
+                            message=(
+                                f"申請「{title}」が{actor}さんにより承認されました。"
+                                f"申請ID：{request_id}。"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="申請承認",
+                            priority="中",
+                            related_type="workflows",
+                            related_id=request_id,
+                        )
+
+                    elif status == "差戻し":
+                        create_notification(
+                            title="申請が差戻しされました",
+                            message=(
+                                f"申請「{title}」が{actor}さんにより差戻しされました。"
+                                f"申請ID：{request_id}。"
+                                f"コメント：{comment or 'コメントなし'}"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="申請承認",
+                            priority="高",
+                            related_type="workflows",
+                            related_id=request_id,
+                        )
+
+                    elif status == "却下":
+                        create_notification(
+                            title="申請が却下されました",
+                            message=(
+                                f"申請「{title}」が{actor}さんにより却下されました。"
+                                f"申請ID：{request_id}。"
+                                f"コメント：{comment or 'コメントなし'}"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="申請承認",
+                            priority="高",
+                            related_type="workflows",
+                            related_id=request_id,
+                        )
+
+                    elif status == "承認待ち":
+                        create_notification(
+                            title="申請が承認待ちになりました",
+                            message=(
+                                f"{request_type}申請「{title}」が承認待ちになりました。"
+                                f"申請ID：{request_id}。"
+                            ),
+                            target_user=approver or "承認者",
+                            category="申請承認",
+                            priority="高",
+                            related_type="workflows",
+                            related_id=request_id,
+                        )
 
     return redirect("workflows:request_detail", request_id=request_id)
 
@@ -133,10 +216,29 @@ def upload_attachment(request, request_id):
             uploaded_by = "未設定"
 
         if uploaded_file:
-            save_request_attachment(
+            attachment_id = save_request_attachment(
                 request_id=request_id,
                 uploaded_file=uploaded_file,
                 uploaded_by=uploaded_by,
             )
+
+            workflow_request = find_request_by_id(request_id)
+
+            if attachment_id and workflow_request:
+                title = workflow_request.get("title", "")
+                approver = workflow_request.get("approver", "")
+
+                create_notification(
+                    title="申請に添付ファイルが追加されました",
+                    message=(
+                        f"申請「{title}」に添付ファイルが追加されました。"
+                        f"申請ID：{request_id}。"
+                    ),
+                    target_user=approver or "承認者",
+                    category="申請承認",
+                    priority="低",
+                    related_type="workflows",
+                    related_id=request_id,
+                )
 
     return redirect("workflows:request_detail", request_id=request_id)

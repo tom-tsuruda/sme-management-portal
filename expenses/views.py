@@ -5,6 +5,8 @@ from django.shortcuts import redirect, render
 
 from core.formatters import normalize_amount
 
+from notifications.services import create_notification
+
 from .services import (
     create_expense,
     find_attachments_by_expense_id,
@@ -117,15 +119,43 @@ def expense_create(request):
                 description=description,
             )
 
+            create_notification(
+                title="経費申請が作成されました",
+                message=(
+                    f"{applicant}さんから「{title}」の経費申請が作成されました。"
+                    f"経費ID：{expense_id}。金額：{amount}。"
+                    f"経費・旅費精算画面で内容を確認してください。"
+                ),
+                target_user=approver or "経理責任者",
+                category="経費精算",
+                priority="高",
+                related_type="expenses",
+                related_id=expense_id,
+            )
+
             uploaded_file = request.FILES.get("attachment")
             uploaded_by = applicant or "未設定"
 
             if uploaded_file:
-                save_expense_attachment(
+                attachment_id = save_expense_attachment(
                     expense_id=expense_id,
                     uploaded_file=uploaded_file,
                     uploaded_by=uploaded_by,
                 )
+
+                if attachment_id:
+                    create_notification(
+                        title="経費申請に証憑が添付されました",
+                        message=(
+                            f"経費申請「{title}」に証憑ファイルが添付されました。"
+                            f"経費ID：{expense_id}。"
+                        ),
+                        target_user=approver or "経理責任者",
+                        category="経費精算",
+                        priority="中",
+                        related_type="expenses",
+                        related_id=expense_id,
+                    )
 
             return redirect("expenses:expense_detail", expense_id=expense_id)
 
@@ -159,12 +189,93 @@ def update_status(request, expense_id):
             actor = "承認者"
 
         if status:
-            update_expense_status(
+            update_result = update_expense_status(
                 expense_id=expense_id,
                 new_status=status,
                 actor=actor,
                 comment=comment,
             )
+
+            if update_result:
+                expense = find_expense_by_id(expense_id)
+
+                if expense:
+                    applicant = expense.get("applicant", "")
+                    approver = expense.get("approver", "")
+                    title = expense.get("title", "")
+                    amount = expense.get("amount", "")
+
+                    if status == "承認済":
+                        create_notification(
+                            title="経費申請が承認されました",
+                            message=(
+                                f"経費申請「{title}」が{actor}さんにより承認されました。"
+                                f"経費ID：{expense_id}。金額：{amount}。"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="経費精算",
+                            priority="中",
+                            related_type="expenses",
+                            related_id=expense_id,
+                        )
+
+                    elif status == "精算済":
+                        create_notification(
+                            title="経費申請が精算済になりました",
+                            message=(
+                                f"経費申請「{title}」が精算済になりました。"
+                                f"経費ID：{expense_id}。金額：{amount}。"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="経費精算",
+                            priority="中",
+                            related_type="expenses",
+                            related_id=expense_id,
+                        )
+
+                    elif status == "差戻し":
+                        create_notification(
+                            title="経費申請が差戻しされました",
+                            message=(
+                                f"経費申請「{title}」が{actor}さんにより差戻しされました。"
+                                f"経費ID：{expense_id}。"
+                                f"コメント：{comment or 'コメントなし'}"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="経費精算",
+                            priority="高",
+                            related_type="expenses",
+                            related_id=expense_id,
+                        )
+
+                    elif status == "却下":
+                        create_notification(
+                            title="経費申請が却下されました",
+                            message=(
+                                f"経費申請「{title}」が{actor}さんにより却下されました。"
+                                f"経費ID：{expense_id}。"
+                                f"コメント：{comment or 'コメントなし'}"
+                            ),
+                            target_user=applicant or "申請者",
+                            category="経費精算",
+                            priority="高",
+                            related_type="expenses",
+                            related_id=expense_id,
+                        )
+
+                    elif status == "申請中":
+                        create_notification(
+                            title="経費申請が申請中になりました",
+                            message=(
+                                f"経費申請「{title}」が申請中になりました。"
+                                f"経費ID：{expense_id}。"
+                            ),
+                            target_user=approver or "経理責任者",
+                            category="経費精算",
+                            priority="高",
+                            related_type="expenses",
+                            related_id=expense_id,
+                        )
 
     return redirect("expenses:expense_detail", expense_id=expense_id)
 
@@ -178,13 +289,33 @@ def upload_attachment(request, expense_id):
             uploaded_by = "未設定"
 
         if uploaded_file:
-            save_expense_attachment(
+            attachment_id = save_expense_attachment(
                 expense_id=expense_id,
                 uploaded_file=uploaded_file,
                 uploaded_by=uploaded_by,
             )
 
+            expense = find_expense_by_id(expense_id)
+
+            if attachment_id and expense:
+                title = expense.get("title", "")
+                approver = expense.get("approver", "")
+
+                create_notification(
+                    title="経費申請に証憑が追加されました",
+                    message=(
+                        f"経費申請「{title}」に証憑ファイルが追加されました。"
+                        f"経費ID：{expense_id}。"
+                    ),
+                    target_user=approver or "経理責任者",
+                    category="経費精算",
+                    priority="中",
+                    related_type="expenses",
+                    related_id=expense_id,
+                )
+
     return redirect("expenses:expense_detail", expense_id=expense_id)
+
 
 def export_csv(request):
     expenses = load_expenses()

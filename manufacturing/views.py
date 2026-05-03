@@ -1,5 +1,7 @@
 from django.shortcuts import redirect, render
 
+from notifications.services import create_notification
+
 from .services import (
     create_task_from_management_item as create_management_task,
     find_management_item_by_id,
@@ -17,6 +19,30 @@ MANAGEMENT_STATUS_CHOICES = [
     "期限超過",
     "対象外",
 ]
+
+
+def get_notification_priority(item, status):
+    risk_level = item.get("risk_level", "")
+
+    if status in ["未整備", "要改善", "期限超過"]:
+        return "高"
+
+    if risk_level == "高":
+        return "高"
+
+    if status == "要確認":
+        return "中"
+
+    return "低"
+
+
+def should_create_status_notification(status):
+    return status in [
+        "未整備",
+        "要確認",
+        "要改善",
+        "期限超過",
+    ]
 
 
 def management_item_list(request):
@@ -130,7 +156,29 @@ def update_status(request, item_id):
         status = request.POST.get("status", "").strip()
 
         if status:
-            update_management_item_status(item_id, status)
+            update_result = update_management_item_status(item_id, status)
+
+            if update_result:
+                item = find_management_item_by_id(item_id)
+
+                if item and should_create_status_notification(status):
+                    priority = get_notification_priority(item, status)
+
+                    create_notification(
+                        title="製造管理項目の状態が更新されました",
+                        message=(
+                            f"製造管理項目「{item.get('item_name', '')}」の状態が"
+                            f"「{status}」に更新されました。"
+                            f"領域：{item.get('area', '')}。"
+                            f"担当部署：{item.get('owner_department', '')}。"
+                            f"リスク：{item.get('risk_level', '')}。"
+                        ),
+                        target_user=item.get("owner", "") or item.get("owner_department", "") or "製造責任者",
+                        category="製造管理",
+                        priority=priority,
+                        related_type="manufacturing",
+                        related_id=item_id,
+                    )
 
     return redirect("manufacturing:management_item_detail", item_id=item_id)
 
@@ -142,12 +190,31 @@ def create_task_from_management_item(request, item_id):
         due_date = request.POST.get("due_date", "").strip()
         priority = request.POST.get("priority", "中").strip()
 
-        create_management_task(
+        task_id = create_management_task(
             item_id=item_id,
             task_name=task_name,
             owner=owner,
             due_date=due_date,
             priority=priority,
         )
+
+        item = find_management_item_by_id(item_id)
+
+        if task_id and item:
+            create_notification(
+                title="製造管理タスクが作成されました",
+                message=(
+                    f"製造管理項目「{item.get('item_name', '')}」から"
+                    f"タスクが作成されました。"
+                    f"タスクID：{task_id}。"
+                    f"担当者：{owner or item.get('owner', '')}。"
+                    f"期限：{due_date or '未設定'}。"
+                ),
+                target_user=owner or item.get("owner", "") or "製造責任者",
+                category="製造管理",
+                priority=priority or item.get("risk_level", "中"),
+                related_type="tasks",
+                related_id=task_id,
+            )
 
     return redirect("manufacturing:management_item_detail", item_id=item_id)

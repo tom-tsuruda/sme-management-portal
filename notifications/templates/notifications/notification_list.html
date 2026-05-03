@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}通知{% endblock %}
+
+{% block content %}
+<h2>通知</h2>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">通知件数</div>
+        <div class="summary-number">{{ total_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">未読通知</div>
+        <div class="summary-number warning">{{ unread_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">高優先度 未読</div>
+        <div class="summary-number danger">{{ high_priority_unread_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">表示件数</div>
+        <div class="summary-number">{{ display_count }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ keyword }}" placeholder="タイトル・本文・対象者で検索">
+
+        <select name="category">
+            <option value="">すべてのカテゴリ</option>
+            {% for category_name in categories %}
+                <option value="{{ category_name }}" {% if category == category_name %}selected{% endif %}>
+                    {{ category_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="priority">
+            <option value="">すべての優先度</option>
+            {% for priority_name in priorities %}
+                <option value="{{ priority_name }}" {% if priority == priority_name %}selected{% endif %}>
+                    {{ priority_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="read_status">
+            <option value="">すべて</option>
+            <option value="unread" {% if read_status == "unread" %}selected{% endif %}>未読</option>
+            <option value="read" {% if read_status == "read" %}selected{% endif %}>既読</option>
+        </select>
+
+        <button type="submit">検索</button>
+        <a class="clear-link" href="{% url 'notifications:notification_list' %}">クリア</a>
+    </form>
+
+    <p class="count-text">
+        全{{ total_count }}件中 {{ display_count }}件を表示
+    </p>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>状態</th>
+                <th>優先度</th>
+                <th>カテゴリ</th>
+                <th>タイトル</th>
+                <th>対象者</th>
+                <th>作成日時</th>
+                <th>詳細</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in notifications %}
+            <tr>
+                <td>{{ notification.id }}</td>
+                <td>
+                    {% if notification.is_read == "1" %}
+                        <span class="badge-status">既読</span>
+                    {% else %}
+                        <span class="badge-middle">未読</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if notification.priority == "高" %}
+                        <span class="badge-high">高</span>
+                    {% elif notification.priority == "中" %}
+                        <span class="badge-middle">中</span>
+                    {% elif notification.priority == "低" %}
+                        <span class="badge-low">低</span>
+                    {% else %}
+                        {{ notification.priority }}
+                    {% endif %}
+                </td>
+                <td>{{ notification.category }}</td>
+                <td>{{ notification.title }}</td>
+                <td>{{ notification.target_user }}</td>
+                <td>{{ notification.created_at }}</td>
+                <td>
+                    <a href="{% url 'notifications:notification_detail' notification.id %}">
+                        詳細
+                    </a>
+                </td>
+                <td>
+                    {% if notification.is_read == "1" %}
+                        <a href="{% url 'notifications:mark_unread' notification.id %}">
+                            未読に戻す
+                        </a>
+                    {% else %}
+                        <a href="{% url 'notifications:mark_read' notification.id %}">
+                            既読にする
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center">通知はありません。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

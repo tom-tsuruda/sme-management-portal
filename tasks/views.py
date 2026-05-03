@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from django.shortcuts import redirect, render
 
 from documents.services import find_document_by_id
+from notifications.services import create_notification
 
 from .services import add_task, find_task_by_id, load_tasks, update_task_status
 
@@ -13,6 +14,24 @@ TASK_STATUS_CHOICES = [
     "完了",
     "要対応",
 ]
+
+
+def get_task_notification_priority(task, status):
+    task_priority = task.get("priority", "")
+
+    if status == "要対応":
+        return "高"
+
+    if task_priority == "高":
+        return "高"
+
+    if status == "進行中":
+        return "中"
+
+    if status == "完了":
+        return "低"
+
+    return "中"
 
 
 def create_task(request):
@@ -29,7 +48,7 @@ def create_task(request):
         related_document_id = request.POST.get("related_document_id", "").strip()
 
         if task_name:
-            add_task(
+            task_id = add_task(
                 task_name=task_name,
                 category=category,
                 owner=owner,
@@ -38,6 +57,23 @@ def create_task(request):
                 priority=priority,
                 related_document_id=related_document_id,
             )
+
+            if task_id:
+                create_notification(
+                    title="タスクが作成されました",
+                    message=(
+                        f"タスク「{task_name}」が作成されました。"
+                        f"タスクID：{task_id}。"
+                        f"カテゴリ：{category or '未設定'}。"
+                        f"担当者：{owner or '未設定'}。"
+                        f"期限：{due_date or '未設定'}。"
+                    ),
+                    target_user=owner or "タスク担当者",
+                    category="タスク管理",
+                    priority=priority or "中",
+                    related_type="tasks",
+                    related_id=task_id,
+                )
 
     return redirect("/tasks/")
 
@@ -103,7 +139,29 @@ def update_status(request):
         keyword = request.POST.get("keyword", "")
 
         if task_id and status:
-            update_task_status(task_id, status)
+            update_result = update_task_status(task_id, status)
+
+            if update_result:
+                task = find_task_by_id(task_id)
+
+                if task:
+                    priority = get_task_notification_priority(task, status)
+
+                    create_notification(
+                        title="タスク状態が更新されました",
+                        message=(
+                            f"タスク「{task.get('task_name', '')}」の状態が"
+                            f"「{status}」に更新されました。"
+                            f"タスクID：{task_id}。"
+                            f"担当者：{task.get('owner', '') or '未設定'}。"
+                            f"期限：{task.get('due_date', '') or '未設定'}。"
+                        ),
+                        target_user=task.get("owner", "") or "タスク担当者",
+                        category="タスク管理",
+                        priority=priority,
+                        related_type="tasks",
+                        related_id=task_id,
+                    )
 
         if keyword:
             query = urlencode({"q": keyword})
@@ -120,6 +178,28 @@ def update_status_from_detail(request, task_id):
         status = request.POST.get("status", "")
 
         if task_id and status:
-            update_task_status(task_id, status)
+            update_result = update_task_status(task_id, status)
+
+            if update_result:
+                task = find_task_by_id(task_id)
+
+                if task:
+                    priority = get_task_notification_priority(task, status)
+
+                    create_notification(
+                        title="タスク状態が更新されました",
+                        message=(
+                            f"タスク「{task.get('task_name', '')}」の状態が"
+                            f"「{status}」に更新されました。"
+                            f"タスクID：{task_id}。"
+                            f"担当者：{task.get('owner', '') or '未設定'}。"
+                            f"期限：{task.get('due_date', '') or '未設定'}。"
+                        ),
+                        target_user=task.get("owner", "") or "タスク担当者",
+                        category="タスク管理",
+                        priority=priority,
+                        related_type="tasks",
+                        related_id=task_id,
+                    )
 
     return redirect("tasks:task_detail", task_id=task_id)

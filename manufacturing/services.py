@@ -453,7 +453,11 @@ def read_management_items_df():
     excel_path = get_manufacturing_excel_path()
 
     try:
-        df = pd.read_excel(excel_path, sheet_name="management_items")
+        df = pd.read_excel(
+            excel_path,
+            sheet_name="management_items",
+            dtype=str,
+        )
         df = df.fillna("")
     except Exception:
         df = pd.DataFrame(columns=MANAGEMENT_ITEM_COLUMNS)
@@ -462,11 +466,26 @@ def read_management_items_df():
         if column not in df.columns:
             df[column] = ""
 
-    return df[MANAGEMENT_ITEM_COLUMNS]
+    df = df[MANAGEMENT_ITEM_COLUMNS].copy()
 
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        df[column] = df[column].astype(str)
+
+    return df
 
 def write_management_items_df(df):
     excel_path = get_manufacturing_excel_path()
+
+    df = df.copy()
+
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        if column not in df.columns:
+            df[column] = ""
+
+    df = df[MANAGEMENT_ITEM_COLUMNS].copy()
+
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        df[column] = df[column].astype(str)
 
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
         df.to_excel(writer, sheet_name="management_items", index=False)

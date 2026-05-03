@@ -1,5 +1,7 @@
 from django.shortcuts import render
 
+from notifications.services import create_notification
+
 from .services import (
     generate_diagnosis_id,
     load_answers_by_diagnosis_id,
@@ -9,6 +11,7 @@ from .services import (
 )
 
 from tasks.services import add_task, find_task_by_id
+
 
 def question_list(request):
     all_questions = load_questions()
@@ -58,6 +61,9 @@ def answer_questions(request):
     ]
 
     if request.method == "POST":
+        problem_count = 0
+        generated_task_count = 0
+
         for q in questions:
             q_id = q.get("id")
             answer = request.POST.get(q_id, "")
@@ -77,6 +83,7 @@ def answer_questions(request):
             }
 
             if answer in problem_answers:
+                problem_count += 1
                 task = None
 
                 if related_task_id:
@@ -97,6 +104,7 @@ def answer_questions(request):
                     )
 
                     if new_task_id:
+                        generated_task_count += 1
                         generated_task_id = new_task_id
                         answer_row["generated_task_id"] = new_task_id
 
@@ -105,9 +113,53 @@ def answer_questions(request):
                         if new_task:
                             action_tasks.append(new_task)
 
+                        create_notification(
+                            title="診断結果からタスクが作成されました",
+                            message=(
+                                f"診断ID：{diagnosis_id}。"
+                                f"質問「{q.get('question_text', '')}」への回答が"
+                                f"「{answer}」だったため、改善タスクを作成しました。"
+                                f"タスクID：{new_task_id}。"
+                            ),
+                            target_user="管理者",
+                            category="診断質問票",
+                            priority="高",
+                            related_type="tasks",
+                            related_id=new_task_id,
+                        )
+
             answers.append(answer_row)
 
         save_answer_history(diagnosis_id, answers)
+
+        if problem_count > 0:
+            create_notification(
+                title="診断結果に要対応項目があります",
+                message=(
+                    f"診断ID：{diagnosis_id} の回答で、"
+                    f"要対応項目が {problem_count} 件見つかりました。"
+                    f"自動生成タスク数：{generated_task_count} 件。"
+                    f"診断履歴画面で内容を確認してください。"
+                ),
+                target_user="管理者",
+                category="診断質問票",
+                priority="高",
+                related_type="questionnaires",
+                related_id=diagnosis_id,
+            )
+        else:
+            create_notification(
+                title="診断回答が完了しました",
+                message=(
+                    f"診断ID：{diagnosis_id} の回答が完了しました。"
+                    f"要対応項目はありませんでした。"
+                ),
+                target_user="管理者",
+                category="診断質問票",
+                priority="低",
+                related_type="questionnaires",
+                related_id=diagnosis_id,
+            )
 
     return render(request, "questionnaires/answer_result.html", {
         "diagnosis_id": diagnosis_id,
@@ -115,10 +167,8 @@ def answer_questions(request):
         "action_tasks": action_tasks,
     })
 
+
 def diagnosis_history(request):
-    """
-    診断履歴一覧を表示する。
-    """
     summaries = load_diagnosis_summaries()
 
     summaries = sorted(
@@ -133,9 +183,6 @@ def diagnosis_history(request):
 
 
 def diagnosis_detail(request, diagnosis_id):
-    """
-    診断IDごとの回答結果を表示する。
-    """
     answers = load_answers_by_diagnosis_id(diagnosis_id)
 
     action_tasks = []

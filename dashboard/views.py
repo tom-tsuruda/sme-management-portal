@@ -8,6 +8,7 @@ from expenses.services import load_expenses
 from manufacturing.services import load_management_items
 from kpi.services import get_latest_monthly_kpi, get_latest_manufacturing_kpi
 from governance.services import load_governance_items
+from notifications.services import load_notifications, load_unread_notifications
 
 
 def home(request):
@@ -18,6 +19,8 @@ def home(request):
     expenses = load_expenses()
     manufacturing_items = load_management_items()
     governance_items = load_governance_items()
+    notifications = load_notifications()
+    unread_notifications = load_unread_notifications()
 
     latest_monthly_kpi = get_latest_monthly_kpi()
     latest_manufacturing_kpi = get_latest_manufacturing_kpi()
@@ -166,6 +169,13 @@ def home(request):
 
     latest_governance_items = governance_action_items[:5]
 
+    high_priority_unread_notifications = [
+        notification for notification in unread_notifications
+        if notification.get("priority") == "高"
+    ]
+
+    latest_notifications = notifications[:5]
+
     context = {
         "total_documents": total_documents,
         "not_ready_document_count": len(not_ready_documents),
@@ -203,6 +213,11 @@ def home(request):
         "governance_high_risk_count": len(governance_high_risk),
         "governance_required_count": len(governance_required),
         "latest_governance_items": latest_governance_items,
+
+        "notification_total_count": len(notifications),
+        "unread_notification_count": len(unread_notifications),
+        "high_priority_unread_notification_count": len(high_priority_unread_notifications),
+        "latest_notifications": latest_notifications,
 
         "latest_monthly_kpi": latest_monthly_kpi,
         "latest_manufacturing_kpi": latest_manufacturing_kpi,

@@ -32,8 +32,14 @@ def backup_document_excel():
 
 
 def format_japanese_date(value):
-    if value == "" or pd.isna(value):
+    if value == "" or value is None:
         return ""
+
+    try:
+        if pd.isna(value):
+            return ""
+    except Exception:
+        pass
 
     try:
         date_value = pd.to_datetime(value)
@@ -62,8 +68,15 @@ def load_documents():
     if not excel_path.exists():
         return []
 
-    df = pd.read_excel(excel_path, sheet_name="documents")
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="documents",
+        dtype=str,
+    )
     df = df.fillna("")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     records = df.to_dict(orient="records")
 
@@ -89,8 +102,15 @@ def update_document_status(document_id, new_status):
     if not excel_path.exists():
         return False
 
-    df = pd.read_excel(excel_path, sheet_name="documents")
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="documents",
+        dtype=str,
+    )
     df = df.fillna("")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     if "id" not in df.columns or "status" not in df.columns:
         return False
@@ -102,10 +122,13 @@ def update_document_status(document_id, new_status):
 
     backup_document_excel()
 
-    df.loc[target_index[0], "status"] = new_status
+    df.loc[target_index[0], "status"] = str(new_status)
 
     if "updated_at" in df.columns:
         df.loc[target_index[0], "updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
         df.to_excel(writer, sheet_name="documents", index=False)

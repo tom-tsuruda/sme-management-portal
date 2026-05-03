@@ -7,7 +7,7 @@
     <h2>ポータルTOP</h2>
     <p>ExcelローカルDB版 Django 経営管理ポータルです。</p>
     <p>
-        文書台帳、タスク管理、質問票、申請承認、経費精算、組織マスタ、製造管理、経営指標、ガバナンスをここから確認できます。
+        文書台帳、タスク管理、質問票、申請承認、経費精算、組織マスタ、製造管理、経営指標、ガバナンス、通知をここから確認できます。
     </p>
 </div>
 
@@ -178,6 +178,30 @@
     </div>
 </div>
 
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">通知件数</div>
+        <div class="summary-number">{{ notification_total_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">未読通知</div>
+        <div class="summary-number warning">{{ unread_notification_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">高優先度 未読通知</div>
+        <div class="summary-number danger">{{ high_priority_unread_notification_count }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">通知確認</div>
+        <div class="summary-number">
+            <a href="{% url 'notifications:notification_list' %}">開く</a>
+        </div>
+    </div>
+</div>
+
 <div class="menu-list">
     <a class="menu-item" href="{% url 'documents:document_list' %}">文書台帳</a>
     <a class="menu-item" href="{% url 'tasks:task_list' %}">タスク管理</a>
@@ -189,6 +213,72 @@
     <a class="menu-item" href="{% url 'manufacturing:management_item_list' %}">製造管理</a>
     <a class="menu-item" href="{% url 'kpi:kpi_home' %}">経営指標</a>
     <a class="menu-item" href="{% url 'governance:governance_item_list' %}">ガバナンス</a>
+    <a class="menu-item" href="{% url 'notifications:notification_list' %}">通知</a>
+</div>
+
+<div class="card">
+    <h2>最新通知</h2>
+
+    {% if latest_notifications %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>状態</th>
+                        <th>優先度</th>
+                        <th>カテゴリ</th>
+                        <th>タイトル</th>
+                        <th>対象者</th>
+                        <th>作成日時</th>
+                        <th>詳細</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notification in latest_notifications %}
+                    <tr>
+                        <td>{{ notification.id }}</td>
+                        <td>
+                            {% if notification.is_read == "1" %}
+                                <span class="badge-status">既読</span>
+                            {% else %}
+                                <span class="badge-middle">未読</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if notification.priority == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif notification.priority == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif notification.priority == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ notification.priority }}
+                            {% endif %}
+                        </td>
+                        <td>{{ notification.category }}</td>
+                        <td>{{ notification.title }}</td>
+                        <td>{{ notification.target_user }}</td>
+                        <td>{{ notification.created_at }}</td>
+                        <td>
+                            <a href="{% url 'notifications:notification_detail' notification.id %}">
+                                詳細
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="{% url 'notifications:notification_list' %}">
+                通知一覧で確認する
+            </a>
+        </p>
+    {% else %}
+        <p>通知はありません。</p>
+    {% endif %}
 </div>
 
 <div class="card">

@@ -46,8 +46,14 @@ def format_japanese_date(value):
     Excelの日付を 2026年5月31日 の形式に変換する。
     空欄や変換できない値はそのまま返す。
     """
-    if value == "" or pd.isna(value):
+    if value == "" or value is None:
         return ""
+
+    try:
+        if pd.isna(value):
+            return ""
+    except Exception:
+        pass
 
     try:
         date_value = pd.to_datetime(value)
@@ -66,8 +72,15 @@ def load_tasks():
     if not excel_path.exists():
         return []
 
-    df = pd.read_excel(excel_path, sheet_name="tasks")
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="tasks",
+        dtype=str,
+    )
     df = df.fillna("")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     records = df.to_dict(orient="records")
 
@@ -125,8 +138,15 @@ def update_task_status(task_id, new_status):
     if not excel_path.exists():
         return False
 
-    df = pd.read_excel(excel_path, sheet_name="tasks")
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="tasks",
+        dtype=str,
+    )
     df = df.fillna("")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     if "id" not in df.columns or "status" not in df.columns:
         return False
@@ -138,10 +158,13 @@ def update_task_status(task_id, new_status):
 
     backup_task_excel()
 
-    df.loc[target_index[0], "status"] = new_status
+    df.loc[target_index[0], "status"] = str(new_status)
 
     if "updated_at" in df.columns:
         df.loc[target_index[0], "updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
         df.to_excel(writer, sheet_name="tasks", index=False)
@@ -161,8 +184,15 @@ def add_task(task_name, category, owner, due_date, status, priority, related_doc
     if not excel_path.exists():
         return None
 
-    df = pd.read_excel(excel_path, sheet_name="tasks")
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="tasks",
+        dtype=str,
+    )
     df = df.fillna("")
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     required_columns = [
         "id",
@@ -202,6 +232,9 @@ def add_task(task_name, category, owner, due_date, status, priority, related_doc
         new_row["updated_at"] = now_text
 
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+
+    for column in df.columns:
+        df[column] = df[column].astype(str)
 
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
         df.to_excel(writer, sheet_name="tasks", index=False)

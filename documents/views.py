@@ -1,5 +1,6 @@
 from django.shortcuts import redirect, render
 
+from notifications.services import create_notification
 from tasks.services import add_task
 
 from .services import (
@@ -19,6 +20,31 @@ DOCUMENT_STATUS_CHOICES = [
     "要改定",
     "廃止",
 ]
+
+
+def should_create_status_notification(status):
+    return status in [
+        "未整備",
+        "未確認",
+        "要確認",
+        "レビュー中",
+        "要改定",
+    ]
+
+
+def get_notification_priority(document, status):
+    required_level = document.get("required_level", "")
+
+    if status in ["未整備", "要改定"]:
+        return "高"
+
+    if required_level in ["必須", "法定必須", "法定必須級", "重要"]:
+        return "高"
+
+    if status in ["未確認", "要確認", "レビュー中"]:
+        return "中"
+
+    return "低"
 
 
 def document_list(request):
@@ -73,7 +99,29 @@ def update_status(request, document_id):
         status = request.POST.get("status", "").strip()
 
         if status:
-            update_document_status(document_id, status)
+            update_result = update_document_status(document_id, status)
+
+            if update_result:
+                document = find_document_by_id(document_id)
+
+                if document and should_create_status_notification(status):
+                    priority = get_notification_priority(document, status)
+
+                    create_notification(
+                        title="文書ステータスが更新されました",
+                        message=(
+                            f"文書「{document.get('document_name', '')}」の状態が"
+                            f"「{status}」に更新されました。"
+                            f"カテゴリ：{document.get('category', '')}。"
+                            f"主管部署：{document.get('owner_dept', '')}。"
+                            f"重要度：{document.get('required_level', '')}。"
+                        ),
+                        target_user=document.get("owner_dept", "") or "文書管理者",
+                        category="文書管理",
+                        priority=priority,
+                        related_type="documents",
+                        related_id=document_id,
+                    )
 
     return redirect("documents:document_detail", document_id=document_id)
 
@@ -90,7 +138,7 @@ def create_task_from_document(request, document_id):
         if not task_name:
             task_name = f"{document.get('document_name', '')}を整備する"
 
-        add_task(
+        task_id = add_task(
             task_name=task_name,
             category=document.get("category", ""),
             owner=owner,
@@ -99,5 +147,22 @@ def create_task_from_document(request, document_id):
             priority=priority,
             related_document_id=document.get("id", ""),
         )
+
+        if task_id:
+            create_notification(
+                title="文書整備タスクが作成されました",
+                message=(
+                    f"文書「{document.get('document_name', '')}」から"
+                    f"タスクが作成されました。"
+                    f"タスクID：{task_id}。"
+                    f"担当者：{owner or '未設定'}。"
+                    f"期限：{due_date or '未設定'}。"
+                ),
+                target_user=owner or document.get("owner_dept", "") or "文書管理者",
+                category="文書管理",
+                priority=priority or "中",
+                related_type="tasks",
+                related_id=task_id,
+            )
 
     return redirect("documents:document_detail", document_id=document_id)

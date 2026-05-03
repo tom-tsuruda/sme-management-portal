@@ -273,7 +273,11 @@ def read_sheet(sheet_name, columns):
     excel_path = get_kpi_excel_path()
 
     try:
-        df = pd.read_excel(excel_path, sheet_name=sheet_name)
+        df = pd.read_excel(
+            excel_path,
+            sheet_name=sheet_name,
+            dtype=str,
+        )
         df = df.fillna("")
     except Exception:
         df = pd.DataFrame(columns=columns)
@@ -282,7 +286,12 @@ def read_sheet(sheet_name, columns):
         if column not in df.columns:
             df[column] = ""
 
-    return df[columns]
+    df = df[columns].copy()
+
+    for column in columns:
+        df[column] = df[column].astype(str)
+
+    return df
 
 
 def to_number(value):

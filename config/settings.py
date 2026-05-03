@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "manufacturing",
     "kpi",
     "governance",
+    "notifications",
 ]
 
 MIDDLEWARE = [

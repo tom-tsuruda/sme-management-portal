@@ -15,6 +15,7 @@ urlpatterns = [
     path("manufacturing/", include("manufacturing.urls")),
     path("kpi/", include("kpi.urls")),
     path("governance/", include("governance.urls")),
+    path("notifications/", include("notifications.urls")),
 ]
 
 if settings.DEBUG:
