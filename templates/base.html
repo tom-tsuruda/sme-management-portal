@@ -421,6 +421,413 @@
             color: #6b7280;
             margin-left: 6px;
         }
+        /* =========================================================
+   共通デザイン調整
+   フォーム・ボタン・テーブル・バッジの見た目を統一
+   ========================================================= */
+
+    :root {
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --border-color: #d1d5db;
+        --border-soft: #e5e7eb;
+        --bg-page: #f5f7fa;
+        --bg-card: #ffffff;
+        --text-main: #111827;
+        --text-sub: #6b7280;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --shadow-soft: 0 4px 12px rgba(15, 23, 42, 0.08);
+        --shadow-card: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    /* ページ全体 */
+    body {
+        background: var(--bg-page);
+        color: var(--text-main);
+    }
+
+    /* カード */
+    .card,
+    .summary-card,
+    .menu-item,
+    .document-category-block,
+    .table-wrap {
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+
+    /* 入力欄・選択欄・テキストエリア共通 */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="file"],
+    select,
+    textarea,
+    .search-form input,
+    .input-long,
+    .input-middle,
+    .input-full,
+    .amount-input {
+        font-family: inherit;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text-main);
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: var(--radius-md);
+        padding: 9px 12px;
+        box-sizing: border-box;
+        outline: none;
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease,
+            background-color 0.15s ease;
+    }
+
+    /* selectの高さをinputと揃える */
+    select {
+        min-height: 38px;
+        padding-right: 32px;
+    }
+
+    /* file inputは少し控えめ */
+    input[type="file"] {
+        width: 100%;
+        max-width: 520px;
+        background: #f8fafc;
+    }
+
+    /* フォーカス時 */
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="search"]:focus,
+    input[type="file"]:focus,
+    select:focus,
+    textarea:focus,
+    .search-form input:focus,
+    .input-long:focus,
+    .input-middle:focus,
+    .input-full:focus,
+    .amount-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        background: #ffffff;
+    }
+
+    /* ボタン共通 */
+    button,
+    input[type="submit"],
+    .button,
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 38px;
+        padding: 9px 16px;
+        border: none;
+        border-radius: var(--radius-md);
+        background: var(--primary-color);
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.2;
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.22);
+        transition:
+            background-color 0.15s ease,
+            box-shadow 0.15s ease,
+            transform 0.08s ease;
+    }
+
+    button:hover,
+    input[type="submit"]:hover,
+    .button:hover,
+    .btn:hover {
+        background: var(--primary-hover);
+        color: #ffffff;
+        text-decoration: none;
+        box-shadow: 0 5px 12px rgba(37, 99, 235, 0.28);
+    }
+
+    button:active,
+    input[type="submit"]:active,
+    .button:active,
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+    /* 小さいボタン */
+    .small-button {
+        min-height: 30px;
+        padding: 6px 10px;
+        border-radius: var(--radius-sm);
+        font-size: 12px;
+    }
+
+    /* クリアリンクなどをボタン風にしすぎない */
+    .clear-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding: 0 4px;
+        color: var(--primary-color);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .clear-link:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    /* フォームレイアウト */
+    form {
+        margin: 0;
+    }
+
+    .inline-form,
+    .search-form,
+    .task-create-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .form-row label {
+        display: block;
+        margin-bottom: 5px;
+        color: #374151;
+        font-weight: 700;
+    }
+
+    /* テーブル */
+    .table-wrap {
+        overflow-x: auto;
+        background: #ffffff;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    th,
+    td {
+        border: none;
+        border-bottom: 1px solid var(--border-soft);
+        padding: 10px 12px;
+    }
+
+    th {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 800;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:nth-child(even) td {
+        background: #fbfdff;
+    }
+
+    tr:hover td {
+        background: #eff6ff;
+    }
+
+    /* バッジ共通 */
+    .badge-high,
+    .badge-middle,
+    .badge-low,
+    .badge-status,
+    .status-badge,
+    .risk-badge,
+    .template-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 24px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.2;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    /* 既存バッジの角ばり解消 */
+    .badge-high {
+        background: #dc2626;
+        color: #ffffff;
+    }
+
+    .badge-middle {
+        background: #d97706;
+        color: #ffffff;
+    }
+
+    .badge-low {
+        background: #059669;
+        color: #ffffff;
+    }
+
+    .badge-status {
+        background: #4b5563;
+        color: #ffffff;
+    }
+
+    /* ひな形・完成文書リンク */
+    .template-badge.available {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    a.template-badge.available:hover {
+        background: #bfdbfe;
+        color: #1e40af;
+        text-decoration: none;
+    }
+
+    .template-badge.none {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    /* details / summary */
+    details {
+        border-radius: var(--radius-lg);
+    }
+
+    summary {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    /* ナビゲーション */
+    nav a {
+        border-radius: 999px;
+        padding: 4px 8px;
+        transition: background-color 0.15s ease;
+    }
+
+    nav a:hover {
+        background: rgba(255, 255, 255, 0.12);
+        text-decoration: none;
+    }
+
+    /* メニューカード */
+    .menu-item {
+        transition:
+            background-color 0.15s ease,
+            transform 0.08s ease,
+            box-shadow 0.15s ease;
+    }
+
+    .menu-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+    }
+
+    /* スマホ時 */
+    @media (max-width: 768px) {
+        .search-form,
+        .inline-form,
+        .task-create-form {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .search-form input,
+        .inline-form input,
+        .inline-form select,
+        .task-create-form input,
+        .task-create-form select,
+        button {
+            width: 100%;
+        }
+
+        table {
+            min-width: 720px;
+        }
+    }
+    /* =========================================================
+   テーブル内フィルター共通デザイン
+   ========================================================= */
+
+   .search-form {
+        display: none !important;
+    }
+
+    .table-filter-row th {
+        background: #f8fafc;
+        padding: 7px 8px;
+        border-bottom: 1px solid #dbe3ef;
+    }
+
+    .table-filter-input {
+        width: 100%;
+        min-width: 90px;
+        height: 34px;
+        padding: 7px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #111827;
+        font-family: inherit;
+        font-size: 12px;
+        box-sizing: border-box;
+        outline: none;
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease,
+            background-color 0.15s ease;
+    }
+
+    .table-filter-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    .table-filter-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .table-filter-clear {
+        margin-left: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #2563eb;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .table-filter-clear:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    .table-filter-status {
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 12px;
+    }
     </style>
 </head>
 <body>
@@ -454,5 +861,119 @@
         {% block content %}
         {% endblock %}
     </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tables = document.querySelectorAll("main table");
+        
+            tables.forEach(function (table) {
+                if (table.classList.contains("no-column-filter")) {
+                    return;
+                }
+        
+                const thead = table.querySelector("thead");
+                const tbody = table.querySelector("tbody");
+        
+                if (!thead || !tbody) {
+                    return;
+                }
+        
+                const headerRow = thead.querySelector("tr");
+        
+                if (!headerRow) {
+                    return;
+                }
+        
+                if (thead.querySelector(".table-filter-row")) {
+                    return;
+                }
+        
+                const headerCells = Array.from(headerRow.children);
+        
+                if (headerCells.length === 0) {
+                    return;
+                }
+        
+                const filterRow = document.createElement("tr");
+                filterRow.className = "table-filter-row";
+        
+                headerCells.forEach(function (headerCell, columnIndex) {
+                    const filterCell = document.createElement("th");
+        
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.className = "table-filter-input";
+        
+                    const label = headerCell.textContent.trim();
+                    input.placeholder = label ? label + "で絞込" : "絞込";
+                    input.dataset.columnIndex = columnIndex;
+        
+                    filterCell.appendChild(input);
+                    filterRow.appendChild(filterCell);
+                });
+        
+                thead.appendChild(filterRow);
+        
+                const status = document.createElement("div");
+                status.className = "table-filter-status";
+                table.parentElement.insertAdjacentElement("afterend", status);
+        
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+        
+                function normalizeText(value) {
+                    return String(value || "")
+                        .replace(/\s+/g, " ")
+                        .trim()
+                        .toLowerCase();
+                }
+        
+                function applyFilters() {
+                    const filters = Array.from(filterRow.querySelectorAll(".table-filter-input"))
+                        .map(function (input) {
+                            return {
+                                columnIndex: Number(input.dataset.columnIndex),
+                                value: normalizeText(input.value)
+                            };
+                        })
+                        .filter(function (filter) {
+                            return filter.value !== "";
+                        });
+        
+                    let visibleCount = 0;
+        
+                    rows.forEach(function (row) {
+                        const cells = Array.from(row.children);
+        
+                        const matched = filters.every(function (filter) {
+                            const cell = cells[filter.columnIndex];
+        
+                            if (!cell) {
+                                return false;
+                            }
+        
+                            const cellText = normalizeText(cell.textContent);
+                            return cellText.includes(filter.value);
+                        });
+        
+                        if (matched) {
+                            row.style.display = "";
+                            visibleCount += 1;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+        
+                    if (filters.length > 0) {
+                        status.textContent = visibleCount + "件を表示中";
+                    } else {
+                        status.textContent = "";
+                    }
+                }
+        
+                filterRow.querySelectorAll(".table-filter-input").forEach(function (input) {
+                    input.addEventListener("input", applyFilters);
+                });
+            });
+        });
+        </script>
 </body>
 </html>
