@@ -19,7 +19,18 @@
         </p>
 
         <div class="table-wrap scroll-list">
-            <table>
+            <table class="manufacturing-template-table">
+                <colgroup>
+                    <col style="width: 60px;">   <!-- 選択 -->
+                    <col style="width: 80px;">  <!-- ID -->
+                    <col style="width: 100px;">  <!-- 領域 -->
+                    <col style="width: 100px;">  <!-- カテゴリ -->
+                    <col style="width: 240px;">  <!-- テンプレート名 -->
+                    <col style="width: 80px;">  <!-- 推奨頻度 -->
+                    <col style="width: 100px;">  <!-- 推奨部署 -->
+                    <col style="width: 70px;">   <!-- リスク -->
+                    <col style="width: 80px;">  <!-- 登録状況 -->
+                </colgroup>
                 <thead>
                     <tr>
                         <th>選択</th>
@@ -34,35 +45,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for template in templates %}
+                    {% for item in templates %}
                     <tr>
                         <td>
-                            {% if template.is_selected %}
-                                -
-                            {% else %}
-                                <input type="checkbox" name="template_ids" value="{{ template.id }}">
-                            {% endif %}
+                            <input
+                                type="checkbox"
+                                name="selected_template_ids"
+                                value="{{ item.id }}"
+                                {% if item.is_registered %}disabled{% endif %}
+                            >
                         </td>
-                        <td>{{ template.id }}</td>
-                        <td>{{ template.area }}</td>
-                        <td>{{ template.category }}</td>
-                        <td>{{ template.template_name }}</td>
-                        <td>{{ template.recommended_frequency }}</td>
-                        <td>{{ template.recommended_owner_department }}</td>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.area }}</td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.template_name }}</td>
+                        <td>{{ item.recommended_frequency }}</td>
+                        <td>{{ item.recommended_department }}</td>
                         <td>
-                            {% if template.risk_level == "高" %}
+                            {% if item.risk_level == "高" %}
                                 <span class="badge-high">高</span>
-                            {% elif template.risk_level == "中" %}
+                            {% elif item.risk_level == "中" %}
                                 <span class="badge-middle">中</span>
-                            {% elif template.risk_level == "低" %}
+                            {% elif item.risk_level == "低" %}
                                 <span class="badge-low">低</span>
                             {% else %}
-                                {{ template.risk_level }}
+                                {{ item.risk_level }}
                             {% endif %}
                         </td>
                         <td>
-                            {% if template.is_selected %}
-                                <span class="badge-status">登録済み</span>
+                            {% if item.is_registered %}
+                                登録済み
                             {% else %}
                                 未登録
                             {% endif %}
@@ -70,7 +82,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9">製造管理テンプレートはありません。</td>
+                        <td colspan="9" class="text-center">表示するテンプレートがありません。</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -78,10 +90,10 @@
         </div>
 
         <p style="margin-top: 14px;">
-            <button type="submit">選択した項目を製造管理に登録</button>
-            <a class="clear-link" href="{% url 'manufacturing:management_item_list' %}">
-                製造管理へ戻る
-            </a>
+                <button type="submit">選択した項目を製造管理に登録</button>
+                <a class="clear-link" href="{% url 'manufacturing:management_item_list' %}">
+                    製造管理へ戻る
+                </a>
         </p>
     </form>
 </div>

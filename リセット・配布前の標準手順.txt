@@ -1,0 +1,10 @@
+配布前の標準手順
+
+今後、配布用にきれいな状態へ戻すときは、この順番です。
+
+cd C:\dev\sme-management-portal
+
+python tools\create_default_seed_files.py --force
+python tools\initialize_default_data.py --force
+
+python manage.py check

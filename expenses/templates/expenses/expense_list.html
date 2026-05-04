@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}経費・旅費精算{% endblock %}
 
@@ -11,20 +12,10 @@
         <a href="{% url 'expenses:expense_create' %}">新しい経費申請を作成する</a>
     </p>
 
-    <form method="get" action="{% url 'expenses:expense_list' %}" class="search-form">
-        <input
-            type="text"
-            name="q"
-            value="{{ keyword }}"
-            placeholder="件名・申請者・部署・分類・状態・金額で検索"
-        >
-        <button type="submit">検索</button>
-        <a class="clear-link" href="{% url 'expenses:expense_list' %}">クリア</a>
-    </form>
-
     <p class="count-text">
         全{{ total_count }}件中 {{ display_count }}件を表示
     </p>
+
     <p>
         <a class="button-link" href="{% url 'expenses:export_csv' %}">
             会計連携CSVを出力
@@ -32,8 +23,20 @@
     </p>
 </div>
 
-<div class="table-wrap">
-    <table>
+<div class="table-wrap expense-table-wrap">
+    <table class="expense-list-table">
+        <colgroup>
+            <col style="width: 90px;">   <!-- ID -->
+            <col style="width: 90px;">  <!-- 種別 -->
+            <col style="width: 170px;">  <!-- 件名 -->
+            <col style="width: 120px;">  <!-- 申請者 -->
+            <col style="width: 100px;">  <!-- 部署 -->
+            <col style="width: 110px;">  <!-- 利用日 -->
+            <col style="width: 100px;">  <!-- 分類 -->
+            <col style="width: 100px;">  <!-- 金額 -->
+            <col style="width: 90px;">   <!-- 状態 -->
+            <col style="width: 100px;">  <!-- 承認者 -->
+        </colgroup>
         <thead>
             <tr>
                 <th>ID</th>
@@ -44,7 +47,6 @@
                 <th>利用日</th>
                 <th>分類</th>
                 <th>金額</th>
-                <th>支払方法</th>
                 <th>状態</th>
                 <th>承認者</th>
             </tr>
@@ -52,29 +54,28 @@
         <tbody>
             {% for expense in expenses %}
             <tr>
-                <td>
+                <td class="text-center">
                     <a href="{% url 'expenses:expense_detail' expense.id %}">
                         {{ expense.id }}
                     </a>
                 </td>
-                <td>{{ expense.expense_type }}</td>
+                <td class="text-center">{{ expense.expense_type }}</td>
                 <td>
                     <a href="{% url 'expenses:expense_detail' expense.id %}">
                         {{ expense.title }}
                     </a>
                 </td>
-                <td>{{ expense.applicant }}</td>
-                <td>{{ expense.department }}</td>
-                <td>{{ expense.expense_date }}</td>
-                <td>{{ expense.category }}</td>
-                <td class="amount-text">{{ expense.amount }}</td>
-                <td>{{ expense.payment_method }}</td>
-                <td>{{ expense.status }}</td>
-                <td>{{ expense.approver }}</td>
+                <td class="text-center">{{ expense.applicant }}</td>
+                <td class="text-center">{{ expense.department }}</td>
+                <td class="text-center">{{ expense.expense_date }}</td>
+                <td class="text-center">{{ expense.category }}</td>
+                <td class="amount-text">{{ expense.amount|intcomma }}</td>
+                <td class="text-center">{{ expense.status }}</td>
+                <td class="text-center">{{ expense.approver }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="11">経費申請データがありません。</td>
+                <td colspan="10" class="text-center">経費申請データがありません。</td>
             </tr>
             {% endfor %}
         </tbody>
