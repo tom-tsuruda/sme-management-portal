@@ -166,6 +166,7 @@
                     <th>主管部署</th>
                     <th>状態</th>
                     <th>ひな形</th>
+                    <th>完成文書</th>
                     <th>リスク</th>
                     <th>次回確認日</th>
                 </tr>
@@ -233,10 +234,25 @@
                     </td>
 
                     <td>
-                        {% if doc.template_available == "あり" or doc.template_available == "有" or doc.template_available == "1" or doc.template_available == "True" or doc.template_available == "true" %}
-                            <span class="template-badge available">ひな形あり</span>
+                        {% if doc.template_exists %}
+                            <a class="template-badge available" href="{% url 'documents:download_template' doc.id %}" target="_blank">
+                                ひな形を見る
+                            </a>
+                        {% elif doc.template_available == "あり" or doc.template_available == "有" or doc.template_available == "1" or doc.template_available == "True" or doc.template_available == "true" %}
+                            <span class="template-badge none">パス未確認</span>
                         {% else %}
                             <span class="template-badge none">未設定</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if doc.completed_file_exists %}
+                            <a class="template-badge available" href="{% url 'documents:download_completed_document' doc.id %}" target="_blank">
+                                完成文書を見る
+                            </a>
+                        {% elif doc.completed_file_path %}
+                            <span class="template-badge none">パス未確認</span>
+                        {% else %}
+                            <span class="template-badge none">未登録</span>
                         {% endif %}
                     </td>
 

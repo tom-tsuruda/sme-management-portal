@@ -42,6 +42,53 @@
                     <td>{{ document.latest_version }}</td>
                 </tr>
                 <tr>
+                    <th>ひな形</th>
+                    <td>
+                        {% if document.template_exists %}
+                            <a href="{% url 'documents:download_template' document.id %}" target="_blank">
+                                ひな形を見る
+                            </a>
+                        {% elif document.template_file_path %}
+                            ひな形パスは登録されていますが、ファイルが見つかりません。
+                            <br>
+                            <span class="small-text">{{ document.template_file_path }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <tr>
+                        <th>完成文書</th>
+                        <td>
+                            {% if document.completed_file_exists %}
+                                <a href="{% url 'documents:download_completed_document' document.id %}" target="_blank">
+                                    完成文書を見る
+                                </a>
+                    
+                                {% if document.completed_file_name %}
+                                    <br>
+                                    <span class="small-text">{{ document.completed_file_name }}</span>
+                                {% endif %}
+                    
+                                {% if document.completed_at %}
+                                    <br>
+                                    <span class="small-text">登録日：{{ document.completed_at }}</span>
+                                {% endif %}
+                    
+                                {% if document.completed_by %}
+                                    <br>
+                                    <span class="small-text">登録者：{{ document.completed_by }}</span>
+                                {% endif %}
+                            {% elif document.completed_file_path %}
+                                完成文書パスは登録されていますが、ファイルが見つかりません。
+                                <br>
+                                <span class="small-text">{{ document.completed_file_path }}</span>
+                            {% else %}
+                                未登録
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tr>
+                <tr>
                     <th>次回確認日</th>
                     <td>{{ document.next_review_date }}</td>
                 </tr>
@@ -73,7 +120,36 @@
         <button type="submit">更新</button>
     </form>
 </div>
+<div class="card">
+    <h2>完成文書を登録</h2>
 
+    <p>
+        ひな形をもとに作成した完成文書をアップロードします。
+        登録すると、この文書の状態は自動的に「整備済」になります。
+    </p>
+
+    <form
+        method="post"
+        action="{% url 'documents:upload_completed_document' document.id %}"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+
+        <p>
+            <input type="file" name="completed_file" required>
+        </p>
+
+        <p>
+            <input
+                type="text"
+                name="completed_by"
+                placeholder="登録者名"
+            >
+        </p>
+
+        <button type="submit">完成文書をアップロード</button>
+    </form>
+</div>
 <div class="card">
     <h2>この文書から整備タスクを作成</h2>
 

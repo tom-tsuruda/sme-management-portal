@@ -1,3 +1,4 @@
+from django.http import FileResponse, Http404
 from django.shortcuts import redirect, render
 
 from notifications.services import create_notification
@@ -6,18 +7,19 @@ from tasks.services import add_task
 from .services import (
     find_document_by_id,
     load_documents,
+    resolve_completed_file_path,
+    resolve_template_file_path,
+    save_completed_document_file,
     update_document_status,
 )
 
-
 DOCUMENT_STATUS_CHOICES = [
     "未整備",
-    "未確認",
-    "要確認",
     "作成中",
-    "レビュー中",
+    "要確認",
     "整備済",
     "要改定",
+    "不要",
     "廃止",
 ]
 
@@ -111,6 +113,59 @@ def document_detail(request, document_id):
         "status_choices": DOCUMENT_STATUS_CHOICES,
     })
 
+def download_template(request, document_id):
+    document = find_document_by_id(document_id)
+
+    if document is None:
+        raise Http404("文書が見つかりません。")
+
+    template_path = resolve_template_file_path(document)
+
+    if template_path is None:
+        raise Http404("ひな形ファイルが見つかりません。")
+
+    return FileResponse(
+        open(template_path, "rb"),
+        as_attachment=False,
+        filename=template_path.name,
+    )
+
+def download_completed_document(request, document_id):
+    document = find_document_by_id(document_id)
+
+    if document is None:
+        raise Http404("文書が見つかりません。")
+
+    completed_path = resolve_completed_file_path(document)
+
+    if completed_path is None:
+        raise Http404("完成文書ファイルが見つかりません。")
+
+    return FileResponse(
+        open(completed_path, "rb"),
+        as_attachment=False,
+        filename=completed_path.name,
+    )
+
+
+def upload_completed_document(request, document_id):
+    document = find_document_by_id(document_id)
+
+    if document is None:
+        raise Http404("文書が見つかりません。")
+
+    if request.method == "POST":
+        uploaded_file = request.FILES.get("completed_file")
+        completed_by = request.POST.get("completed_by", "").strip()
+
+        if uploaded_file:
+            save_completed_document_file(
+                document_id=document_id,
+                uploaded_file=uploaded_file,
+                completed_by=completed_by,
+            )
+
+    return redirect("documents:document_detail", document_id=document_id)
 
 def update_status(request, document_id):
     if request.method == "POST":

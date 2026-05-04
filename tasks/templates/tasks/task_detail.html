@@ -132,6 +132,33 @@
                 関連文書の詳細を見る
             </a>
         </p>
+
+        {% if related_document.template_exists %}
+        <p>
+            <a href="{% url 'documents:download_template' related_document.id %}" target="_blank">
+                関連文書のひな形を見る
+            </a>
+        </p>
+        {% if related_document.completed_file_exists %}
+        <p>
+            <a href="{% url 'documents:download_completed_document' related_document.id %}" target="_blank">
+                関連文書の完成文書を見る
+            </a>
+        </p>
+    {% elif related_document.completed_file_path %}
+        <p>
+            完成文書パスは登録されていますが、ファイルが見つかりません。
+        </p>
+    {% else %}
+        <p>
+            完成文書はまだ登録されていません。
+        </p>
+    {% endif %}
+    {% elif related_document.template_file_path %}
+        <p>
+            ひな形パスは登録されていますが、ファイルが見つかりません。
+        </p>
+    {% endif %}    
     {% elif task.related_document_id %}
         <p>関連文書IDはありますが、文書台帳に該当データが見つかりません。</p>
     {% else %}
