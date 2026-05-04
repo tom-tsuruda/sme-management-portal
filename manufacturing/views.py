@@ -61,6 +61,7 @@ INCIDENT_AREA_CHOICES = [
     "IT/OT",
 ]
 
+
 def resolve_employee_name(employee_id, fallback=""):
     employee = find_employee_by_id(employee_id) if employee_id else None
 
@@ -97,6 +98,7 @@ def get_monitoring_notification_priority(item, result):
 
     return "低"
 
+
 def get_incident_notification_priority(severity):
     if severity in ["重大", "高"]:
         return "高"
@@ -109,6 +111,7 @@ def get_incident_notification_priority(severity):
 
 def should_create_incident_notification(severity):
     return severity in ["重大", "高", "中"]
+
 
 def should_create_status_notification(status):
     return status in [
@@ -131,6 +134,20 @@ def should_create_monitoring_notification(result):
 def management_item_list(request):
     all_items = load_management_items()
     items = all_items
+
+    all_incidents = load_incidents()
+
+    incident_open_count = len([
+        incident for incident in all_incidents
+        if incident.get("status") in ["未対応", "対応中", "再発防止確認中"]
+    ])
+
+    incident_high_count = len([
+        incident for incident in all_incidents
+        if incident.get("severity") in ["重大", "高"]
+    ])
+
+    latest_incidents = all_incidents[:20]
 
     keyword = request.GET.get("q", "").strip()
     area = request.GET.get("area", "").strip()
@@ -220,6 +237,11 @@ def management_item_list(request):
         "completed_count": completed_count,
         "overdue_count": overdue_count,
         "high_risk_count": high_risk_count,
+
+        "incidents": latest_incidents,
+        "incident_total_count": len(all_incidents),
+        "incident_open_count": incident_open_count,
+        "incident_high_count": incident_high_count,
     }
 
     return render(request, "manufacturing/management_item_list.html", context)
@@ -363,6 +385,7 @@ def create_monitoring_record(request, item_id):
             )
 
     return redirect("manufacturing:management_item_detail", item_id=item_id)
+
 
 def incident_list(request):
     all_incidents = load_incidents()
@@ -511,7 +534,7 @@ def incident_create(request):
                     related_id=incident_id,
                 )
 
-            return redirect("manufacturing:incident_list")
+            return redirect("manufacturing:management_item_list")
 
     return render(request, "manufacturing/incident_form.html", {
         "employees": employees,

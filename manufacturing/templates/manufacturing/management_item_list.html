@@ -5,12 +5,6 @@
 {% block content %}
 <h2>製造管理</h2>
 
-<p>
-    <a href="{% url 'manufacturing:incident_list' %}">製造インシデント管理</a>
-    |
-    <a href="{% url 'manufacturing:incident_create' %}">インシデント登録</a>
-</p>
-
 <div class="summary-grid">
     <div class="summary-card">
         <div class="summary-label">管理項目数</div>
@@ -33,38 +27,11 @@
     </div>
 </div>
 
-<div class="card">
-    <form method="get" class="search-form">
-        <input type="text" name="q" value="{{ keyword }}" placeholder="管理項目・領域・担当者で検索">
+<p class="count-text">
+    製造管理項目：全{{ total_count }}件中 {{ display_count }}件を表示
+</p>
 
-        <select name="area">
-            <option value="">すべての領域</option>
-            {% for area_name in areas %}
-                <option value="{{ area_name }}" {% if area == area_name %}selected{% endif %}>
-                    {{ area_name }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <select name="status">
-            <option value="">すべての状態</option>
-            {% for status_name in status_choices %}
-                <option value="{{ status_name }}" {% if status == status_name %}selected{% endif %}>
-                    {{ status_name }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">検索</button>
-        <a class="clear-link" href="{% url 'manufacturing:management_item_list' %}">クリア</a>
-    </form>
-
-    <p class="count-text">
-        全{{ total_count }}件中 {{ display_count }}件を表示
-    </p>
-</div>
-
-<div class="table-wrap">
+<div class="table-wrap scroll-list">
     <table>
         <thead>
             <tr>
@@ -112,10 +79,94 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="11" class="text-center">製造管理項目がありません。</td>
+                <td colspan="11">製造管理項目がありません。</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<div class="card" style="margin-top: 24px;">
+    <h2>製造インシデント</h2>
+
+    <p>
+        <a href="{% url 'manufacturing:incident_create' %}">＋ インシデント登録</a>
+    </p>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">インシデント数</div>
+            <div class="summary-number">{{ incident_total_count }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">未対応</div>
+            <div class="summary-number warning">{{ incident_open_count }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">重大/高</div>
+            <div class="summary-number danger">{{ incident_high_count }}</div>
+        </div>
+    </div>
+
+    {% if incidents %}
+    <div class="table-wrap scroll-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>発生日</th>
+                    <th>領域</th>
+                    <th>タイトル</th>
+                    <th>重大度</th>
+                    <th>担当者</th>
+                    <th>状態</th>
+                    <th>関連タスク</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incident in incidents %}
+                <tr>
+                    <td>{{ incident.id }}</td>
+                    <td>{{ incident.incident_date }}</td>
+                    <td>{{ incident.area }}</td>
+                    <td>{{ incident.title }}</td>
+                    <td>
+                        {% if incident.severity == "重大" or incident.severity == "高" %}
+                            <span class="badge-high">{{ incident.severity }}</span>
+                        {% elif incident.severity == "中" %}
+                            <span class="badge-middle">{{ incident.severity }}</span>
+                        {% elif incident.severity == "低" %}
+                            <span class="badge-low">{{ incident.severity }}</span>
+                        {% else %}
+                            {{ incident.severity }}
+                        {% endif %}
+                    </td>
+                    <td>{{ incident.owner }}</td>
+                    <td>
+                        <span class="badge-status">{{ incident.status }}</span>
+                    </td>
+                    <td>
+                        {% if incident.related_task_id %}
+                            <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
+                                {{ incident.related_task_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'manufacturing:incident_detail' incident.id %}">詳細</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>製造インシデントはありません。</p>
+    {% endif %}
 </div>
 {% endblock %}

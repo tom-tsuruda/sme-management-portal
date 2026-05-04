@@ -16,6 +16,16 @@ TASK_STATUS_CHOICES = [
     "要対応",
 ]
 
+TASK_CATEGORY_CHOICES = [
+    "文書整備",
+    "確認事項",
+    "申請対応",
+    "経費処理",
+    "製造管理",
+    "品質管理",
+    "ガバナンス",
+    "その他",
+]
 
 def resolve_employee_name(employee_id, fallback=""):
     employee = find_employee_by_id(employee_id) if employee_id else None
@@ -123,12 +133,12 @@ def task_list(request):
 
     return render(request, "tasks/task_list.html", {
         "tasks": tasks,
-        "employees": employees,
         "keyword": keyword,
         "total_count": len(all_tasks),
         "display_count": len(tasks),
+        "employees": employees,
+        "context_task_categories": TASK_CATEGORY_CHOICES,
     })
-
 
 def task_detail(request, task_id):
     """

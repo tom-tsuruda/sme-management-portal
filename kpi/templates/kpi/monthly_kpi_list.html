@@ -7,15 +7,9 @@
 <p>
     <a href="{% url 'kpi:monthly_kpi_create' %}">＋ 月次経営KPIを登録</a>
 </p>
-<div class="card">
-    <form method="get" class="search-form">
-        <input type="text" name="q" value="{{ keyword }}" placeholder="年月・コメントで検索">
-        <button type="submit">検索</button>
-        <a class="clear-link" href="{% url 'kpi:monthly_kpi_list' %}">クリア</a>
-    </form>
-</div>
 
-<div class="table-wrap">
+
+<div class="table-wrap scroll-list">
     <table>
         <thead>
             <tr>
