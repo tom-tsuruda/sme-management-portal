@@ -10,6 +10,7 @@ from tasks.services import add_task
 
 MANAGEMENT_ITEM_COLUMNS = [
     "id",
+    "template_id",
     "area",
     "category",
     "item_name",
@@ -57,6 +58,219 @@ INCIDENT_COLUMNS = [
     "related_task_id",
     "created_at",
     "updated_at",
+]
+
+MANAGEMENT_TEMPLATE_COLUMNS = [
+    "id",
+    "area",
+    "category",
+    "template_name",
+    "description",
+    "recommended_frequency",
+    "recommended_owner_department",
+    "related_law_or_standard",
+    "risk_level",
+    "is_default",
+    "is_active",
+]
+
+
+DEFAULT_MANAGEMENT_TEMPLATE_ROWS = [
+    {
+        "id": "MTPL-001",
+        "area": "品質管理",
+        "category": "品質",
+        "template_name": "不良率の月次確認",
+        "description": "月次で不良率、不良件数、主な不良内容を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "品質管理部",
+        "related_law_or_standard": "ISO9001相当",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-002",
+        "area": "品質管理",
+        "category": "検査",
+        "template_name": "出荷検査結果の確認",
+        "description": "出荷検査の実施状況、不合格件数、再検査状況を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "品質管理部",
+        "related_law_or_standard": "ISO9001相当",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-003",
+        "area": "品質管理",
+        "category": "クレーム",
+        "template_name": "品質クレーム発生状況の確認",
+        "description": "顧客クレームの件数、原因、是正処置、再発防止策を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "品質管理部",
+        "related_law_or_standard": "",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-004",
+        "area": "設備保全",
+        "category": "設備",
+        "template_name": "主要設備の点検実施状況確認",
+        "description": "主要設備の日常点検、定期点検、未実施項目を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "製造部",
+        "related_law_or_standard": "",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-005",
+        "area": "設備保全",
+        "category": "故障",
+        "template_name": "設備故障履歴の確認",
+        "description": "設備故障の発生件数、停止時間、原因、再発防止策を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "製造部",
+        "related_law_or_standard": "",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-006",
+        "area": "安全衛生",
+        "category": "安全",
+        "template_name": "ヒヤリハット件数確認",
+        "description": "ヒヤリハットの件数、内容、対策状況を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "安全環境部",
+        "related_law_or_standard": "労働安全衛生",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-007",
+        "area": "安全衛生",
+        "category": "教育",
+        "template_name": "安全教育実施状況確認",
+        "description": "安全教育、作業変更時教育、定期教育の実施状況を確認する。",
+        "recommended_frequency": "四半期",
+        "recommended_owner_department": "安全環境部",
+        "related_law_or_standard": "労働安全衛生法",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-008",
+        "area": "化学物質",
+        "category": "SDS",
+        "template_name": "SDS最新版確認",
+        "description": "使用化学物質のSDSが最新版で管理されているか確認する。",
+        "recommended_frequency": "四半期",
+        "recommended_owner_department": "安全環境部",
+        "related_law_or_standard": "化学物質管理",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-009",
+        "area": "化学物質",
+        "category": "リスクアセスメント",
+        "template_name": "化学物質リスクアセスメント確認",
+        "description": "化学物質の使用、保管、廃棄に関するリスク評価を確認する。",
+        "recommended_frequency": "半期",
+        "recommended_owner_department": "安全環境部",
+        "related_law_or_standard": "労働安全衛生法",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-010",
+        "area": "環境管理",
+        "category": "廃棄物",
+        "template_name": "産業廃棄物管理状況確認",
+        "description": "委託先、マニフェスト、保管状況、処理記録を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "安全環境部",
+        "related_law_or_standard": "廃棄物処理法",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-011",
+        "area": "製造管理",
+        "category": "生産",
+        "template_name": "生産計画と実績の確認",
+        "description": "生産計画、実績、差異、遅延理由を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "製造部",
+        "related_law_or_standard": "",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-012",
+        "area": "製造管理",
+        "category": "納期",
+        "template_name": "納期遅延状況確認",
+        "description": "納期遵守率、遅延案件、原因、対策を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "製造部",
+        "related_law_or_standard": "",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-013",
+        "area": "研究開発",
+        "category": "テーマ管理",
+        "template_name": "研究開発テーマ進捗確認",
+        "description": "研究テーマごとの進捗、課題、成果、次アクションを確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "研究開発部",
+        "related_law_or_standard": "",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-014",
+        "area": "IT/OT",
+        "category": "バックアップ",
+        "template_name": "工場システムバックアップ確認",
+        "description": "生産管理、検査、制御系データのバックアップ状況を確認する。",
+        "recommended_frequency": "月次",
+        "recommended_owner_department": "製造部",
+        "related_law_or_standard": "情報セキュリティ",
+        "risk_level": "高",
+        "is_default": "1",
+        "is_active": "1",
+    },
+    {
+        "id": "MTPL-015",
+        "area": "IT/OT",
+        "category": "セキュリティ",
+        "template_name": "工場PC・制御機器の管理状況確認",
+        "description": "工場PC、制御機器、ネットワーク機器の管理状況を確認する。",
+        "recommended_frequency": "四半期",
+        "recommended_owner_department": "製造部",
+        "related_law_or_standard": "情報セキュリティ",
+        "risk_level": "中",
+        "is_default": "1",
+        "is_active": "1",
+    },
 ]
 
 def get_manufacturing_excel_path():
@@ -920,3 +1134,224 @@ def create_task_from_management_item(item_id, task_name, owner, due_date, priori
         priority=priority,
         related_document_id=item.get("required_document_id", ""),
     )
+
+def read_management_templates_df():
+    ensure_manufacturing_excel()
+    excel_path = get_manufacturing_excel_path()
+
+    try:
+        df = pd.read_excel(
+            excel_path,
+            sheet_name="management_templates",
+            dtype=str,
+        )
+        df = df.fillna("")
+    except Exception:
+        df = pd.DataFrame(DEFAULT_MANAGEMENT_TEMPLATE_ROWS)
+
+        for column in MANAGEMENT_TEMPLATE_COLUMNS:
+            if column not in df.columns:
+                df[column] = ""
+
+        df = df[MANAGEMENT_TEMPLATE_COLUMNS].copy()
+
+        management_df = read_management_items_df()
+        monitoring_df = read_monitoring_records_df()
+        incident_df = read_incidents_df()
+
+        with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+            management_df.to_excel(writer, sheet_name="management_items", index=False)
+            monitoring_df.to_excel(writer, sheet_name="monitoring_records", index=False)
+            incident_df.to_excel(writer, sheet_name="incidents", index=False)
+            df.to_excel(writer, sheet_name="management_templates", index=False)
+
+    for column in MANAGEMENT_TEMPLATE_COLUMNS:
+        if column not in df.columns:
+            df[column] = ""
+
+    df = df[MANAGEMENT_TEMPLATE_COLUMNS].copy()
+
+    for column in MANAGEMENT_TEMPLATE_COLUMNS:
+        df[column] = df[column].astype(str)
+
+    return df
+
+
+def write_all_manufacturing_sheets(
+    management_df=None,
+    monitoring_df=None,
+    incident_df=None,
+    template_df=None,
+):
+    excel_path = get_manufacturing_excel_path()
+
+    if management_df is None:
+        management_df = read_management_items_df()
+
+    if monitoring_df is None:
+        monitoring_df = read_monitoring_records_df()
+
+    if incident_df is None:
+        incident_df = read_incidents_df()
+
+    if template_df is None:
+        template_df = read_management_templates_df()
+
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        if column not in management_df.columns:
+            management_df[column] = ""
+
+    for column in MONITORING_RECORD_COLUMNS:
+        if column not in monitoring_df.columns:
+            monitoring_df[column] = ""
+
+    for column in INCIDENT_COLUMNS:
+        if column not in incident_df.columns:
+            incident_df[column] = ""
+
+    for column in MANAGEMENT_TEMPLATE_COLUMNS:
+        if column not in template_df.columns:
+            template_df[column] = ""
+
+    management_df = management_df[MANAGEMENT_ITEM_COLUMNS].copy()
+    monitoring_df = monitoring_df[MONITORING_RECORD_COLUMNS].copy()
+    incident_df = incident_df[INCIDENT_COLUMNS].copy()
+    template_df = template_df[MANAGEMENT_TEMPLATE_COLUMNS].copy()
+
+    for column in MANAGEMENT_ITEM_COLUMNS:
+        management_df[column] = management_df[column].astype(str)
+
+    for column in MONITORING_RECORD_COLUMNS:
+        monitoring_df[column] = monitoring_df[column].astype(str)
+
+    for column in INCIDENT_COLUMNS:
+        incident_df[column] = incident_df[column].astype(str)
+
+    for column in MANAGEMENT_TEMPLATE_COLUMNS:
+        template_df[column] = template_df[column].astype(str)
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        management_df.to_excel(writer, sheet_name="management_items", index=False)
+        monitoring_df.to_excel(writer, sheet_name="monitoring_records", index=False)
+        incident_df.to_excel(writer, sheet_name="incidents", index=False)
+        template_df.to_excel(writer, sheet_name="management_templates", index=False)
+
+
+def load_management_templates():
+    template_df = read_management_templates_df()
+    management_df = read_management_items_df()
+
+    selected_template_ids = set(
+        str(value).strip()
+        for value in management_df.get("template_id", pd.Series(dtype=str)).fillna("")
+        if str(value).strip()
+    )
+
+    records = template_df.to_dict(orient="records")
+
+    for record in records:
+        record["is_selected"] = str(record.get("id", "")).strip() in selected_template_ids
+
+    return records
+
+
+def generate_next_management_item_id_from_df(df):
+    if "id" not in df.columns or df.empty:
+        return "MFG-001"
+
+    max_number = 0
+
+    for value in df["id"].dropna():
+        text = str(value).strip()
+
+        if text.startswith("MFG-"):
+            try:
+                number = int(text.replace("MFG-", ""))
+                max_number = max(max_number, number)
+            except ValueError:
+                continue
+
+    return f"MFG-{max_number + 1:03d}"
+
+
+def create_management_items_from_templates(template_ids):
+    if not template_ids:
+        return 0
+
+    template_ids = [
+        str(template_id).strip()
+        for template_id in template_ids
+        if str(template_id).strip()
+    ]
+
+    if not template_ids:
+        return 0
+
+    template_df = read_management_templates_df()
+    management_df = read_management_items_df()
+
+    existing_template_ids = set(
+        str(value).strip()
+        for value in management_df.get("template_id", pd.Series(dtype=str)).fillna("")
+        if str(value).strip()
+    )
+
+    backup_manufacturing_excel()
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    new_rows = []
+
+    for template_id in template_ids:
+        if template_id in existing_template_ids:
+            continue
+
+        matched_templates = template_df[
+            template_df["id"].astype(str) == str(template_id)
+        ]
+
+        if matched_templates.empty:
+            continue
+
+        template = matched_templates.iloc[0].to_dict()
+
+        current_df = pd.concat(
+            [management_df, pd.DataFrame(new_rows)],
+            ignore_index=True,
+        )
+
+        item_id = generate_next_management_item_id_from_df(current_df)
+
+        new_rows.append({
+            "id": item_id,
+            "template_id": template.get("id", ""),
+            "area": template.get("area", ""),
+            "category": template.get("category", ""),
+            "item_name": template.get("template_name", ""),
+            "description": template.get("description", ""),
+            "owner_department": template.get("recommended_owner_department", ""),
+            "owner": "",
+            "check_frequency": template.get("recommended_frequency", ""),
+            "required_document_id": "",
+            "related_law_or_standard": template.get("related_law_or_standard", ""),
+            "risk_level": template.get("risk_level", "中"),
+            "status": "要確認",
+            "last_checked_at": "",
+            "next_check_date": "",
+            "created_at": now_text,
+            "updated_at": now_text,
+        })
+
+    if not new_rows:
+        return 0
+
+    management_df = pd.concat(
+        [management_df, pd.DataFrame(new_rows)],
+        ignore_index=True,
+    )
+
+    write_all_manufacturing_sheets(
+        management_df=management_df,
+        template_df=template_df,
+    )
+
+    return len(new_rows)

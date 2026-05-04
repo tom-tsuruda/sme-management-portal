@@ -13,6 +13,8 @@ from .services import (
     create_incident as create_manufacturing_incident,
     load_incidents,
     find_incident_by_id,
+    load_management_templates,
+    create_management_items_from_templates,
 )
 
 
@@ -246,6 +248,49 @@ def management_item_list(request):
 
     return render(request, "manufacturing/management_item_list.html", context)
 
+def management_template_list(request):
+    templates = load_management_templates()
+
+    if request.method == "POST":
+        selected_template_ids = request.POST.getlist("template_ids")
+
+        created_count = create_management_items_from_templates(
+            selected_template_ids
+        )
+
+        if created_count > 0:
+            create_notification(
+                title="製造管理テンプレートから管理項目を登録しました",
+                message=f"製造管理テンプレートから {created_count} 件の管理項目を登録しました。",
+                target_user="製造責任者",
+                category="製造管理",
+                priority="中",
+                related_type="manufacturing",
+                related_id="templates",
+            )
+
+        return redirect("manufacturing:management_item_list")
+
+    active_templates = [
+        template for template in templates
+        if str(template.get("is_active", "")) in ["1", "true", "True", "TRUE", "有効", ""]
+    ]
+
+    areas = sorted(set([
+        template.get("area", "")
+        for template in active_templates
+        if template.get("area", "")
+    ]))
+
+    return render(request, "manufacturing/management_template_list.html", {
+        "templates": active_templates,
+        "areas": areas,
+        "total_count": len(active_templates),
+        "selected_count": len([
+            template for template in active_templates
+            if template.get("is_selected")
+        ]),
+    })
 
 def management_item_detail(request, item_id):
     item = find_management_item_by_id(item_id)

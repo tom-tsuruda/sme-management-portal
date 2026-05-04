@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}製造管理テンプレート{% endblock %}
+
+{% block content %}
+<h2>製造管理テンプレート</h2>
+
+<p class="count-text">
+    テンプレート {{ total_count }}件 / 登録済み {{ selected_count }}件
+</p>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+
+        <p>
+            会社で定期的に確認したい項目を選択してください。
+            登録済みの項目は重複登録されません。
+        </p>
+
+        <div class="table-wrap scroll-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>選択</th>
+                        <th>ID</th>
+                        <th>領域</th>
+                        <th>カテゴリ</th>
+                        <th>テンプレート名</th>
+                        <th>推奨頻度</th>
+                        <th>推奨部署</th>
+                        <th>リスク</th>
+                        <th>登録状況</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for template in templates %}
+                    <tr>
+                        <td>
+                            {% if template.is_selected %}
+                                -
+                            {% else %}
+                                <input type="checkbox" name="template_ids" value="{{ template.id }}">
+                            {% endif %}
+                        </td>
+                        <td>{{ template.id }}</td>
+                        <td>{{ template.area }}</td>
+                        <td>{{ template.category }}</td>
+                        <td>{{ template.template_name }}</td>
+                        <td>{{ template.recommended_frequency }}</td>
+                        <td>{{ template.recommended_owner_department }}</td>
+                        <td>
+                            {% if template.risk_level == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif template.risk_level == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif template.risk_level == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ template.risk_level }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if template.is_selected %}
+                                <span class="badge-status">登録済み</span>
+                            {% else %}
+                                未登録
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">製造管理テンプレートはありません。</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p style="margin-top: 14px;">
+            <button type="submit">選択した項目を製造管理に登録</button>
+            <a class="clear-link" href="{% url 'manufacturing:management_item_list' %}">
+                製造管理へ戻る
+            </a>
+        </p>
+    </form>
+</div>
+{% endblock %}
