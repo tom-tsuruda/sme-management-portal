@@ -34,6 +34,7 @@
             grid-column: auto;
         }
     }
+    
 </style>
 
 <div class="card">
@@ -41,8 +42,18 @@
     <p>未整備文書・確認事項・期限付きタスクを管理します。</p>
     <p class="count-text">全{{ total_count }}件中 {{ display_count }}件を表示</p>
 
-    <div class="table-wrap scroll-list" style="margin-top: 16px;">
-        <table>
+    <div class="table-wrap scroll-list">
+        <table class="task-list-table">
+            <colgroup>
+                <col style="width: 100px;">
+                <col style="width: 660px;">
+                <col style="width: 130px;">
+                <col style="width: 120px;">
+                <col style="width: 140px;">
+                <col style="width: 65px;">
+                <col style="width: 40px;">
+                <col style="width: 40px;">
+            </colgroup>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -52,7 +63,7 @@
                     <th>期限</th>
                     <th>状態</th>
                     <th>優先度</th>
-                    <th>関連文書</th>
+                    <th>詳細</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,8 +77,20 @@
                     <td>{{ task.owner }}</td>
                     <td>{{ task.due_date }}</td>
                     <td>{{ task.status }}</td>
-                    <td>{{ task.priority }}</td>
-                    <td>{{ task.related_document_id }}</td>
+                    <td>
+                        {% if task.priority == "高" %}
+                            <span class="badge-high">高</span>
+                        {% elif task.priority == "中" %}
+                            <span class="badge-middle">中</span>
+                        {% elif task.priority == "低" %}
+                            <span class="badge-low">低</span>
+                        {% else %}
+                            {{ task.priority }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'tasks:task_detail' task.id %}">詳細</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
