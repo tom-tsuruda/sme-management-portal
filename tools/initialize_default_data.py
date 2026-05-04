@@ -27,6 +27,36 @@ DEFAULT_FILES = [
         "target": "questionnaire_data.xlsx",
         "label": "質問票データ",
     },
+    {
+        "seed": "manufacturing_master_default.xlsx",
+        "target": "manufacturing_master.xlsx",
+        "label": "製造管理データ",
+    },
+    {
+        "seed": "kpi_data_default.xlsx",
+        "target": "kpi_data.xlsx",
+        "label": "経営KPIデータ",
+    },
+    {
+        "seed": "workflow_data_default.xlsx",
+        "target": "workflow_data.xlsx",
+        "label": "申請承認データ",
+    },
+    {
+        "seed": "expense_data_default.xlsx",
+        "target": "expense_data.xlsx",
+        "label": "経費精算データ",
+    },
+    {
+        "seed": "organization_master_default.xlsx",
+        "target": "organization_master.xlsx",
+        "label": "組織マスタ",
+    },
+    {
+        "seed": "notification_data_default.xlsx",
+        "target": "notification_data.xlsx",
+        "label": "操作履歴データ",
+    },
 ]
 
 

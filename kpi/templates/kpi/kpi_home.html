@@ -6,13 +6,6 @@
 {% block content %}
 <h2>経営指標ダッシュボード</h2>
 
-<div class="card">
-    <p>
-        月次の経営指標・製造指標を確認できます。
-        初期MVPでは <code>data/kpi_data.xlsx</code> を正データとして利用します。
-    </p>
-</div>
-
 {% if latest_monthly_kpi %}
 <div class="summary-grid">
     <div class="summary-card">
@@ -83,7 +76,7 @@
     </a>
 </div>
 
-<div class="card">
+<div class="card" style="margin-top: 24px;">
     <h2>最新 月次経営KPI</h2>
 
     {% if monthly_kpis %}
