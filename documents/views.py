@@ -60,10 +60,17 @@ def document_list(request):
             target_text = " ".join([
                 str(doc.get("id", "")),
                 str(doc.get("category", "")),
+                str(doc.get("subcategory", "")),
                 str(doc.get("document_name", "")),
+                str(doc.get("document_type", "")),
                 str(doc.get("required_level", "")),
                 str(doc.get("owner_dept", "")),
+                str(doc.get("owner_department", "")),
+                str(doc.get("owner", "")),
                 str(doc.get("status", "")),
+                str(doc.get("template_available", "")),
+                str(doc.get("risk_level", "")),
+                str(doc.get("related_question_ids", "")),
             ])
 
             if keyword.lower() in target_text.lower():
@@ -71,8 +78,19 @@ def document_list(request):
 
         documents = filtered_documents
 
+    grouped_documents = {}
+
+    for doc in documents:
+        category = doc.get("category", "") or "未分類"
+
+        if category not in grouped_documents:
+            grouped_documents[category] = []
+
+        grouped_documents[category].append(doc)
+
     return render(request, "documents/document_list.html", {
         "documents": documents,
+        "grouped_documents": grouped_documents,
         "keyword": keyword,
         "total_count": len(all_documents),
         "display_count": len(documents),
