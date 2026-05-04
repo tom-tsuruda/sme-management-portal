@@ -32,13 +32,24 @@
         部署一覧
     </a>
 
+    <a class="menu-item" href="{% url 'organizations:department_create' %}">
+        部署追加
+    </a>
+
     <a class="menu-item" href="{% url 'organizations:position_list' %}">
         役職一覧
+    </a>
+
+    <a class="menu-item" href="{% url 'organizations:position_create' %}">
+        役職追加
     </a>
 
     <a class="menu-item" href="{% url 'organizations:employee_list' %}">
         社員一覧
     </a>
-</div>
 
+    <a class="menu-item" href="{% url 'organizations:employee_create' %}">
+        社員追加
+    </a>
+</div>
 {% endblock %}

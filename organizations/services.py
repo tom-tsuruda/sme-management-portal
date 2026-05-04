@@ -56,244 +56,14 @@ def ensure_organization_excel():
     if excel_path.exists():
         return
 
-    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    departments = [
-        {
-            "id": "DEPT-001",
-            "department_code": "D001",
-            "department_name": "経営企画部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-001",
-            "description": "経営方針、KPI、全社企画を管理する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "DEPT-002",
-            "department_code": "D002",
-            "department_name": "総務部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-002",
-            "description": "社内規程、庶務、ガバナンス文書を管理する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "DEPT-003",
-            "department_code": "D003",
-            "department_name": "製造部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-003",
-            "description": "製造工程、生産計画、設備管理を担当する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "DEPT-004",
-            "department_code": "D004",
-            "department_name": "品質管理部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-004",
-            "description": "検査、不適合、品質記録を管理する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "DEPT-005",
-            "department_code": "D005",
-            "department_name": "研究開発部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-005",
-            "description": "研究テーマ、試作、技術開発を担当する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "DEPT-006",
-            "department_code": "D006",
-            "department_name": "安全環境部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-006",
-            "description": "安全衛生、環境、化学物質管理を担当する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "DEPT-007",
-            "department_code": "D007",
-            "department_name": "経理部",
-            "parent_department_id": "",
-            "manager_employee_id": "EMP-007",
-            "description": "経費、支払、会計連携データを管理する部門",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-    ]
-
-    positions = [
-        {
-            "id": "POS-001",
-            "position_code": "P001",
-            "position_name": "代表取締役",
-            "rank": "1",
-            "approval_limit_amount": "999999999",
-            "description": "最終承認者",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "POS-002",
-            "position_code": "P002",
-            "position_name": "部長",
-            "rank": "2",
-            "approval_limit_amount": "1000000",
-            "description": "部門責任者",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "POS-003",
-            "position_code": "P003",
-            "position_name": "課長",
-            "rank": "3",
-            "approval_limit_amount": "300000",
-            "description": "課単位の管理者",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "POS-004",
-            "position_code": "P004",
-            "position_name": "担当者",
-            "rank": "4",
-            "approval_limit_amount": "0",
-            "description": "一般担当者",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-    ]
-
-    employees = [
-        {
-            "id": "EMP-001",
-            "employee_code": "E001",
-            "employee_name": "経営 太郎",
-            "department_id": "DEPT-001",
-            "position_id": "POS-001",
-            "email": "president@example.com",
-            "role": "経営者",
-            "supervisor_employee_id": "",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "EMP-002",
-            "employee_code": "E002",
-            "employee_name": "総務 花子",
-            "department_id": "DEPT-002",
-            "position_id": "POS-002",
-            "email": "soumu@example.com",
-            "role": "管理者",
-            "supervisor_employee_id": "EMP-001",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "EMP-003",
-            "employee_code": "E003",
-            "employee_name": "製造 一郎",
-            "department_id": "DEPT-003",
-            "position_id": "POS-002",
-            "email": "manufacturing@example.com",
-            "role": "製造責任者",
-            "supervisor_employee_id": "EMP-001",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "EMP-004",
-            "employee_code": "E004",
-            "employee_name": "品質 次郎",
-            "department_id": "DEPT-004",
-            "position_id": "POS-002",
-            "email": "quality@example.com",
-            "role": "品質責任者",
-            "supervisor_employee_id": "EMP-001",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "EMP-005",
-            "employee_code": "E005",
-            "employee_name": "研究 三郎",
-            "department_id": "DEPT-005",
-            "position_id": "POS-002",
-            "email": "rd@example.com",
-            "role": "研究開発責任者",
-            "supervisor_employee_id": "EMP-001",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "EMP-006",
-            "employee_code": "E006",
-            "employee_name": "安全 四郎",
-            "department_id": "DEPT-006",
-            "position_id": "POS-002",
-            "email": "safety@example.com",
-            "role": "安全環境責任者",
-            "supervisor_employee_id": "EMP-001",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-        {
-            "id": "EMP-007",
-            "employee_code": "E007",
-            "employee_name": "経理 五郎",
-            "department_id": "DEPT-007",
-            "position_id": "POS-002",
-            "email": "accounting@example.com",
-            "role": "経理責任者",
-            "supervisor_employee_id": "EMP-001",
-            "is_approver": "1",
-            "is_active": "1",
-            "created_at": now_text,
-            "updated_at": now_text,
-        },
-    ]
-
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
-        pd.DataFrame(departments, columns=DEPARTMENT_COLUMNS).to_excel(
+        pd.DataFrame(columns=DEPARTMENT_COLUMNS).to_excel(
             writer, sheet_name="departments", index=False
         )
-        pd.DataFrame(positions, columns=POSITION_COLUMNS).to_excel(
+        pd.DataFrame(columns=POSITION_COLUMNS).to_excel(
             writer, sheet_name="positions", index=False
         )
-        pd.DataFrame(employees, columns=EMPLOYEE_COLUMNS).to_excel(
+        pd.DataFrame(columns=EMPLOYEE_COLUMNS).to_excel(
             writer, sheet_name="employees", index=False
         )
 
@@ -322,6 +92,44 @@ def read_sheet(sheet_name, columns):
         df[column] = df[column].astype(str)
 
     return df
+
+
+def write_organization_excel(departments_df, positions_df, employees_df):
+    excel_path = get_organization_excel_path()
+
+    departments_df = departments_df.copy()
+    positions_df = positions_df.copy()
+    employees_df = employees_df.copy()
+
+    for column in DEPARTMENT_COLUMNS:
+        if column not in departments_df.columns:
+            departments_df[column] = ""
+
+    for column in POSITION_COLUMNS:
+        if column not in positions_df.columns:
+            positions_df[column] = ""
+
+    for column in EMPLOYEE_COLUMNS:
+        if column not in employees_df.columns:
+            employees_df[column] = ""
+
+    departments_df = departments_df[DEPARTMENT_COLUMNS].copy()
+    positions_df = positions_df[POSITION_COLUMNS].copy()
+    employees_df = employees_df[EMPLOYEE_COLUMNS].copy()
+
+    for column in DEPARTMENT_COLUMNS:
+        departments_df[column] = departments_df[column].astype(str)
+
+    for column in POSITION_COLUMNS:
+        positions_df[column] = positions_df[column].astype(str)
+
+    for column in EMPLOYEE_COLUMNS:
+        employees_df[column] = employees_df[column].astype(str)
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        departments_df.to_excel(writer, sheet_name="departments", index=False)
+        positions_df.to_excel(writer, sheet_name="positions", index=False)
+        employees_df.to_excel(writer, sheet_name="employees", index=False)
 
 
 def load_departments():
@@ -383,3 +191,324 @@ def find_employee_by_id(employee_id):
         if str(emp.get("id")) == str(employee_id):
             return emp
     return None
+
+
+def generate_next_id(df, prefix, width=3):
+    if "id" not in df.columns or df.empty:
+        return f"{prefix}-{1:0{width}d}"
+
+    max_number = 0
+
+    for value in df["id"].dropna():
+        text = str(value).strip()
+
+        if text.startswith(f"{prefix}-"):
+            try:
+                number = int(text.replace(f"{prefix}-", ""))
+                max_number = max(max_number, number)
+            except ValueError:
+                continue
+
+    return f"{prefix}-{max_number + 1:0{width}d}"
+
+
+def generate_next_code(df, column, prefix, width=3):
+    if column not in df.columns or df.empty:
+        return f"{prefix}{1:0{width}d}"
+
+    max_number = 0
+
+    for value in df[column].dropna():
+        text = str(value).strip()
+
+        if text.startswith(prefix):
+            try:
+                number = int(text.replace(prefix, ""))
+                max_number = max(max_number, number)
+            except ValueError:
+                continue
+
+    return f"{prefix}{max_number + 1:0{width}d}"
+
+
+def normalize_checkbox(value):
+    return "1" if str(value) in ["1", "on", "true", "True", "TRUE", "承認者", "有効"] else "0"
+
+
+def add_department(
+    department_name,
+    department_code="",
+    parent_department_id="",
+    manager_employee_id="",
+    description="",
+    is_active="1",
+):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    department_id = generate_next_id(departments_df, "DEPT")
+
+    if not department_code:
+        department_code = generate_next_code(departments_df, "department_code", "D")
+
+    new_row = {
+        "id": department_id,
+        "department_code": department_code,
+        "department_name": department_name,
+        "parent_department_id": parent_department_id,
+        "manager_employee_id": manager_employee_id,
+        "description": description,
+        "is_active": normalize_checkbox(is_active),
+        "created_at": now_text,
+        "updated_at": now_text,
+    }
+
+    departments_df = pd.concat(
+        [departments_df, pd.DataFrame([new_row])],
+        ignore_index=True,
+    )
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+
+    return department_id
+
+
+def update_department(
+    department_id,
+    department_code,
+    department_name,
+    parent_department_id,
+    manager_employee_id,
+    description,
+    is_active,
+):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    target_index = departments_df.index[
+        departments_df["id"].astype(str) == str(department_id)
+    ].tolist()
+
+    if not target_index:
+        return False
+
+    index = target_index[0]
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    departments_df.loc[index, "department_code"] = department_code
+    departments_df.loc[index, "department_name"] = department_name
+    departments_df.loc[index, "parent_department_id"] = parent_department_id
+    departments_df.loc[index, "manager_employee_id"] = manager_employee_id
+    departments_df.loc[index, "description"] = description
+    departments_df.loc[index, "is_active"] = normalize_checkbox(is_active)
+    departments_df.loc[index, "updated_at"] = now_text
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+    return True
+
+
+def delete_department(department_id):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    departments_df = departments_df[
+        departments_df["id"].astype(str) != str(department_id)
+    ].copy()
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+    return True
+
+
+def add_position(
+    position_name,
+    position_code="",
+    rank="",
+    approval_limit_amount="",
+    description="",
+    is_active="1",
+):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    position_id = generate_next_id(positions_df, "POS")
+
+    if not position_code:
+        position_code = generate_next_code(positions_df, "position_code", "P")
+
+    new_row = {
+        "id": position_id,
+        "position_code": position_code,
+        "position_name": position_name,
+        "rank": rank,
+        "approval_limit_amount": approval_limit_amount,
+        "description": description,
+        "is_active": normalize_checkbox(is_active),
+        "created_at": now_text,
+        "updated_at": now_text,
+    }
+
+    positions_df = pd.concat(
+        [positions_df, pd.DataFrame([new_row])],
+        ignore_index=True,
+    )
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+
+    return position_id
+
+
+def update_position(
+    position_id,
+    position_code,
+    position_name,
+    rank,
+    approval_limit_amount,
+    description,
+    is_active,
+):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    target_index = positions_df.index[
+        positions_df["id"].astype(str) == str(position_id)
+    ].tolist()
+
+    if not target_index:
+        return False
+
+    index = target_index[0]
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    positions_df.loc[index, "position_code"] = position_code
+    positions_df.loc[index, "position_name"] = position_name
+    positions_df.loc[index, "rank"] = rank
+    positions_df.loc[index, "approval_limit_amount"] = approval_limit_amount
+    positions_df.loc[index, "description"] = description
+    positions_df.loc[index, "is_active"] = normalize_checkbox(is_active)
+    positions_df.loc[index, "updated_at"] = now_text
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+    return True
+
+
+def delete_position(position_id):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    positions_df = positions_df[
+        positions_df["id"].astype(str) != str(position_id)
+    ].copy()
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+    return True
+
+
+def add_employee(
+    employee_name,
+    employee_code="",
+    department_id="",
+    position_id="",
+    email="",
+    role="",
+    supervisor_employee_id="",
+    is_approver="0",
+    is_active="1",
+):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    employee_id = generate_next_id(employees_df, "EMP")
+
+    if not employee_code:
+        employee_code = generate_next_code(employees_df, "employee_code", "E")
+
+    new_row = {
+        "id": employee_id,
+        "employee_code": employee_code,
+        "employee_name": employee_name,
+        "department_id": department_id,
+        "position_id": position_id,
+        "email": email,
+        "role": role,
+        "supervisor_employee_id": supervisor_employee_id,
+        "is_approver": normalize_checkbox(is_approver),
+        "is_active": normalize_checkbox(is_active),
+        "created_at": now_text,
+        "updated_at": now_text,
+    }
+
+    employees_df = pd.concat(
+        [employees_df, pd.DataFrame([new_row])],
+        ignore_index=True,
+    )
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+
+    return employee_id
+
+
+def update_employee(
+    employee_id,
+    employee_code,
+    employee_name,
+    department_id,
+    position_id,
+    email,
+    role,
+    supervisor_employee_id,
+    is_approver,
+    is_active,
+):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    target_index = employees_df.index[
+        employees_df["id"].astype(str) == str(employee_id)
+    ].tolist()
+
+    if not target_index:
+        return False
+
+    index = target_index[0]
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    employees_df.loc[index, "employee_code"] = employee_code
+    employees_df.loc[index, "employee_name"] = employee_name
+    employees_df.loc[index, "department_id"] = department_id
+    employees_df.loc[index, "position_id"] = position_id
+    employees_df.loc[index, "email"] = email
+    employees_df.loc[index, "role"] = role
+    employees_df.loc[index, "supervisor_employee_id"] = supervisor_employee_id
+    employees_df.loc[index, "is_approver"] = normalize_checkbox(is_approver)
+    employees_df.loc[index, "is_active"] = normalize_checkbox(is_active)
+    employees_df.loc[index, "updated_at"] = now_text
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+    return True
+
+
+def delete_employee(employee_id):
+    departments_df = read_sheet("departments", DEPARTMENT_COLUMNS)
+    positions_df = read_sheet("positions", POSITION_COLUMNS)
+    employees_df = read_sheet("employees", EMPLOYEE_COLUMNS)
+
+    employees_df = employees_df[
+        employees_df["id"].astype(str) != str(employee_id)
+    ].copy()
+
+    write_organization_excel(departments_df, positions_df, employees_df)
+    return True

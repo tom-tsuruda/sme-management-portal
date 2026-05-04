@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{% if position %}役職編集{% else %}役職追加{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{% if position %}役職編集{% else %}役職追加{% endif %}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>役職コード</label>
+            <input type="text" name="position_code" class="input-middle"
+                   value="{% if position %}{{ position.position_code }}{% endif %}"
+                   placeholder="空欄の場合は自動採番">
+        </div>
+
+        <div class="form-row">
+            <label>役職名</label>
+            <input type="text" name="position_name" class="input-middle"
+                   value="{% if position %}{{ position.position_name }}{% endif %}"
+                   required>
+        </div>
+
+        <div class="form-row">
+            <label>ランク</label>
+            <input type="number" name="rank" class="amount-input"
+                   value="{% if position %}{{ position.rank }}{% endif %}">
+        </div>
+
+        <div class="form-row">
+            <label>承認上限額</label>
+            <input type="text" name="approval_limit_amount" class="amount-input"
+                   value="{% if position %}{{ position.approval_limit_amount }}{% endif %}"
+                   placeholder="例：1000000">
+        </div>
+
+        <div class="form-row">
+            <label>説明</label>
+            <input type="text" name="description" class="input-long"
+                   value="{% if position %}{{ position.description }}{% endif %}">
+        </div>
+
+        <div class="form-row">
+            <label>
+                <input type="checkbox" name="is_active" value="1"
+                    {% if not position or position.is_active == "1" %}checked{% endif %}>
+                有効
+            </label>
+        </div>
+
+        <p>
+            <button type="submit">保存</button>
+            <a class="clear-link" href="{% url 'organizations:position_list' %}">役職一覧へ戻る</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

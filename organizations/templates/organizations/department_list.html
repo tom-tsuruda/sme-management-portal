@@ -3,18 +3,35 @@
 {% block title %}部署一覧{% endblock %}
 
 {% block content %}
+<style>
+    .master-list-table th,
+    .master-list-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .master-list-table .action-cell {
+        white-space: nowrap;
+    }
+
+    .master-list-table .action-cell a {
+        margin-right: 12px;
+    }
+
+    .master-list-table .action-cell form {
+        display: inline-block;
+        margin-left: 4px;
+    }
+</style>
+
 <h2>部署一覧</h2>
 
-<div class="card">
-    <form method="get" class="search-form">
-        <input type="text" name="q" value="{{ keyword }}" placeholder="部署名・コード・説明で検索">
-        <button type="submit">検索</button>
-        <a class="clear-link" href="{% url 'organizations:department_list' %}">クリア</a>
-    </form>
-</div>
+<p>
+    <a href="{% url 'organizations:department_create' %}">＋ 部署追加</a>
+</p>
 
-<div class="table-wrap">
-    <table>
+<div class="table-wrap scroll-list">
+    <table class="master-list-table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -24,6 +41,7 @@
                 <th>責任者ID</th>
                 <th>説明</th>
                 <th>有効</th>
+                <th>操作</th>
             </tr>
         </thead>
         <tbody>
@@ -36,10 +54,20 @@
                 <td>{{ dept.manager_employee_id }}</td>
                 <td>{{ dept.description }}</td>
                 <td>{{ dept.is_active }}</td>
+                <td class="action-cell">
+                    <a href="{% url 'organizations:department_edit' dept.id %}">編集</a>
+
+                    <form method="post"
+                          action="{% url 'organizations:department_delete' dept.id %}"
+                          onsubmit="return confirm('この部署を削除しますか？');">
+                        {% csrf_token %}
+                        <button type="submit" class="small-button">削除</button>
+                    </form>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center">部署データがありません。</td>
+                <td colspan="8">部署データがありません。</td>
             </tr>
             {% endfor %}
         </tbody>

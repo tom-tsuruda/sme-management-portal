@@ -1,20 +1,38 @@
 {% extends "base.html" %}
+{% load format_filters %}
 
 {% block title %}役職一覧{% endblock %}
 
 {% block content %}
+<style>
+    .master-list-table th,
+    .master-list-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .master-list-table .action-cell {
+        white-space: nowrap;
+    }
+
+    .master-list-table .action-cell a {
+        margin-right: 12px;
+    }
+
+    .master-list-table .action-cell form {
+        display: inline-block;
+        margin-left: 4px;
+    }
+</style>
+
 <h2>役職一覧</h2>
 
-<div class="card">
-    <form method="get" class="search-form">
-        <input type="text" name="q" value="{{ keyword }}" placeholder="役職名・コード・説明で検索">
-        <button type="submit">検索</button>
-        <a class="clear-link" href="{% url 'organizations:position_list' %}">クリア</a>
-    </form>
-</div>
+<p>
+    <a href="{% url 'organizations:position_create' %}">＋ 役職追加</a>
+</p>
 
-<div class="table-wrap">
-    <table>
+<div class="table-wrap scroll-list">
+    <table class="master-list-table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -24,6 +42,7 @@
                 <th>承認上限額</th>
                 <th>説明</th>
                 <th>有効</th>
+                <th>操作</th>
             </tr>
         </thead>
         <tbody>
@@ -33,13 +52,23 @@
                 <td>{{ pos.position_code }}</td>
                 <td>{{ pos.position_name }}</td>
                 <td>{{ pos.rank }}</td>
-                <td class="amount-text">{{ pos.approval_limit_amount }}</td>
+                <td class="amount-text">{{ pos.approval_limit_amount|amount }}</td>
                 <td>{{ pos.description }}</td>
                 <td>{{ pos.is_active }}</td>
+                <td class="action-cell">
+                    <a href="{% url 'organizations:position_edit' pos.id %}">編集</a>
+
+                    <form method="post"
+                          action="{% url 'organizations:position_delete' pos.id %}"
+                          onsubmit="return confirm('この役職を削除しますか？');">
+                        {% csrf_token %}
+                        <button type="submit" class="small-button">削除</button>
+                    </form>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center">役職データがありません。</td>
+                <td colspan="8">役職データがありません。</td>
             </tr>
             {% endfor %}
         </tbody>

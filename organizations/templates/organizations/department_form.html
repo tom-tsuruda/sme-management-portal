@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{% if department %}部署編集{% else %}部署追加{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{% if department %}部署編集{% else %}部署追加{% endif %}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>部署コード</label>
+            <input type="text" name="department_code" class="input-middle"
+                   value="{% if department %}{{ department.department_code }}{% endif %}"
+                   placeholder="空欄の場合は自動採番">
+        </div>
+
+        <div class="form-row">
+            <label>部署名</label>
+            <input type="text" name="department_name" class="input-middle"
+                   value="{% if department %}{{ department.department_name }}{% endif %}"
+                   required>
+        </div>
+
+        <div class="form-row">
+            <label>上位部署</label>
+            <select name="parent_department_id" class="input-middle">
+                <option value="">なし</option>
+                {% for dept in departments %}
+                    {% if not department or dept.id != department.id %}
+                        <option value="{{ dept.id }}"
+                            {% if department and department.parent_department_id == dept.id %}selected{% endif %}>
+                            {{ dept.department_name }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>責任者</label>
+            <select name="manager_employee_id" class="input-middle">
+                <option value="">未設定</option>
+                {% for emp in employees %}
+                    <option value="{{ emp.id }}"
+                        {% if department and department.manager_employee_id == emp.id %}selected{% endif %}>
+                        {{ emp.employee_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>説明</label>
+            <input type="text" name="description" class="input-long"
+                   value="{% if department %}{{ department.description }}{% endif %}">
+        </div>
+
+        <div class="form-row">
+            <label>
+                <input type="checkbox" name="is_active" value="1"
+                    {% if not department or department.is_active == "1" %}checked{% endif %}>
+                有効
+            </label>
+        </div>
+
+        <p>
+            <button type="submit">保存</button>
+            <a class="clear-link" href="{% url 'organizations:department_list' %}">部署一覧へ戻る</a>
+        </p>
+    </form>
+</div>
+{% endblock %}
