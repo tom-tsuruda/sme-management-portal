@@ -5,7 +5,7 @@
 {% block content %}
 <div class="card">
     <h2>売上一覧</h2>
-    <p>請求前・請求済・入金済の売上を管理します。</p>
+    <p>売上を登録すると、対応する売掛金が自動作成されます。</p>
 
     <div class="list-actions">
         <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
@@ -19,13 +19,14 @@
             <colgroup>
                 <col style="width: 90px;">
                 <col style="width: 110px;">
-                <col style="width: 160px;">
+                <col style="width: 150px;">
                 <col style="width: 220px;">
                 <col style="width: 110px;">
                 <col style="width: 100px;">
                 <col style="width: 120px;">
-                <col style="width: 90px;">
                 <col style="width: 120px;">
+                <col style="width: 90px;">
+                <col style="width: 90px;">
             </colgroup>
             <thead>
                 <tr>
@@ -36,8 +37,9 @@
                     <th>金額</th>
                     <th>消費税</th>
                     <th>税込金額</th>
-                    <th>状態</th>
                     <th>入金予定日</th>
+                    <th>状態</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,8 +52,13 @@
                     <td class="text-right nowrap">{{ sale.amount_display }}</td>
                     <td class="text-right nowrap">{{ sale.tax_amount_display }}</td>
                     <td class="text-right nowrap">{{ sale.total_amount_display }}</td>
-                    <td>{{ sale.status }}</td>
                     <td>{{ sale.due_date_display }}</td>
+                    <td>{{ sale.status }}</td>
+                    <td>
+                        <a class="small-button" href="{% url 'accounting:sales_edit' sale.id %}">
+                            編集
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>

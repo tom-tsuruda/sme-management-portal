@@ -1,11 +1,11 @@
 from pathlib import Path
 from datetime import datetime
 import re
-import shutil
 
 import pandas as pd
 from django.conf import settings
 
+from core.backup import backup_excel_file
 from core.formatters import (
     format_amount,
     format_japanese_date,
@@ -28,22 +28,6 @@ SALES_COLUMNS = [
     "total_amount",
     "due_date",
     "status",
-    "memo",
-    "created_at",
-    "updated_at",
-]
-
-RECEIVABLE_COLUMNS = [
-    "id",
-    "source_type",
-    "source_id",
-    "invoice_date",
-    "customer",
-    "title",
-    "amount",
-    "due_date",
-    "status",
-    "collected_date",
     "memo",
     "created_at",
     "updated_at",
@@ -96,41 +80,13 @@ def get_accounting_excel_path():
     return Path(settings.BASE_DIR) / "data" / "accounting_data.xlsx"
 
 
-def get_backup_dir():
-    backup_dir = Path(settings.BASE_DIR) / "data" / "backups"
-    backup_dir.mkdir(parents=True, exist_ok=True)
-    return backup_dir
-
-
-def cleanup_old_backups(file_prefix, keep_count=3):
-    backup_dir = get_backup_dir()
-    backup_files = sorted(
-        backup_dir.glob(f"{file_prefix}_*.xlsx"),
-        key=lambda path: path.stat().st_mtime,
-        reverse=True,
-    )
-
-    for old_file in backup_files[keep_count:]:
-        try:
-            old_file.unlink()
-        except Exception:
-            pass
-
-
 def backup_accounting_excel():
-    excel_path = get_accounting_excel_path()
-
-    if not excel_path.exists():
-        return None
-
-    backup_dir = get_backup_dir()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = backup_dir / f"accounting_data_{timestamp}.xlsx"
-
-    shutil.copy2(excel_path, backup_path)
-    cleanup_old_backups("accounting_data", keep_count=3)
-
-    return backup_path
+    return backup_excel_file(
+        excel_path=get_accounting_excel_path(),
+        base_dir=settings.BASE_DIR,
+        file_prefix="accounting_data",
+        keep_count=3,
+    )
 
 
 def ensure_accounting_excel():
@@ -163,6 +119,21 @@ def ensure_accounting_excel():
         )
 
 
+def normalize_dataframe_columns(df, columns):
+    df = df.copy()
+
+    for column in columns:
+        if column not in df.columns:
+            df[column] = ""
+
+    df = df[columns].copy()
+
+    for column in columns:
+        df[column] = df[column].astype(str)
+
+    return df
+
+
 def read_sheet(sheet_name, columns):
     ensure_accounting_excel()
     excel_path = get_accounting_excel_path()
@@ -177,16 +148,7 @@ def read_sheet(sheet_name, columns):
     except Exception:
         df = pd.DataFrame(columns=columns)
 
-    for column in columns:
-        if column not in df.columns:
-            df[column] = ""
-
-    df = df[columns].copy()
-
-    for column in columns:
-        df[column] = df[column].astype(str)
-
-    return df
+    return normalize_dataframe_columns(df, columns)
 
 
 def write_accounting_excel(
@@ -222,21 +184,6 @@ def write_accounting_excel(
         receivables_df.to_excel(writer, sheet_name="receivables", index=False)
         payables_df.to_excel(writer, sheet_name="payables", index=False)
         balance_sheet_df.to_excel(writer, sheet_name="balance_sheet", index=False)
-
-
-def normalize_dataframe_columns(df, columns):
-    df = df.copy()
-
-    for column in columns:
-        if column not in df.columns:
-            df[column] = ""
-
-    df = df[columns].copy()
-
-    for column in columns:
-        df[column] = df[column].astype(str)
-
-    return df
 
 
 def to_number(value):
@@ -375,6 +322,30 @@ def load_balance_sheets():
     return sorted(records, key=lambda x: str(x.get("target_month", "")), reverse=True)
 
 
+def find_sale_by_id(sale_id):
+    for sale in load_sales():
+        if str(sale.get("id")) == str(sale_id):
+            return sale
+
+    return None
+
+
+def find_receivable_by_id(receivable_id):
+    for receivable in load_receivables():
+        if str(receivable.get("id")) == str(receivable_id):
+            return receivable
+
+    return None
+
+
+def find_payable_by_id(payable_id):
+    for payable in load_payables():
+        if str(payable.get("id")) == str(payable_id):
+            return payable
+
+    return None
+
+
 def find_balance_sheet_by_month(target_month):
     for row in load_balance_sheets():
         if str(row.get("target_month", "")) == str(target_month):
@@ -382,24 +353,18 @@ def find_balance_sheet_by_month(target_month):
 
     return None
 
+
 def receivable_status_from_sale_status(sale_status):
-    """
-    売上ステータスから売掛金ステータスを決める。
-    """
     if sale_status == "入金済":
         return "回収済"
 
-    if sale_status in ["未請求", "請求済"]:
+    if sale_status in ["未請求", "請求済", "その他"]:
         return "未回収"
 
     return "未回収"
 
 
 def sync_receivable_from_sale(sale_id):
-    """
-    売上データをもとに、対応する売掛金を自動作成・自動更新する。
-    売上の反対側として売掛金を必ずセットで持つ。
-    """
     sales_df = read_sheet("sales", SALES_COLUMNS)
     receivables_df = read_sheet("receivables", RECEIVABLE_COLUMNS)
 
@@ -411,7 +376,6 @@ def sync_receivable_from_sale(sale_id):
         return None
 
     sale = sales_df.loc[sale_indexes[0]].to_dict()
-
     now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     receivable_indexes = receivables_df.index[
@@ -468,6 +432,7 @@ def sync_receivable_from_sale(sale_id):
 
     return receivable_id
 
+
 def create_sale(
     sale_date,
     customer,
@@ -507,11 +472,10 @@ def create_sale(
     )
 
     write_accounting_excel(sales_df=sales_df)
-
-    # 売上の反対側として売掛金を自動作成
     sync_receivable_from_sale(sale_id)
 
     return sale_id
+
 
 def update_sale(
     sale_id,
@@ -552,11 +516,10 @@ def update_sale(
     sales_df.loc[index, "updated_at"] = now_text
 
     write_accounting_excel(sales_df=sales_df)
-
-    # 売上を編集したら、対応する売掛金も自動更新
     sync_receivable_from_sale(sale_id)
 
     return True
+
 
 def create_receivable(
     invoice_date,
@@ -583,7 +546,7 @@ def create_receivable(
         "due_date": due_date,
         "status": status,
         "collected_date": collected_date,
-        "memo": memo or "手入力売掛金",
+        "memo": memo or "その他・手入力売掛金",
         "created_at": now_text,
         "updated_at": now_text,
     }
@@ -592,9 +555,48 @@ def create_receivable(
         [receivables_df, pd.DataFrame([new_row])],
         ignore_index=True,
     )
+
     write_accounting_excel(receivables_df=receivables_df)
 
     return receivable_id
+
+
+def update_receivable(
+    receivable_id,
+    invoice_date,
+    customer,
+    title,
+    amount,
+    due_date,
+    status,
+    collected_date,
+    memo,
+):
+    receivables_df = read_sheet("receivables", RECEIVABLE_COLUMNS)
+
+    target_index = receivables_df.index[
+        receivables_df["id"].astype(str) == str(receivable_id)
+    ].tolist()
+
+    if not target_index:
+        return False
+
+    index = target_index[0]
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    receivables_df.loc[index, "invoice_date"] = invoice_date
+    receivables_df.loc[index, "customer"] = customer
+    receivables_df.loc[index, "title"] = title
+    receivables_df.loc[index, "amount"] = str(to_number(amount))
+    receivables_df.loc[index, "due_date"] = due_date
+    receivables_df.loc[index, "status"] = status
+    receivables_df.loc[index, "collected_date"] = collected_date
+    receivables_df.loc[index, "memo"] = memo
+    receivables_df.loc[index, "updated_at"] = now_text
+
+    write_accounting_excel(receivables_df=receivables_df)
+
+    return True
 
 
 def create_payable(
@@ -620,7 +622,7 @@ def create_payable(
         "due_date": due_date,
         "status": status,
         "paid_date": paid_date,
-        "memo": memo,
+        "memo": memo or "その他・手入力買掛金",
         "created_at": now_text,
         "updated_at": now_text,
     }
@@ -629,9 +631,48 @@ def create_payable(
         [payables_df, pd.DataFrame([new_row])],
         ignore_index=True,
     )
+
     write_accounting_excel(payables_df=payables_df)
 
     return payable_id
+
+
+def update_payable(
+    payable_id,
+    purchase_date,
+    vendor,
+    title,
+    amount,
+    due_date,
+    status,
+    paid_date,
+    memo,
+):
+    payables_df = read_sheet("payables", PAYABLE_COLUMNS)
+
+    target_index = payables_df.index[
+        payables_df["id"].astype(str) == str(payable_id)
+    ].tolist()
+
+    if not target_index:
+        return False
+
+    index = target_index[0]
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    payables_df.loc[index, "purchase_date"] = purchase_date
+    payables_df.loc[index, "vendor"] = vendor
+    payables_df.loc[index, "title"] = title
+    payables_df.loc[index, "amount"] = str(to_number(amount))
+    payables_df.loc[index, "due_date"] = due_date
+    payables_df.loc[index, "status"] = status
+    payables_df.loc[index, "paid_date"] = paid_date
+    payables_df.loc[index, "memo"] = memo
+    payables_df.loc[index, "updated_at"] = now_text
+
+    write_accounting_excel(payables_df=payables_df)
+
+    return True
 
 
 def save_balance_sheet(
@@ -699,6 +740,7 @@ def calculate_accounting_summary(target_month=""):
     receivables = load_receivables()
     payables = load_payables()
     expenses = get_expense_records_for_accounting()
+    balance_sheets = load_balance_sheets()
 
     available_months = sorted(
         {
@@ -719,7 +761,7 @@ def calculate_accounting_summary(target_month=""):
         }
         | {
             str(row.get("target_month", ""))
-            for row in load_balance_sheets()
+            for row in balance_sheets
         },
         reverse=True,
     )
@@ -776,12 +818,7 @@ def calculate_accounting_summary(target_month=""):
     fixed_assets = to_number(balance_sheet.get("fixed_assets")) if balance_sheet else 0
     loan_balance = to_number(balance_sheet.get("loan_balance")) if balance_sheet else 0
 
-    asset_total = (
-        cash_balance
-        + receivable_uncollected
-        + inventory_amount
-        + fixed_assets
-    )
+    asset_total = cash_balance + receivable_uncollected + inventory_amount + fixed_assets
     liability_total = payable_unpaid + loan_balance
     net_assets = asset_total - liability_total
 
@@ -828,13 +865,8 @@ def calculate_accounting_summary(target_month=""):
         "monthly_expenses": monthly_expenses,
     }
 
+
 def calculate_cashflow_schedule(target_month=""):
-    """
-    売掛金・買掛金から簡易資金繰り表を作成する。
-    入金予定 = 売掛金の due_date
-    支払予定 = 買掛金の due_date
-    開始現預金 = 簡易BSの現預金
-    """
     receivables = load_receivables()
     payables = load_payables()
 
@@ -878,7 +910,6 @@ def calculate_cashflow_schedule(target_month=""):
 
     balance_sheet = find_balance_sheet_by_month(target_month)
     opening_cash = to_number(balance_sheet.get("cash_balance")) if balance_sheet else 0
-
     ending_cash = opening_cash + expected_receipts - expected_payments
 
     daily_map = {}

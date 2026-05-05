@@ -19,12 +19,13 @@
             <colgroup>
                 <col style="width: 90px;">
                 <col style="width: 110px;">
-                <col style="width: 160px;">
+                <col style="width: 150px;">
                 <col style="width: 220px;">
                 <col style="width: 120px;">
                 <col style="width: 120px;">
                 <col style="width: 90px;">
                 <col style="width: 120px;">
+                <col style="width: 90px;">
             </colgroup>
             <thead>
                 <tr>
@@ -36,6 +37,7 @@
                     <th>支払予定日</th>
                     <th>状態</th>
                     <th>支払日</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,10 +51,15 @@
                     <td>{{ payable.due_date_display }}</td>
                     <td>{{ payable.status }}</td>
                     <td>{{ payable.paid_date_display }}</td>
+                    <td>
+                        <a class="small-button" href="{% url 'accounting:payable_edit' payable.id %}">
+                            編集
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8">買掛金データがありません。</td>
+                    <td colspan="9">買掛金データがありません。</td>
                 </tr>
                 {% endfor %}
             </tbody>

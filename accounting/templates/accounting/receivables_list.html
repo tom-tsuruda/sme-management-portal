@@ -5,11 +5,11 @@
 {% block content %}
 <div class="card">
     <h2>売掛金一覧</h2>
-    <p>請求済みで、まだ回収していない売掛金を管理します。</p>
+    <p>売上連動の売掛金と、その他・手入力の売掛金を管理します。</p>
 
     <div class="list-actions">
         <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
-        <a class="button" href="{% url 'accounting:receivable_create' %}">売掛金を登録する</a>
+        <a class="button" href="{% url 'accounting:receivable_create' %}">その他売掛金を登録する</a>
     </div>
 </div>
 
@@ -18,18 +18,20 @@
         <table class="list-table">
             <colgroup>
                 <col style="width: 90px;">
+                <col style="width: 90px;">
                 <col style="width: 110px;">
-                <col style="width: 160px;">
+                <col style="width: 150px;">
                 <col style="width: 220px;">
                 <col style="width: 120px;">
                 <col style="width: 120px;">
                 <col style="width: 90px;">
                 <col style="width: 120px;">
+                <col style="width: 90px;">
             </colgroup>
             <thead>
                 <tr>
-                    <th>発生元</th>
                     <th>ID</th>
+                    <th>発生元</th>
                     <th>請求日</th>
                     <th>得意先</th>
                     <th>件名</th>
@@ -37,19 +39,22 @@
                     <th>入金予定日</th>
                     <th>状態</th>
                     <th>回収日</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
                 {% for receivable in receivables %}
                 <tr>
+                    <td>{{ receivable.id }}</td>
                     <td>
                         {% if receivable.source_type == "sale" %}
                             売上連動
+                        {% elif receivable.source_type == "opening" %}
+                            期首
                         {% else %}
                             その他
                         {% endif %}
                     </td>
-                    <td>{{ receivable.id }}</td>
                     <td>{{ receivable.invoice_date_display }}</td>
                     <td>{{ receivable.customer }}</td>
                     <td class="text-left long-text">{{ receivable.title }}</td>
@@ -57,6 +62,11 @@
                     <td>{{ receivable.due_date_display }}</td>
                     <td>{{ receivable.status }}</td>
                     <td>{{ receivable.collected_date_display }}</td>
+                    <td>
+                        <a class="small-button" href="{% url 'accounting:receivable_edit' receivable.id %}">
+                            編集
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>

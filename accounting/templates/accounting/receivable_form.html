@@ -1,52 +1,96 @@
 {% extends "base.html" %}
 
-{% block title %}売掛金登録{% endblock %}
-
-{% if receivable.source_type == "sale" %}
-<p class="count-text">
-    この売掛金は売上データから自動作成されています。
-    売上を編集すると、この売掛金も再更新されます。
-</p>
-{% endif %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>売掛金登録</h2>
+    <h2>{{ page_title }}</h2>
 
     <div class="list-actions">
-        <a href="{% url 'accounting:receivables_list' %}">← 売掛金一覧へ戻る</a>
+        <a href="{% url 'accounting:payables_list' %}">← 買掛金一覧へ戻る</a>
+        <a href="{% url 'accounting:accounting_home' %}">経理・決算へ戻る</a>
     </div>
 </div>
 
+{% if page_title == "買掛金が見つかりません" %}
+<div class="card">
+    <p>指定された買掛金データが見つかりません。</p>
+</div>
+{% else %}
 <div class="card">
     <form method="post">
         {% csrf_token %}
 
         <div class="app-form-grid">
-            <input type="date" name="invoice_date" class="input-full date-input" title="請求日">
+            <input
+                type="date"
+                name="purchase_date"
+                value="{{ payable.purchase_date }}"
+                class="input-full date-input"
+                title="発生日"
+            >
 
-            <input type="text" name="customer" class="input-full" placeholder="得意先">
+            <input
+                type="text"
+                name="vendor"
+                value="{{ payable.vendor }}"
+                class="input-full"
+                placeholder="支払先"
+            >
 
-            <input type="text" name="title" required class="input-full" placeholder="件名">
+            <input
+                type="text"
+                name="title"
+                value="{{ payable.title }}"
+                required
+                class="input-full"
+                placeholder="件名"
+            >
 
-            <input type="text" name="amount" class="input-full" placeholder="金額　例：100,000">
+            <input
+                type="text"
+                name="amount"
+                value="{{ payable.amount_display }}"
+                class="input-full"
+                placeholder="金額　例：100,000"
+            >
 
-            <input type="date" name="due_date" class="input-full date-input" title="入金予定日">
+            <input
+                type="date"
+                name="due_date"
+                value="{{ payable.due_date }}"
+                class="input-full date-input"
+                title="支払予定日"
+            >
 
             <select name="status" class="input-full">
                 {% for status in status_choices %}
-                    <option value="{{ status }}">{{ status }}</option>
+                    <option value="{{ status }}" {% if payable.status == status %}selected{% endif %}>
+                        {{ status }}
+                    </option>
                 {% endfor %}
             </select>
 
-            <input type="date" name="collected_date" class="input-full date-input" title="回収日">
+            <input
+                type="date"
+                name="paid_date"
+                value="{{ payable.paid_date }}"
+                class="input-full date-input"
+                title="支払日"
+            >
 
-            <textarea name="memo" rows="4" class="input-full full" placeholder="メモ"></textarea>
+            <textarea
+                name="memo"
+                rows="4"
+                class="input-full full"
+                placeholder="メモ"
+            >{{ payable.memo }}</textarea>
         </div>
 
         <div class="form-actions">
-            <button type="submit">登録する</button>
+            <button type="submit">{{ submit_label }}</button>
         </div>
     </form>
 </div>
+{% endif %}
 {% endblock %}

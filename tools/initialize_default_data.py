@@ -13,7 +13,6 @@ BACKUP_DIR = DATA_DIR / "backups"
 MEDIA_DIR = BASE_DIR / "media"
 
 
-# Django の services を使うための準備
 sys.path.append(str(BASE_DIR))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
@@ -91,17 +90,6 @@ def timestamp_text():
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
-def backup_existing_file(target_path):
-    if not target_path.exists():
-        return None
-
-    backup_path = BACKUP_DIR / f"{target_path.stem}_{timestamp_text()}{target_path.suffix}"
-    shutil.copy2(target_path, backup_path)
-    cleanup_old_backups(target_path.stem, keep_count=3)
-
-    return backup_path
-
-
 def cleanup_old_backups(file_prefix, keep_count=3):
     backup_files = sorted(
         BACKUP_DIR.glob(f"{file_prefix}_*.xlsx"),
@@ -115,6 +103,17 @@ def cleanup_old_backups(file_prefix, keep_count=3):
             print(f"[CLEANUP] 古いバックアップを削除しました: {old_file}")
         except Exception as exc:
             print(f"[WARN] 古いバックアップを削除できませんでした: {old_file} / {exc}")
+
+
+def backup_existing_file(target_path):
+    if not target_path.exists():
+        return None
+
+    backup_path = BACKUP_DIR / f"{target_path.stem}_{timestamp_text()}{target_path.suffix}"
+    shutil.copy2(target_path, backup_path)
+    cleanup_old_backups(target_path.stem, keep_count=3)
+
+    return backup_path
 
 
 def initialize_file(seed_name, target_name, label, force=False, allow_generate=False):

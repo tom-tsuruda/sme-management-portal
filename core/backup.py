@@ -19,8 +19,8 @@ def cleanup_old_backups(backup_dir, file_prefix, keep_count=3):
     for old_file in backup_files[keep_count:]:
         try:
             old_file.unlink()
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[WARN] 古いバックアップを削除できませんでした: {old_file} / {exc}")
 
 
 def backup_excel_file(excel_path, base_dir, file_prefix, keep_count=3):

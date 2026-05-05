@@ -7,10 +7,16 @@ from .services import (
     create_receivable,
     create_sale,
     find_balance_sheet_by_month,
+    find_payable_by_id,
+    find_receivable_by_id,
+    find_sale_by_id,
     load_payables,
     load_receivables,
     load_sales,
     save_balance_sheet,
+    update_payable,
+    update_receivable,
+    update_sale,
 )
 
 
@@ -18,18 +24,21 @@ SALE_STATUS_CHOICES = [
     "未請求",
     "請求済",
     "入金済",
+    "その他",
 ]
 
 RECEIVABLE_STATUS_CHOICES = [
     "未回収",
     "一部回収",
     "回収済",
+    "その他",
 ]
 
 PAYABLE_STATUS_CHOICES = [
     "未払",
     "支払予定",
     "支払済",
+    "その他",
 ]
 
 
@@ -80,6 +89,7 @@ def sales_create(request):
         "submit_label": "登録する",
     })
 
+
 def sales_edit(request, sale_id):
     sale = find_sale_by_id(sale_id)
 
@@ -123,6 +133,7 @@ def sales_edit(request, sale_id):
         "submit_label": "保存する",
     })
 
+
 def receivables_list(request):
     receivables = load_receivables()
 
@@ -157,7 +168,54 @@ def receivable_create(request):
             return redirect("accounting:receivables_list")
 
     return render(request, "accounting/receivable_form.html", {
+        "receivable": None,
         "status_choices": RECEIVABLE_STATUS_CHOICES,
+        "page_title": "売掛金登録",
+        "submit_label": "登録する",
+    })
+
+
+def receivable_edit(request, receivable_id):
+    receivable = find_receivable_by_id(receivable_id)
+
+    if not receivable:
+        return render(request, "accounting/receivable_form.html", {
+            "receivable": None,
+            "status_choices": RECEIVABLE_STATUS_CHOICES,
+            "page_title": "売掛金が見つかりません",
+            "submit_label": "保存する",
+        })
+
+    if request.method == "POST":
+        invoice_date = request.POST.get("invoice_date", "").strip()
+        customer = request.POST.get("customer", "").strip()
+        title = request.POST.get("title", "").strip()
+        amount = request.POST.get("amount", "").strip()
+        due_date = request.POST.get("due_date", "").strip()
+        status = request.POST.get("status", "").strip()
+        collected_date = request.POST.get("collected_date", "").strip()
+        memo = request.POST.get("memo", "").strip()
+
+        if title:
+            update_receivable(
+                receivable_id=receivable_id,
+                invoice_date=invoice_date,
+                customer=customer,
+                title=title,
+                amount=amount,
+                due_date=due_date,
+                status=status,
+                collected_date=collected_date,
+                memo=memo,
+            )
+
+            return redirect("accounting:receivables_list")
+
+    return render(request, "accounting/receivable_form.html", {
+        "receivable": receivable,
+        "status_choices": RECEIVABLE_STATUS_CHOICES,
+        "page_title": "売掛金編集",
+        "submit_label": "保存する",
     })
 
 
@@ -195,7 +253,54 @@ def payable_create(request):
             return redirect("accounting:payables_list")
 
     return render(request, "accounting/payable_form.html", {
+        "payable": None,
         "status_choices": PAYABLE_STATUS_CHOICES,
+        "page_title": "買掛金登録",
+        "submit_label": "登録する",
+    })
+
+
+def payable_edit(request, payable_id):
+    payable = find_payable_by_id(payable_id)
+
+    if not payable:
+        return render(request, "accounting/payable_form.html", {
+            "payable": None,
+            "status_choices": PAYABLE_STATUS_CHOICES,
+            "page_title": "買掛金が見つかりません",
+            "submit_label": "保存する",
+        })
+
+    if request.method == "POST":
+        purchase_date = request.POST.get("purchase_date", "").strip()
+        vendor = request.POST.get("vendor", "").strip()
+        title = request.POST.get("title", "").strip()
+        amount = request.POST.get("amount", "").strip()
+        due_date = request.POST.get("due_date", "").strip()
+        status = request.POST.get("status", "").strip()
+        paid_date = request.POST.get("paid_date", "").strip()
+        memo = request.POST.get("memo", "").strip()
+
+        if title:
+            update_payable(
+                payable_id=payable_id,
+                purchase_date=purchase_date,
+                vendor=vendor,
+                title=title,
+                amount=amount,
+                due_date=due_date,
+                status=status,
+                paid_date=paid_date,
+                memo=memo,
+            )
+
+            return redirect("accounting:payables_list")
+
+    return render(request, "accounting/payable_form.html", {
+        "payable": payable,
+        "status_choices": PAYABLE_STATUS_CHOICES,
+        "page_title": "買掛金編集",
+        "submit_label": "保存する",
     })
 
 
@@ -231,6 +336,7 @@ def balance_sheet_edit(request):
         "balance_sheet": balance_sheet,
         "target_month": target_month,
     })
+
 
 def cashflow_schedule(request):
     target_month = request.GET.get("target_month", "").strip()
