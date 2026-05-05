@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}資金繰り表{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>資金繰り表</h2>
+    <p>
+        売掛金の入金予定日と、買掛金の支払予定日から、月次の簡易資金繰りを確認します。
+        回収済・支払済のものは予定から除外します。
+    </p>
+
+    <form method="get" class="inline-form">
+        <select name="target_month" class="input-middle">
+            <option value="">最新月を表示</option>
+            {% for month in available_months %}
+                <option value="{{ month }}" {% if month == target_month %}selected{% endif %}>
+                    {{ month }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">表示</button>
+    </form>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
+        <a href="{% url 'accounting:receivables_list' %}">売掛金一覧</a>
+        <a href="{% url 'accounting:payables_list' %}">買掛金一覧</a>
+        <a href="{% url 'accounting:balance_sheet_edit' %}?target_month={{ target_month }}">簡易BS入力</a>
+    </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">開始現預金</div>
+        <div class="summary-number">{{ opening_cash_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">入金予定</div>
+        <div class="summary-number">{{ expected_receipts_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">支払予定</div>
+        <div class="summary-number warning">{{ expected_payments_display }}</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-label">予定月末残高</div>
+        <div class="summary-number {% if ending_cash < 0 %}danger{% endif %}">
+            {{ ending_cash_display }}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>日別資金繰り</h2>
+
+    <div class="list-frame">
+        <div class="list-scroll">
+            <table class="list-table">
+                <colgroup>
+                    <col style="width: 120px;">
+                    <col style="width: 120px;">
+                    <col style="width: 120px;">
+                    <col style="width: 120px;">
+                    <col style="width: 360px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>予定日</th>
+                        <th>入金予定</th>
+                        <th>支払予定</th>
+                        <th>予定残高</th>
+                        <th>内訳</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in cashflow_rows %}
+                    <tr>
+                        <td>{{ row.date_display }}</td>
+                        <td class="text-right nowrap">{{ row.receipts_display }}</td>
+                        <td class="text-right nowrap">{{ row.payments_display }}</td>
+                        <td class="text-right nowrap {% if row.balance < 0 %}danger{% endif %}">
+                            {{ row.balance_display }}
+                        </td>
+                        <td class="text-left long-text">
+                            {% for item in row.items %}
+                                <div>
+                                    {{ item.type }}：
+                                    {{ item.partner }}
+                                    ／ {{ item.title }}
+                                    ／ {{ item.amount_display }}
+                                </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">対象月の入金予定・支払予定はありません。</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

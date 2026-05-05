@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}売上登録{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>売上登録</h2>
+    <p>簡易的な売上データを登録します。</p>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:sales_list' %}">← 売上一覧へ戻る</a>
+    </div>
+</div>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="app-form-grid">
+            <input type="date" name="sale_date" class="input-full date-input" title="売上日">
+
+            <input type="text" name="customer" class="input-full" placeholder="得意先">
+
+            <input type="text" name="title" required class="input-full" placeholder="件名">
+
+            <input type="text" name="amount" class="input-full" placeholder="金額　例：100,000">
+
+            <input type="text" name="tax_amount" class="input-full" placeholder="消費税　例：10,000">
+            <input
+                type="date"
+                name="due_date"
+                value="{{ sale.due_date }}"
+                class="input-full date-input"
+                title="入金予定日"
+            >
+            <select name="status" class="input-full">
+                {% for status in status_choices %}
+                    <option value="{{ status }}">{{ status }}</option>
+                {% endfor %}
+            </select>
+
+            <textarea name="memo" rows="4" class="input-full full" placeholder="メモ"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">登録する</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

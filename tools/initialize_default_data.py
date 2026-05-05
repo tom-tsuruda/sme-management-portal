@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import datetime
 import argparse
+import os
 import shutil
 import sys
 
@@ -10,6 +11,17 @@ DATA_DIR = BASE_DIR / "data"
 SEED_DIR = DATA_DIR / "seeds"
 BACKUP_DIR = DATA_DIR / "backups"
 MEDIA_DIR = BASE_DIR / "media"
+
+
+# Django の services を使うための準備
+sys.path.append(str(BASE_DIR))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+
+def setup_django():
+    import django
+    django.setup()
+
 
 DEFAULT_FILES = [
     {
@@ -57,6 +69,12 @@ DEFAULT_FILES = [
         "target": "notification_data.xlsx",
         "label": "操作履歴データ",
     },
+    {
+        "seed": "accounting_data_default.xlsx",
+        "target": "accounting_data.xlsx",
+        "label": "経理・決算データ",
+        "allow_generate": True,
+    },
 ]
 
 
@@ -79,16 +97,29 @@ def backup_existing_file(target_path):
 
     backup_path = BACKUP_DIR / f"{target_path.stem}_{timestamp_text()}{target_path.suffix}"
     shutil.copy2(target_path, backup_path)
+    cleanup_old_backups(target_path.stem, keep_count=3)
+
     return backup_path
 
 
-def initialize_file(seed_name, target_name, label, force=False):
+def cleanup_old_backups(file_prefix, keep_count=3):
+    backup_files = sorted(
+        BACKUP_DIR.glob(f"{file_prefix}_*.xlsx"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+
+    for old_file in backup_files[keep_count:]:
+        try:
+            old_file.unlink()
+            print(f"[CLEANUP] 古いバックアップを削除しました: {old_file}")
+        except Exception as exc:
+            print(f"[WARN] 古いバックアップを削除できませんでした: {old_file} / {exc}")
+
+
+def initialize_file(seed_name, target_name, label, force=False, allow_generate=False):
     seed_path = SEED_DIR / seed_name
     target_path = DATA_DIR / target_name
-
-    if not seed_path.exists():
-        print(f"[NG] {label}: 初期原本が見つかりません: {seed_path}")
-        return False
 
     if target_path.exists() and not force:
         print(f"[SKIP] {label}: 既に運用データがあります: {target_path}")
@@ -98,9 +129,29 @@ def initialize_file(seed_name, target_name, label, force=False):
         backup_path = backup_existing_file(target_path)
         print(f"[BACKUP] {label}: 既存ファイルをバックアップしました: {backup_path}")
 
-    shutil.copy2(seed_path, target_path)
-    print(f"[OK] {label}: 初期原本から運用データを作成しました: {target_path}")
-    return True
+    if seed_path.exists():
+        shutil.copy2(seed_path, target_path)
+        print(f"[OK] {label}: 初期原本から運用データを作成しました: {target_path}")
+        return True
+
+    if allow_generate and target_name == "accounting_data.xlsx":
+        print(f"[INFO] {label}: 初期原本がないため、空の経理・決算Excelを生成します。")
+
+        if target_path.exists() and force:
+            target_path.unlink()
+
+        from accounting.services import ensure_accounting_excel
+        ensure_accounting_excel()
+
+        if target_path.exists():
+            print(f"[OK] {label}: accounting.services から運用データを生成しました: {target_path}")
+            return True
+
+        print(f"[NG] {label}: accounting_data.xlsx の生成に失敗しました: {target_path}")
+        return False
+
+    print(f"[NG] {label}: 初期原本が見つかりません: {seed_path}")
+    return False
 
 
 def main():
@@ -116,11 +167,14 @@ def main():
     args = parser.parse_args()
 
     ensure_directories()
+    setup_django()
 
     print("=== 初期データセットアップ開始 ===")
     print(f"BASE_DIR: {BASE_DIR}")
     print(f"DATA_DIR: {DATA_DIR}")
     print(f"SEED_DIR: {SEED_DIR}")
+    print(f"BACKUP_DIR: {BACKUP_DIR}")
+    print(f"FORCE: {args.force}")
 
     success_count = 0
 
@@ -130,6 +184,7 @@ def main():
             target_name=item["target"],
             label=item["label"],
             force=args.force,
+            allow_generate=item.get("allow_generate", False),
         )
 
         if result:

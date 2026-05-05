@@ -16,6 +16,7 @@ urlpatterns = [
     path("kpi/", include("kpi.urls")),
     path("governance/", include("governance.urls")),
     path("notifications/", include("notifications.urls")),
+    path("accounting/", include("accounting.urls")),
 ]
 
 if settings.DEBUG:

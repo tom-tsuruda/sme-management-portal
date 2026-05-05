@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}売掛金一覧{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>売掛金一覧</h2>
+    <p>請求済みで、まだ回収していない売掛金を管理します。</p>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
+        <a class="button" href="{% url 'accounting:receivable_create' %}">売掛金を登録する</a>
+    </div>
+</div>
+
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 110px;">
+                <col style="width: 160px;">
+                <col style="width: 220px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+                <col style="width: 90px;">
+                <col style="width: 120px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>発生元</th>
+                    <th>ID</th>
+                    <th>請求日</th>
+                    <th>得意先</th>
+                    <th>件名</th>
+                    <th>金額</th>
+                    <th>入金予定日</th>
+                    <th>状態</th>
+                    <th>回収日</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receivable in receivables %}
+                <tr>
+                    <td>
+                        {% if receivable.source_type == "sale" %}
+                            売上連動
+                        {% else %}
+                            その他
+                        {% endif %}
+                    </td>
+                    <td>{{ receivable.id }}</td>
+                    <td>{{ receivable.invoice_date_display }}</td>
+                    <td>{{ receivable.customer }}</td>
+                    <td class="text-left long-text">{{ receivable.title }}</td>
+                    <td class="text-right nowrap">{{ receivable.amount_display }}</td>
+                    <td>{{ receivable.due_date_display }}</td>
+                    <td>{{ receivable.status }}</td>
+                    <td>{{ receivable.collected_date_display }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10">売掛金データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

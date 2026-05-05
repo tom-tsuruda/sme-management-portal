@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}売上一覧{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>売上一覧</h2>
+    <p>請求前・請求済・入金済の売上を管理します。</p>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
+        <a class="button" href="{% url 'accounting:sales_create' %}">売上を登録する</a>
+    </div>
+</div>
+
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 110px;">
+                <col style="width: 160px;">
+                <col style="width: 220px;">
+                <col style="width: 110px;">
+                <col style="width: 100px;">
+                <col style="width: 120px;">
+                <col style="width: 90px;">
+                <col style="width: 120px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>売上日</th>
+                    <th>得意先</th>
+                    <th>件名</th>
+                    <th>金額</th>
+                    <th>消費税</th>
+                    <th>税込金額</th>
+                    <th>状態</th>
+                    <th>入金予定日</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                <tr>
+                    <td>{{ sale.id }}</td>
+                    <td>{{ sale.sale_date_display }}</td>
+                    <td>{{ sale.customer }}</td>
+                    <td class="text-left long-text">{{ sale.title }}</td>
+                    <td class="text-right nowrap">{{ sale.amount_display }}</td>
+                    <td class="text-right nowrap">{{ sale.tax_amount_display }}</td>
+                    <td class="text-right nowrap">{{ sale.total_amount_display }}</td>
+                    <td>{{ sale.status }}</td>
+                    <td>{{ sale.due_date_display }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10">売上データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

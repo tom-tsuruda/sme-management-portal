@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}簡易BS入力{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>簡易BS入力</h2>
+    <p>
+        対象月ごとの現預金、棚卸資産、固定資産、借入金を入力します。
+        売掛金・買掛金は一覧データから自動集計します。
+    </p>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
+    </div>
+</div>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="app-form-grid">
+            <input
+                type="month"
+                name="target_month"
+                value="{{ target_month }}"
+                required
+                class="input-full"
+                title="対象月"
+            >
+
+            <input
+                type="text"
+                name="cash_balance"
+                value="{{ balance_sheet.cash_balance_display }}"
+                class="input-full"
+                placeholder="現預金　例：5,000,000"
+            >
+
+            <input
+                type="text"
+                name="inventory_amount"
+                value="{{ balance_sheet.inventory_amount_display }}"
+                class="input-full"
+                placeholder="棚卸資産　例：1,200,000"
+            >
+
+            <input
+                type="text"
+                name="fixed_assets"
+                value="{{ balance_sheet.fixed_assets_display }}"
+                class="input-full"
+                placeholder="固定資産　例：3,000,000"
+            >
+
+            <input
+                type="text"
+                name="loan_balance"
+                value="{{ balance_sheet.loan_balance_display }}"
+                class="input-full"
+                placeholder="借入金　例：2,000,000"
+            >
+
+            <textarea
+                name="memo"
+                rows="4"
+                class="input-full full"
+                placeholder="メモ"
+            >{{ balance_sheet.memo }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">保存する</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

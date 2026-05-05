@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}買掛金一覧{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>買掛金一覧</h2>
+    <p>仕入・外注・未払費用など、今後支払う必要がある金額を管理します。</p>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:accounting_home' %}">← 経理・決算へ戻る</a>
+        <a class="button" href="{% url 'accounting:payable_create' %}">買掛金を登録する</a>
+    </div>
+</div>
+
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 110px;">
+                <col style="width: 160px;">
+                <col style="width: 220px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+                <col style="width: 90px;">
+                <col style="width: 120px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>発生日</th>
+                    <th>支払先</th>
+                    <th>件名</th>
+                    <th>金額</th>
+                    <th>支払予定日</th>
+                    <th>状態</th>
+                    <th>支払日</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payable in payables %}
+                <tr>
+                    <td>{{ payable.id }}</td>
+                    <td>{{ payable.purchase_date_display }}</td>
+                    <td>{{ payable.vendor }}</td>
+                    <td class="text-left long-text">{{ payable.title }}</td>
+                    <td class="text-right nowrap">{{ payable.amount_display }}</td>
+                    <td>{{ payable.due_date_display }}</td>
+                    <td>{{ payable.status }}</td>
+                    <td>{{ payable.paid_date_display }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">買掛金データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

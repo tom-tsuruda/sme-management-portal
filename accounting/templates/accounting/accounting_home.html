@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}経理・決算{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>経理・決算</h2>
+    <p>
+        売上、売掛金、買掛金、経費精算データをもとに、簡易的なPL・BSを確認します。
+        正式な会計ソフトではなく、経営状況を早くつかむための管理機能です。
+    </p>
+
+    <form method="get" class="inline-form">
+        <select name="target_month" class="input-middle">
+            <option value="">最新月を表示</option>
+            {% for month in available_months %}
+                <option value="{{ month }}" {% if month == target_month %}selected{% endif %}>
+                    {{ month }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">表示</button>
+    </form>
+
+    <div class="list-actions">
+        <a href="{% url 'accounting:sales_list' %}">売上一覧</a>
+        <a href="{% url 'accounting:receivables_list' %}">売掛金一覧</a>
+        <a href="{% url 'accounting:payables_list' %}">買掛金一覧</a>
+        <a href="{% url 'accounting:balance_sheet_edit' %}?target_month={{ target_month }}">簡易BS入力</a>
+        <a href="{% url 'expenses:expense_list' %}">経費・旅費精算</a>
+        <a href="{% url 'accounting:cashflow_schedule' %}?target_month={{ target_month }}">資金繰り表</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>簡易PL</h2>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">売上高</div>
+            <div class="summary-number">{{ sales_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">経費</div>
+            <div class="summary-number warning">{{ expense_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">買掛・仕入</div>
+            <div class="summary-number warning">{{ payable_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">簡易利益</div>
+            <div class="summary-number {% if simple_profit < 0 %}danger{% endif %}">
+                {{ simple_profit_display }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>簡易BS</h2>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">資産合計</div>
+            <div class="summary-number">{{ asset_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">負債合計</div>
+            <div class="summary-number warning">{{ liability_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">純資産</div>
+            <div class="summary-number {% if net_assets < 0 %}danger{% endif %}">
+                {{ net_assets_display }}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">売掛未回収</div>
+            <div class="summary-number danger">{{ receivable_uncollected_display }}</div>
+        </div>
+    </div>
+
+    <div class="list-frame">
+        <table class="list-table">
+            <tbody>
+                <tr>
+                    <th>現預金</th>
+                    <td class="text-right nowrap">{{ cash_balance_display }}</td>
+                    <th>買掛未払</th>
+                    <td class="text-right nowrap">{{ payable_unpaid_display }}</td>
+                </tr>
+                <tr>
+                    <th>売掛金</th>
+                    <td class="text-right nowrap">{{ receivable_uncollected_display }}</td>
+                    <th>借入金</th>
+                    <td class="text-right nowrap">{{ loan_balance_display }}</td>
+                </tr>
+                <tr>
+                    <th>棚卸資産</th>
+                    <td class="text-right nowrap">{{ inventory_amount_display }}</td>
+                    <th>負債合計</th>
+                    <td class="text-right nowrap">{{ liability_total_display }}</td>
+                </tr>
+                <tr>
+                    <th>固定資産</th>
+                    <td class="text-right nowrap">{{ fixed_assets_display }}</td>
+                    <th>純資産</th>
+                    <td class="text-right nowrap">{{ net_assets_display }}</td>
+                </tr>
+                <tr>
+                    <th>資産合計</th>
+                    <td class="text-right nowrap">{{ asset_total_display }}</td>
+                    <th>負債・純資産合計</th>
+                    <td class="text-right nowrap">{{ asset_total_display }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="list-actions">
+        <a class="button" href="{% url 'accounting:balance_sheet_edit' %}?target_month={{ target_month }}">
+            簡易BSを入力・編集する
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>月次状況</h2>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">当月売掛発生</div>
+            <div class="summary-number">{{ receivable_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">売掛未回収残高</div>
+            <div class="summary-number danger">{{ receivable_uncollected_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">当月買掛発生</div>
+            <div class="summary-number">{{ payable_total_display }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">買掛未払残高</div>
+            <div class="summary-number danger">{{ payable_unpaid_display }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
