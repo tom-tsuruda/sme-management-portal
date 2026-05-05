@@ -3,86 +3,85 @@
 {% block title %}社員一覧{% endblock %}
 
 {% block content %}
-<style>
-    .master-list-table th,
-    .master-list-table td {
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    .master-list-table .action-cell {
-        white-space: nowrap;
-    }
-
-    .master-list-table .action-cell a {
-        margin-right: 12px;
-    }
-
-    .master-list-table .action-cell form {
-        display: inline-block;
-        margin-left: 4px;
-    }
-</style>
-
 <h2>社員一覧</h2>
 
 <p>
     <a href="{% url 'organizations:employee_create' %}">＋ 社員追加</a>
 </p>
 
-<div class="table-wrap scroll-list">
-    <table class="master-list-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>社員コード</th>
-                <th>社員名</th>
-                <th>部署</th>
-                <th>役職</th>
-                <th>メール</th>
-                <th>ロール</th>
-                <th>承認者</th>
-                <th>有効</th>
-                <th>詳細</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for emp in employees %}
-            <tr>
-                <td>{{ emp.id }}</td>
-                <td>{{ emp.employee_code }}</td>
-                <td>{{ emp.employee_name }}</td>
-                <td>{{ emp.department_name }}</td>
-                <td>{{ emp.position_name }}</td>
-                <td>{{ emp.email }}</td>
-                <td>{{ emp.role }}</td>
-                <td>{{ emp.is_approver }}</td>
-                <td>{{ emp.is_active }}</td>
-                <td>
-                    <a href="{% url 'organizations:employee_detail' emp.id %}">詳細</a>
-                </td>
-                <td class="action-cell">
-                    <a href="{% url 'organizations:employee_edit' emp.id %}">編集</a>
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 80px;">
+                <col style="width: 120px;">
+                <col style="width: 140px;">
+                <col style="width: 130px;">
+                <col style="width: 120px;">
+                <col style="width: 220px;">
+                <col style="width: 100px;">
+                <col style="width: 80px;">
+                <col style="width: 70px;">
+                <col style="width: 130px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>社員コード</th>
+                    <th>社員名</th>
+                    <th>部署</th>
+                    <th>役職</th>
+                    <th>メール</th>
+                    <th>ロール</th>
+                    <th>承認者</th>
+                    <th>有効</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td>
+                        <a href="{% url 'organizations:employee_detail' emp.id %}">
+                            {{ emp.id }}
+                        </a>
+                    </td>
+                    <td>{{ emp.employee_code }}</td>
+                    <td class="text-left long-text">
+                        <a href="{% url 'organizations:employee_detail' emp.id %}">
+                            {{ emp.employee_name }}
+                        </a>
+                    </td>
+                    <td>{{ emp.department_name }}</td>
+                    <td>{{ emp.position_name }}</td>
+                    <td class="text-left long-text">{{ emp.email }}</td>
+                    <td>{{ emp.role }}</td>
+                    <td>{{ emp.is_approver }}</td>
+                    <td>{{ emp.is_active }}</td>
+                    <td class="nowrap">
+                        <div class="list-actions" style="justify-content: center; gap: 12px; margin-top: 0;">
+                            <a href="{% url 'organizations:employee_edit' emp.id %}">編集</a>
 
-                    <form method="post"
-                          action="{% url 'organizations:employee_delete' emp.id %}"
-                          onsubmit="return confirm('この社員を削除しますか？');">
-                        {% csrf_token %}
-                        <button type="submit" class="small-button">削除</button>
-                    </form>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="11">社員データがありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                            <form method="post"
+                                  action="{% url 'organizations:employee_delete' emp.id %}"
+                                  onsubmit="return confirm('この社員を削除しますか？');">
+                                {% csrf_token %}
+                                <button type="submit" class="small-button">削除</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center">社員データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<p>
+<div class="list-actions">
     <a href="{% url 'organizations:organization_home' %}">組織マスタへ戻る</a>
-</p>
+</div>
 {% endblock %}

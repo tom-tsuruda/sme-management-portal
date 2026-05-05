@@ -18,83 +18,79 @@
             登録済みの項目は重複登録されません。
         </p>
 
-        <div class="table-wrap scroll-list">
-            <table class="manufacturing-template-table">
-                <colgroup>
-                    <col style="width: 60px;">   <!-- 選択 -->
-                    <col style="width: 80px;">  <!-- ID -->
-                    <col style="width: 100px;">  <!-- 領域 -->
-                    <col style="width: 100px;">  <!-- カテゴリ -->
-                    <col style="width: 240px;">  <!-- テンプレート名 -->
-                    <col style="width: 80px;">  <!-- 推奨頻度 -->
-                    <col style="width: 100px;">  <!-- 推奨部署 -->
-                    <col style="width: 70px;">   <!-- リスク -->
-                    <col style="width: 80px;">  <!-- 登録状況 -->
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th>選択</th>
-                        <th>ID</th>
-                        <th>領域</th>
-                        <th>カテゴリ</th>
-                        <th>テンプレート名</th>
-                        <th>推奨頻度</th>
-                        <th>推奨部署</th>
-                        <th>リスク</th>
-                        <th>登録状況</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in templates %}
-                    <tr>
-                        <td>
-                            <input
-                                type="checkbox"
-                                name="selected_template_ids"
-                                value="{{ item.id }}"
-                                {% if item.is_registered %}disabled{% endif %}
-                            >
-                        </td>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.area }}</td>
-                        <td>{{ item.category }}</td>
-                        <td>{{ item.template_name }}</td>
-                        <td>{{ item.recommended_frequency }}</td>
-                        <td>{{ item.recommended_department }}</td>
-                        <td>
-                            {% if item.risk_level == "高" %}
-                                <span class="badge-high">高</span>
-                            {% elif item.risk_level == "中" %}
-                                <span class="badge-middle">中</span>
-                            {% elif item.risk_level == "低" %}
-                                <span class="badge-low">低</span>
-                            {% else %}
-                                {{ item.risk_level }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.is_registered %}
-                                登録済み
-                            {% else %}
-                                未登録
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="9" class="text-center">表示するテンプレートがありません。</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="list-frame">
+            <div class="list-scroll">
+                <table class="list-table">
+                    <colgroup>
+                        <col style="width: 55px;">
+                        <col style="width: 90px;">
+                        <col style="width: 100px;">
+                        <col style="width: 100px;">
+                        <col style="width: 100px;">
+                        <col style="width: 95px;">
+                        <col style="width: 100px;">
+                        <col style="width: 65px;">
+                        <col style="width: 90px;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>選択</th>
+                            <th>ID</th>
+                            <th>領域</th>
+                            <th>カテゴリ</th>
+                            <th>テンプレート名</th>
+                            <th>推奨頻度</th>
+                            <th>推奨部署</th>
+                            <th>リスク</th>
+                            <th>登録状況</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in templates %}
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    name="template_ids"
+                                    value="{{ item.id }}"
+                                    {% if item.is_registered %}disabled{% endif %}
+                                >
+                            </td>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.area }}</td>
+                            <td>{{ item.category }}</td>
+                            <td class="long-text">{{ item.template_name }}</td>
+                            <td>{{ item.recommended_frequency }}</td>
+                            <td>{{ item.recommended_department }}</td>
+                            <td>
+                                {% if item.risk_level == "高" %}
+                                    <span class="badge-high">高</span>
+                                {% elif item.risk_level == "中" %}
+                                    <span class="badge-middle">中</span>
+                                {% elif item.risk_level == "低" %}
+                                    <span class="badge-low">低</span>
+                                {% else %}
+                                    {{ item.risk_level }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.is_registered|yesno:"登録済み,未登録" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center">表示するテンプレートがありません。</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <p style="margin-top: 14px;">
-                <button type="submit">選択した項目を製造管理に登録</button>
-                <a class="clear-link" href="{% url 'manufacturing:management_item_list' %}">
-                    製造管理へ戻る
-                </a>
-        </p>
+        <div class="list-actions">
+            <button type="submit">選択した項目を製造管理に登録</button>
+            <a class="clear-link" href="{% url 'manufacturing:management_item_list' %}">
+                製造管理へ戻る
+            </a>
+        </div>
     </form>
 </div>
 {% endblock %}

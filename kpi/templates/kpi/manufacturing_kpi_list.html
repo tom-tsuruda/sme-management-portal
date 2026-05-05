@@ -5,54 +5,73 @@
 
 {% block content %}
 <h2>製造KPI</h2>
+
 <p>
     <a href="{% url 'kpi:manufacturing_kpi_create' %}">＋ 製造KPIを登録</a>
 </p>
 
-<div class="table-wrap scroll-list">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>年月</th>
-                <th>部署</th>
-                <th>生産数量</th>
-                <th>不良数</th>
-                <th>不良率</th>
-                <th>歩留まり</th>
-                <th>納期遵守率</th>
-                <th>設備稼働率</th>
-                <th>停止時間</th>
-                <th>詳細</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in kpis %}
-            <tr>
-                <td>{{ row.id }}</td>
-                <td>{{ row.year_month }}</td>
-                <td>{{ row.department }}</td>
-                <td>{{ row.production_volume|amount }}</td>
-                <td>{{ row.defect_count|amount }}</td>
-                <td>{{ row.defect_rate_display }}</td>
-                <td>{{ row.yield_rate_display }}</td>
-                <td>{{ row.on_time_delivery_rate_display }}</td>
-                <td>{{ row.equipment_availability_display }}</td>
-                <td>{{ row.downtime_hours|amount }}</td>
-                <td>
-                    <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">詳細</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="11" class="text-center">製造KPIがありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 110px;">
+                <col style="width: 130px;">
+                <col style="width: 120px;">
+                <col style="width: 100px;">
+                <col style="width: 90px;">
+                <col style="width: 100px;">
+                <col style="width: 110px;">
+                <col style="width: 110px;">
+                <col style="width: 100px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>年月</th>
+                    <th>部署</th>
+                    <th>生産数量</th>
+                    <th>不良数</th>
+                    <th>不良率</th>
+                    <th>歩留まり</th>
+                    <th>納期遵守率</th>
+                    <th>設備稼働率</th>
+                    <th>停止時間</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in kpis %}
+                <tr>
+                    <td>
+                        <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
+                            {{ row.id }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
+                            {{ row.year_month }}
+                        </a>
+                    </td>
+                    <td>{{ row.department }}</td>
+                    <td class="text-right nowrap">{{ row.production_volume|amount }}</td>
+                    <td class="text-right nowrap">{{ row.defect_count|amount }}</td>
+                    <td>{{ row.defect_rate_display }}</td>
+                    <td>{{ row.yield_rate_display }}</td>
+                    <td>{{ row.on_time_delivery_rate_display }}</td>
+                    <td>{{ row.equipment_availability_display }}</td>
+                    <td class="text-right nowrap">{{ row.downtime_hours|amount }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center">製造KPIがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<p>
+<div class="list-actions">
     <a href="{% url 'kpi:kpi_home' %}">経営指標ダッシュボードへ戻る</a>
-</p>
+</div>
 {% endblock %}

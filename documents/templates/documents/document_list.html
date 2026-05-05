@@ -24,126 +24,61 @@
 </div>
 
 <style>
-.document-category-block {
-    margin-bottom: 18px;
-    background: #ffffff;
-    border-radius: 14px;
-    border: 1px solid #d5dbe3;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-    overflow: hidden;
-}
+    .document-category-block {
+        margin-bottom: 18px;
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #d5dbe3;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+    }
 
-.document-category-block summary {
-    cursor: pointer;
-    padding: 16px 20px;
-    font-weight: 800;
-    font-size: 1.05rem;
-    background: #f1f5f9;
-    border-left: 6px solid #2563eb;
-    list-style: none;
-}
+    .document-category-block summary {
+        cursor: pointer;
+        padding: 16px 20px;
+        font-weight: 800;
+        font-size: 1.05rem;
+        background: #f1f5f9;
+        border-left: 6px solid #2563eb;
+        list-style: none;
+    }
 
-.document-category-block summary::-webkit-details-marker {
-    display: none;
-}
+    .document-category-block summary::-webkit-details-marker {
+        display: none;
+    }
 
-.document-category-block summary::before {
-    content: "▶";
-    display: inline-block;
-    margin-right: 10px;
-    transition: transform 0.2s ease;
-}
+    .document-category-block summary::before {
+        content: "▶";
+        display: inline-block;
+        margin-right: 10px;
+        transition: transform 0.2s ease;
+    }
 
-.document-category-block[open] summary::before {
-    transform: rotate(90deg);
-}
+    .document-category-block[open] summary::before {
+        transform: rotate(90deg);
+    }
 
-.document-category-block summary:hover {
-    background: #e8eef7;
-}
+    .document-category-block summary:hover {
+        background: #e8eef7;
+    }
 
-.document-category-meta {
-    color: #64748b;
-    font-size: 0.9rem;
-    margin-left: 8px;
-}
+    .document-category-meta {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-left: 8px;
+    }
 
-.document-category-block .table-wrap {
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-}
+    .document-category-block .list-frame {
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        margin-bottom: 0;
+    }
 
-.document-table th,
-.document-table td {
-    vertical-align: top;
-}
-
-.document-id {
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.status-badge,
-.risk-badge,
-.template-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    background: #e5e7eb;
-}
-
-.status-badge.not-ready {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.status-badge.progress {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.status-badge.ready {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.status-badge.na {
-    background: #e0e7ff;
-    color: #3730a3;
-}
-
-.risk-badge.high {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.risk-badge.middle {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.risk-badge.low {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.template-badge.available {
-    background: #e0e7ff;
-    color: #3730a3;
-}
-
-.template-badge.none {
-    background: #e5e7eb;
-    color: #374151;
-}
-
-.small-text {
-    color: #64748b;
-    font-size: 0.85rem;
-}
+    .small-text {
+        color: #64748b;
+        font-size: 0.85rem;
+    }
 </style>
 
 {% for category, category_documents in grouped_documents.items %}
@@ -155,132 +90,147 @@
         </span>
     </summary>
 
-    <div class="table-wrap">
-        <table class="document-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>文書名</th>
-                    <th>種別</th>
-                    <th>必須度</th>
-                    <th>主管部署</th>
-                    <th>状態</th>
-                    <th>ひな形</th>
-                    <th>完成文書</th>
-                    <th>リスク</th>
-                    <th>次回確認日</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for doc in category_documents %}
-                <tr>
-                    <td class="document-id">
-                        <a href="{% url 'documents:document_detail' doc.id %}">
-                            {{ doc.id }}
-                        </a>
-                    </td>
-
-                    <td>
-                        <a href="{% url 'documents:document_detail' doc.id %}">
-                            {{ doc.document_name }}
-                        </a>
-
-                        {% if doc.subcategory %}
-                            <br>
-                            <span class="small-text">{{ doc.subcategory }}</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if doc.document_type %}
-                            {{ doc.document_type }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if doc.required_level %}
-                            {{ doc.required_level }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if doc.owner_department %}
-                            {{ doc.owner_department }}
-                        {% elif doc.owner_dept %}
-                            {{ doc.owner_dept }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if doc.status == "未整備" or doc.status == "要改定" %}
-                            <span class="status-badge not-ready">{{ doc.status }}</span>
-                        {% elif doc.status == "作成中" or doc.status == "レビュー中" or doc.status == "要確認" or doc.status == "未確認" %}
-                            <span class="status-badge progress">{{ doc.status }}</span>
-                        {% elif doc.status == "整備済" %}
-                            <span class="status-badge ready">{{ doc.status }}</span>
-                        {% elif doc.status == "対象外" or doc.status == "廃止" %}
-                            <span class="status-badge na">{{ doc.status }}</span>
-                        {% elif doc.status %}
-                            <span class="status-badge">{{ doc.status }}</span>
-                        {% else %}
-                            <span class="status-badge">未設定</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if doc.template_exists %}
-                            <a class="template-badge available" href="{% url 'documents:download_template' doc.id %}" target="_blank">
-                                ひな形を見る
+    <div class="list-frame">
+        <div class="list-scroll">
+            <table class="list-table">
+                <colgroup>
+                    <col style="width: 90px;">
+                    <col style="width: 240px;">
+                    <col style="width: 100px;">
+                    <col style="width: 90px;">
+                    <col style="width: 120px;">
+                    <col style="width: 100px;">
+                    <col style="width: 120px;">
+                    <col style="width: 130px;">
+                    <col style="width: 70px;">
+                    <col style="width: 120px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>文書名</th>
+                        <th>種別</th>
+                        <th>必須度</th>
+                        <th>主管部署</th>
+                        <th>状態</th>
+                        <th>ひな形</th>
+                        <th>完成文書</th>
+                        <th>リスク</th>
+                        <th>次回確認日</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in category_documents %}
+                    <tr>
+                        <td class="nowrap">
+                            <a href="{% url 'documents:document_detail' doc.id %}">
+                                {{ doc.id }}
                             </a>
-                        {% elif doc.template_available == "あり" or doc.template_available == "有" or doc.template_available == "1" or doc.template_available == "True" or doc.template_available == "true" %}
-                            <span class="template-badge none">パス未確認</span>
-                        {% else %}
-                            <span class="template-badge none">未設定</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if doc.completed_file_exists %}
-                            <a class="template-badge available" href="{% url 'documents:download_completed_document' doc.id %}" target="_blank">
-                                完成文書を見る
+                        </td>
+
+                        <td class="text-left long-text">
+                            <a href="{% url 'documents:document_detail' doc.id %}">
+                                {{ doc.document_name }}
                             </a>
-                        {% elif doc.completed_file_path %}
-                            <span class="template-badge none">パス未確認</span>
-                        {% else %}
-                            <span class="template-badge none">未登録</span>
-                        {% endif %}
-                    </td>
 
-                    <td>
-                        {% if doc.risk_level == "高" %}
-                            <span class="risk-badge high">高</span>
-                        {% elif doc.risk_level == "中" %}
-                            <span class="risk-badge middle">中</span>
-                        {% elif doc.risk_level == "低" %}
-                            <span class="risk-badge low">低</span>
-                        {% elif doc.risk_level %}
-                            <span class="risk-badge">{{ doc.risk_level }}</span>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
+                            {% if doc.subcategory %}
+                                <br>
+                                <span class="small-text">{{ doc.subcategory }}</span>
+                            {% endif %}
+                        </td>
 
-                    <td>
-                        {% if doc.next_review_date %}
-                            {{ doc.next_review_date }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <td>
+                            {% if doc.document_type %}
+                                {{ doc.document_type }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.required_level %}
+                                {{ doc.required_level }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.owner_department %}
+                                {{ doc.owner_department }}
+                            {% elif doc.owner_dept %}
+                                {{ doc.owner_dept }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.status == "未整備" or doc.status == "要改定" %}
+                                <span class="status-badge not-ready">{{ doc.status }}</span>
+                            {% elif doc.status == "作成中" or doc.status == "レビュー中" or doc.status == "要確認" or doc.status == "未確認" %}
+                                <span class="status-badge progress">{{ doc.status }}</span>
+                            {% elif doc.status == "整備済" %}
+                                <span class="status-badge ready">{{ doc.status }}</span>
+                            {% elif doc.status == "対象外" or doc.status == "廃止" %}
+                                <span class="status-badge na">{{ doc.status }}</span>
+                            {% elif doc.status %}
+                                <span class="badge-status">{{ doc.status }}</span>
+                            {% else %}
+                                <span class="badge-status">未設定</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.template_exists %}
+                                <a class="template-badge available" href="{% url 'documents:download_template' doc.id %}" target="_blank">
+                                    ひな形を見る
+                                </a>
+                            {% elif doc.template_available == "あり" or doc.template_available == "有" or doc.template_available == "1" or doc.template_available == "True" or doc.template_available == "true" %}
+                                <span class="template-badge none">パス未確認</span>
+                            {% else %}
+                                <span class="template-badge none">未設定</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.completed_file_exists %}
+                                <a class="template-badge available" href="{% url 'documents:download_completed_document' doc.id %}" target="_blank">
+                                    完成文書を見る
+                                </a>
+                            {% elif doc.completed_file_path %}
+                                <span class="template-badge none">パス未確認</span>
+                            {% else %}
+                                <span class="template-badge none">未登録</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.risk_level == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif doc.risk_level == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif doc.risk_level == "低" %}
+                                <span class="badge-low">低</span>
+                            {% elif doc.risk_level %}
+                                <span class="badge-status">{{ doc.risk_level }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if doc.next_review_date %}
+                                {{ doc.next_review_date }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </details>
 {% empty %}

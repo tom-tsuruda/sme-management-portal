@@ -28,59 +28,61 @@
     </p>
 </div>
 
-<div class="table-wrap workflow-table-wrap">
-    <table class="workflow-list-table">
-        <colgroup>
-            <col style="width: 100px;">  <!-- ID -->
-            <col style="width: 110px;">  <!-- 種別 -->
-            <col style="width: 180px;">  <!-- 件名 -->
-            <col style="width: 120px;">  <!-- 申請者 -->
-            <col style="width: 100px;">  <!-- 部署 -->
-            <col style="width: 120px;">  <!-- 金額 -->
-            <col style="width: 110px;">  <!-- 状態 -->
-            <col style="width: 120px;">  <!-- 承認者 -->
-            <col style="width: 150px;">  <!-- 作成日 -->
-        </colgroup>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>種別</th>
-                <th>件名</th>
-                <th>申請者</th>
-                <th>部署</th>
-                <th>金額</th>
-                <th>状態</th>
-                <th>承認者</th>
-                <th>作成日</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in requests %}
-            <tr>
-                <td class="text-center">
-                    <a href="{% url 'workflows:request_detail' item.id %}">
-                        {{ item.id }}
-                    </a>
-                </td>
-                <td class="text-center">{{ item.request_type }}</td>
-                <td>
-                    <a href="{% url 'workflows:request_detail' item.id %}">
-                        {{ item.title }}
-                    </a>
-                </td>
-                <td class="text-center">{{ item.applicant }}</td>
-                <td class="text-center">{{ item.department }}</td>
-                <td class="amount-text">{{ item.amount|intcomma }}</td>
-                <td class="text-center">{{ item.status }}</td>
-                <td class="text-center">{{ item.approver }}</td>
-                <td class="text-center">{{ item.created_at }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="text-center">申請データがありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 100px;">
+                <col style="width: 200px;">
+                <col style="width: 110px;">
+                <col style="width: 100px;">
+                <col style="width: 110px;">
+                <col style="width: 90px;">
+                <col style="width: 110px;">
+                <col style="width: 140px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>種別</th>
+                    <th>件名</th>
+                    <th>申請者</th>
+                    <th>部署</th>
+                    <th>金額</th>
+                    <th>状態</th>
+                    <th>承認者</th>
+                    <th>作成日</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in requests %}
+                <tr>
+                    <td>
+                        <a href="{% url 'workflows:request_detail' item.id %}">
+                            {{ item.id }}
+                        </a>
+                    </td>
+                    <td>{{ item.request_type }}</td>
+                    <td class="text-left long-text">
+                        <a href="{% url 'workflows:request_detail' item.id %}">
+                            {{ item.title }}
+                        </a>
+                    </td>
+                    <td>{{ item.applicant }}</td>
+                    <td>{{ item.department }}</td>
+                    <td class="text-right nowrap">{{ item.amount|intcomma }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.approver }}</td>
+                    <td>{{ item.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">申請データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

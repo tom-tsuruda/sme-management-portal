@@ -46,7 +46,6 @@
 </div>
 {% endif %}
 
-
 {% if latest_manufacturing_kpi %}
 <div class="card">
     <h2>最新 製造KPI</h2>
@@ -88,62 +87,66 @@
 </div>
 {% endif %}
 
-
 <div class="card">
     <h2>要対応タスク</h2>
 
     {% if action_tasks %}
-    <div class="table-wrap scroll-list">
-        <table class="task-list-table">
-            <colgroup>
-                <col style="width: 100px;">
-                <col style="width: 660px;">
-                <col style="width: 130px;">
-                <col style="width: 120px;">
-                <col style="width: 140px;">
-                <col style="width: 65px;">
-                <col style="width: 40px;">
-                <col style="width: 40px;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>タスク名</th>
-                    <th>カテゴリ</th>
-                    <th>担当</th>
-                    <th>期限</th>
-                    <th>状態</th>
-                    <th>優先度</th>
-                    <th>詳細</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in action_tasks %}
-                <tr>
-                    <td>{{ task.id }}</td>
-                    <td>{{ task.task_name }}</td>
-                    <td>{{ task.category }}</td>
-                    <td>{{ task.owner }}</td>
-                    <td>{{ task.due_date }}</td>
-                    <td>{{ task.status }}</td>
-                    <td>
-                        {% if task.priority == "高" %}
-                            <span class="badge-high">高</span>
-                        {% elif task.priority == "中" %}
-                            <span class="badge-middle">中</span>
-                        {% elif task.priority == "低" %}
-                            <span class="badge-low">低</span>
-                        {% else %}
-                            {{ task.priority }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'tasks:task_detail' task.id %}">詳細</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="list-frame">
+        <div class="list-scroll">
+            <table class="list-table">
+                <colgroup>
+                    <col style="width: 80px;">
+                    <col style="width: 400px;">
+                    <col style="width: 110px;">
+                    <col style="width: 110px;">
+                    <col style="width: 110px;">
+                    <col style="width: 70px;">
+                    <col style="width: 70px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>タスク名</th>
+                        <th>カテゴリ</th>
+                        <th>担当</th>
+                        <th>期限</th>
+                        <th>状態</th>
+                        <th>優先度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in action_tasks %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'tasks:task_detail' task.id %}">
+                                {{ task.id }}
+                            </a>
+                        </td>
+                        <td class="text-left long-text">
+                            <a href="{% url 'tasks:task_detail' task.id %}">
+                                {{ task.task_name }}
+                            </a>
+                        </td>
+                        <td>{{ task.category }}</td>
+                        <td>{{ task.owner }}</td>
+                        <td>{{ task.due_date }}</td>
+                        <td>{{ task.status }}</td>
+                        <td>
+                            {% if task.priority == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif task.priority == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif task.priority == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ task.priority }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% else %}
         <p>要対応タスクはありません。</p>

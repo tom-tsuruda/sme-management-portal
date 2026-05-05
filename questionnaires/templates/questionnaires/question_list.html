@@ -77,88 +77,16 @@
             margin-left: 8px;
         }
 
-        .question-category-block .table-wrap {
-            margin: 0;
+        .question-category-block .list-frame {
+            border: none;
             border-radius: 0;
             box-shadow: none;
-        }
-
-        .question-table {
-            table-layout: fixed;
-            width: 1080px;
-            min-width: 1080px;
-        }
-
-        .question-table th,
-        .question-table td {
-            vertical-align: middle;
-        }
-
-        .question-table th {
-            text-align: center;
-        }
-
-        .question-table .table-filter-row th {
-            text-align: center;
-        }
-
-        .question-table .table-filter-input {
-            text-align: center;
-        }
-
-        .question-table th:nth-child(1),
-        .question-table td:nth-child(1),
-        .question-table th:nth-child(3),
-        .question-table td:nth-child(3),
-        .question-table th:nth-child(4),
-        .question-table td:nth-child(4) {
-            text-align: center;
-        }
-
-        .question-table th:nth-child(2),
-        .question-table td:nth-child(2),
-        .question-table th:nth-child(5),
-        .question-table td:nth-child(5) {
-            text-align: left;
-        }
-
-        .question-table td:nth-child(4) {
-            white-space: nowrap;
-        }
-
-        .question-id {
-            font-weight: 700;
-            color: #334155;
-            white-space: nowrap;
+            margin-bottom: 0;
         }
 
         .question-answer-select {
             width: 190px;
             max-width: 100%;
-        }
-
-        .risk-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            background: #e5e7eb;
-        }
-
-        .risk-badge.high {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .risk-badge.middle {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .risk-badge.low {
-            background: #dcfce7;
-            color: #166534;
         }
     </style>
 
@@ -171,90 +99,92 @@
             </span>
         </summary>
 
-        <div class="table-wrap">
-            <table class="question-table">
-                <colgroup>
-                    <col style="width: 80px;">  <!-- ID -->
-                    <col style="width: 300px;">  <!-- 質問 -->
-                    <col style="width: 120px;">  <!-- 回答 -->
-                    <col style="width: 60px;">   <!-- リスク -->
-                    <col style="width: 300px;">  <!-- 推奨タスク -->
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>質問</th>
-                        <th>回答</th>
-                        <th>リスク</th>
-                        <th>推奨タスク</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for q in category_questions %}
-                    <tr>
-                        <td class="question-id">{{ q.id }}</td>
-                        <td>{{ q.question_text }}</td>
-                        <td>
-                            <select name="{{ q.id }}" class="question-answer-select">
-                                <option value="">選択してください</option>
+        <div class="list-frame">
+            <div class="list-scroll">
+                <table class="list-table">
+                    <colgroup>
+                        <col style="width: 90px;">
+                        <col style="width: 370px;">
+                        <col style="width: 220px;">
+                        <col style="width: 70px;">
+                        <col style="width: 420px;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>質問</th>
+                            <th>回答</th>
+                            <th>リスク</th>
+                            <th>推奨タスク</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in category_questions %}
+                        <tr>
+                            <td class="nowrap"><strong>{{ q.id }}</strong></td>
+                            <td class="text-left long-text">{{ q.question_text }}</td>
+                            <td>
+                                <select name="{{ q.id }}" class="question-answer-select">
+                                    <option value="">選択してください</option>
 
-                                {% if q.option_a %}
-                                    <option value="{{ q.option_a }}">{{ q.option_a }}</option>
-                                {% else %}
-                                    <option value="はい">はい</option>
-                                {% endif %}
+                                    {% if q.option_a %}
+                                        <option value="{{ q.option_a }}">{{ q.option_a }}</option>
+                                    {% else %}
+                                        <option value="はい">はい</option>
+                                    {% endif %}
 
-                                {% if q.option_b %}
-                                    <option value="{{ q.option_b }}">{{ q.option_b }}</option>
-                                {% else %}
-                                    <option value="一部対応">一部対応</option>
-                                {% endif %}
+                                    {% if q.option_b %}
+                                        <option value="{{ q.option_b }}">{{ q.option_b }}</option>
+                                    {% else %}
+                                        <option value="一部対応">一部対応</option>
+                                    {% endif %}
 
-                                {% if q.option_c %}
-                                    <option value="{{ q.option_c }}">{{ q.option_c }}</option>
-                                {% else %}
-                                    <option value="いいえ">いいえ</option>
-                                {% endif %}
+                                    {% if q.option_c %}
+                                        <option value="{{ q.option_c }}">{{ q.option_c }}</option>
+                                    {% else %}
+                                        <option value="いいえ">いいえ</option>
+                                    {% endif %}
 
-                                {% if q.option_d %}
-                                    <option value="{{ q.option_d }}">{{ q.option_d }}</option>
-                                {% else %}
-                                    <option value="不明">不明</option>
-                                {% endif %}
+                                    {% if q.option_d %}
+                                        <option value="{{ q.option_d }}">{{ q.option_d }}</option>
+                                    {% else %}
+                                        <option value="不明">不明</option>
+                                    {% endif %}
 
-                                {% if q.option_e %}
-                                    <option value="{{ q.option_e }}">{{ q.option_e }}</option>
+                                    {% if q.option_e %}
+                                        <option value="{{ q.option_e }}">{{ q.option_e }}</option>
+                                    {% else %}
+                                        <option value="対象外">対象外</option>
+                                    {% endif %}
+                                </select>
+                            </td>
+                            <td>
+                                {% if q.risk_level == "高" %}
+                                    <span class="badge-high">高</span>
+                                {% elif q.risk_level == "中" %}
+                                    <span class="badge-middle">中</span>
+                                {% elif q.risk_level == "低" %}
+                                    <span class="badge-low">低</span>
                                 {% else %}
-                                    <option value="対象外">対象外</option>
+                                    <span class="badge-status">{{ q.risk_level|default:"-" }}</span>
                                 {% endif %}
-                            </select>
-                        </td>
-                        <td>
-                            {% if q.risk_level == "高" %}
-                                <span class="risk-badge high">高</span>
-                            {% elif q.risk_level == "中" %}
-                                <span class="risk-badge middle">中</span>
-                            {% elif q.risk_level == "低" %}
-                                <span class="risk-badge low">低</span>
-                            {% else %}
-                                <span class="risk-badge">{{ q.risk_level|default:"-" }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if q.recommended_task_name %}
-                                {{ q.recommended_task_name }}
-                            {% elif q.related_task_id %}
-                                <a href="/tasks/?q={{ q.related_task_id }}">
-                                    {{ q.related_task_id }}
-                                </a>
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            <td class="text-left long-text">
+                                {% if q.recommended_task_name %}
+                                    {{ q.recommended_task_name }}
+                                {% elif q.related_task_id %}
+                                    <a href="/tasks/?q={{ q.related_task_id }}">
+                                        {{ q.related_task_id }}
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </details>
     {% empty %}
@@ -263,8 +193,8 @@
     </div>
     {% endfor %}
 
-    <p>
+    <div class="form-actions">
         <button type="submit">回答を送信</button>
-    </p>
+    </div>
 </form>
 {% endblock %}

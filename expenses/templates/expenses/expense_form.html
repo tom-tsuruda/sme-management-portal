@@ -21,7 +21,7 @@
         {% csrf_token %}
 
         <div class="form-row">
-            <label>申請種別</label><br>
+            <label>申請種別</label>
             <select name="expense_type" class="input-middle">
                 {% for expense_type in expense_type_choices %}
                     <option value="{{ expense_type }}">{{ expense_type }}</option>
@@ -30,12 +30,12 @@
         </div>
 
         <div class="form-row">
-            <label>件名</label><br>
+            <label>件名</label>
             <input type="text" name="title" required class="input-long" placeholder="例：東京 出張交通費">
         </div>
 
         <div class="form-row">
-            <label>申請者</label><br>
+            <label>申請者</label>
             <div class="inline-form">
                 <select name="applicant_employee_id" class="input-middle">
                     <option value="">社員マスタから選択</option>
@@ -52,7 +52,7 @@
         </div>
 
         <div class="form-row">
-            <label>部署</label><br>
+            <label>部署</label>
             <div class="inline-form">
                 <select name="department_id" class="input-middle">
                     <option value="">申請者の部署を使う / 部署マスタから選択</option>
@@ -69,12 +69,12 @@
         </div>
 
         <div class="form-row">
-            <label>利用日</label><br>
-            <input type="date" name="expense_date" class="input-middle">
+            <label>利用日</label>
+            <input type="date" name="expense_date" class="input-middle date-input">
         </div>
 
         <div class="form-row">
-            <label>分類</label><br>
+            <label>分類</label>
             <select name="category" class="input-middle">
                 {% for category in expense_category_choices %}
                     <option value="{{ category }}">{{ category }}</option>
@@ -83,12 +83,12 @@
         </div>
 
         <div class="form-row">
-            <label>金額</label><br>
+            <label>金額</label>
             <input type="text" name="amount" class="amount-input" placeholder="例：12,000">
         </div>
 
         <div class="form-row">
-            <label>支払方法</label><br>
+            <label>支払方法</label>
             <select name="payment_method" class="input-middle">
                 {% for payment_method in payment_method_choices %}
                     <option value="{{ payment_method }}">{{ payment_method }}</option>
@@ -97,7 +97,7 @@
         </div>
 
         <div class="form-row">
-            <label>承認者</label><br>
+            <label>承認者</label>
             <div class="inline-form">
                 <select name="approver_employee_id" class="input-middle">
                     <option value="">承認者マスタから選択</option>
@@ -114,18 +114,18 @@
         </div>
 
         <div class="form-row">
-            <label>内容・目的</label><br>
+            <label>内容・目的</label>
             <textarea name="description" rows="6" class="input-full" placeholder="例：東京出張に伴う新幹線代"></textarea>
         </div>
 
         <div class="form-row">
-            <label>領収書・証憑添付</label><br>
+            <label>領収書・証憑添付</label>
             <input type="file" name="attachment">
         </div>
 
-        <p>
+        <div class="form-actions">
             <button type="submit">申請する</button>
-        </p>
+        </div>
     </form>
 </div>
 {% endblock %}

@@ -9,38 +9,49 @@
     全{{ total_count }}件中 {{ display_count }}件を表示
 </p>
 
-<div class="table-wrap scroll-list">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>種別</th>
-                <th>内容</th>
-                <th>対象</th>
-                <th>作成日時</th>
-                <th>詳細</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for notification in notifications %}
-            <tr>
-                <td>{{ notification.id }}</td>
-                <td>{{ notification.category }}</td>
-                <td>{{ notification.title }}</td>
-                <td>{{ notification.target_user }}</td>
-                <td>{{ notification.created_at }}</td>
-                <td>
-                    <a href="{% url 'notifications:notification_detail' notification.id %}">
-                        詳細
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">操作履歴はありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 120px;">
+                <col style="width: 430px;">
+                <col style="width: 160px;">
+                <col style="width: 180px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>種別</th>
+                    <th>内容</th>
+                    <th>対象</th>
+                    <th>作成日時</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notification in notifications %}
+                <tr>
+                    <td>
+                        <a href="{% url 'notifications:notification_detail' notification.id %}">
+                            {{ notification.id }}
+                        </a>
+                    </td>
+                    <td>{{ notification.category }}</td>
+                    <td class="text-left long-text">
+                        <a href="{% url 'notifications:notification_detail' notification.id %}">
+                            {{ notification.title }}
+                        </a>
+                    </td>
+                    <td>{{ notification.target_user }}</td>
+                    <td>{{ notification.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">操作履歴はありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

@@ -10,16 +10,7 @@
         gap: 14px;
         margin-top: 10px;
     }
-    .task-list-table th,
-    .task-list-table td {
-        text-align: center;
-        vertical-align: middle;
-    }
 
-    .task-list-table th:nth-child(2),
-    .task-list-table td:nth-child(2) {
-        text-align: left;
-    }
     .task-form-grid .full {
         grid-column: 1 / -1;
     }
@@ -28,10 +19,6 @@
         margin-top: 6px;
         font-size: 12px;
         color: #6b7280;
-    }
-
-    .compact-actions {
-        margin-top: 14px;
     }
 
     @media (max-width: 768px) {
@@ -43,7 +30,6 @@
             grid-column: auto;
         }
     }
-    
 </style>
 
 <div class="card">
@@ -51,63 +37,64 @@
     <p>未整備文書・確認事項・期限付きタスクを管理します。</p>
     <p class="count-text">全{{ total_count }}件中 {{ display_count }}件を表示</p>
 
-    <div class="table-wrap scroll-list">
-        <table class="task-list-table">
-            <colgroup>
-                <col style="width: 100px;">
-                <col style="width: 660px;">
-                <col style="width: 130px;">
-                <col style="width: 120px;">
-                <col style="width: 140px;">
-                <col style="width: 65px;">
-                <col style="width: 40px;">
-                <col style="width: 40px;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>タスク名</th>
-                    <th>カテゴリ</th>
-                    <th>担当</th>
-                    <th>期限</th>
-                    <th>状態</th>
-                    <th>優先度</th>
-                    <th>詳細</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in tasks %}
-                <tr>
-                    <td>
-                        <a href="{% url 'tasks:task_detail' task.id %}">{{ task.id }}</a>
-                    </td>
-                    <td>{{ task.task_name }}</td>
-                    <td>{{ task.category }}</td>
-                    <td>{{ task.owner }}</td>
-                    <td>{{ task.due_date }}</td>
-                    <td>{{ task.status }}</td>
-                    <td>
-                        {% if task.priority == "高" %}
-                            <span class="badge-high">高</span>
-                        {% elif task.priority == "中" %}
-                            <span class="badge-middle">中</span>
-                        {% elif task.priority == "低" %}
-                            <span class="badge-low">低</span>
-                        {% else %}
-                            {{ task.priority }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'tasks:task_detail' task.id %}">詳細</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8">タスクはありません。</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="list-frame">
+        <div class="list-scroll">
+            <table class="list-table">
+                <colgroup>
+                    <col style="width: 90px;">
+                    <col style="width: 430px;">
+                    <col style="width: 120px;">
+                    <col style="width: 110px;">
+                    <col style="width: 110px;">
+                    <col style="width: 80px;">
+                    <col style="width: 70px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>タスク名</th>
+                        <th>カテゴリ</th>
+                        <th>担当</th>
+                        <th>期限</th>
+                        <th>状態</th>
+                        <th>優先度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'tasks:task_detail' task.id %}">{{ task.id }}</a>
+                        </td>
+                        <td class="text-left long-text">
+                            <a href="{% url 'tasks:task_detail' task.id %}">
+                                {{ task.task_name }}
+                            </a>
+                        </td>
+                        <td>{{ task.category }}</td>
+                        <td>{{ task.owner }}</td>
+                        <td>{{ task.due_date }}</td>
+                        <td>{{ task.status }}</td>
+                        <td>
+                            {% if task.priority == "高" %}
+                                <span class="badge-high">高</span>
+                            {% elif task.priority == "中" %}
+                                <span class="badge-middle">中</span>
+                            {% elif task.priority == "低" %}
+                                <span class="badge-low">低</span>
+                            {% else %}
+                                {{ task.priority }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">タスクはありません。</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -139,7 +126,7 @@
 
             <input type="text" name="owner" class="input-full" placeholder="担当を手入力">
 
-            <input type="date" name="due_date" class="input-full">
+            <input type="date" name="due_date" class="input-full date-input">
 
             <select name="status" class="input-full">
                 <option value="未着手">状態：未着手</option>
@@ -159,7 +146,7 @@
             <textarea name="notes" class="input-full full" rows="3" placeholder="備考（任意）"></textarea>
         </div>
 
-        <div class="compact-actions">
+        <div class="form-actions">
             <button type="submit">追加する</button>
         </div>
     </form>

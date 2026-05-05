@@ -30,10 +30,6 @@
         font-size: 13px;
     }
 
-    .form-actions {
-        margin-top: 14px;
-    }
-
     @media (max-width: 768px) {
         .incident-form-grid {
             grid-template-columns: 1fr;
@@ -47,9 +43,10 @@
 
 <div class="card">
     <h2>製造インシデント登録</h2>
-    <p>
+
+    <div class="list-actions">
         <a href="{% url 'manufacturing:incident_list' %}">← インシデント一覧へ戻る</a>
-    </p>
+    </div>
 
     <form method="post" action="{% url 'manufacturing:incident_create' %}">
         {% csrf_token %}
@@ -61,7 +58,7 @@
                 {% endfor %}
             </select>
 
-            <input type="date" name="incident_date" class="input-full">
+            <input type="date" name="incident_date" class="input-full date-input">
 
             <input
                 type="text"
@@ -154,7 +151,7 @@
                 このインシデント対応タスクを作成する
             </label>
 
-            <input type="date" name="due_date" class="input-full" title="タスク期限">
+            <input type="date" name="due_date" class="input-full date-input" title="タスク期限">
         </div>
 
         <div class="form-actions">

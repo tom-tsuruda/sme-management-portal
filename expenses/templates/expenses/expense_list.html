@@ -23,62 +23,64 @@
     </p>
 </div>
 
-<div class="table-wrap expense-table-wrap">
-    <table class="expense-list-table">
-        <colgroup>
-            <col style="width: 90px;">   <!-- ID -->
-            <col style="width: 90px;">  <!-- 種別 -->
-            <col style="width: 170px;">  <!-- 件名 -->
-            <col style="width: 120px;">  <!-- 申請者 -->
-            <col style="width: 100px;">  <!-- 部署 -->
-            <col style="width: 110px;">  <!-- 利用日 -->
-            <col style="width: 100px;">  <!-- 分類 -->
-            <col style="width: 100px;">  <!-- 金額 -->
-            <col style="width: 90px;">   <!-- 状態 -->
-            <col style="width: 100px;">  <!-- 承認者 -->
-        </colgroup>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>種別</th>
-                <th>件名</th>
-                <th>申請者</th>
-                <th>部署</th>
-                <th>利用日</th>
-                <th>分類</th>
-                <th>金額</th>
-                <th>状態</th>
-                <th>承認者</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for expense in expenses %}
-            <tr>
-                <td class="text-center">
-                    <a href="{% url 'expenses:expense_detail' expense.id %}">
-                        {{ expense.id }}
-                    </a>
-                </td>
-                <td class="text-center">{{ expense.expense_type }}</td>
-                <td>
-                    <a href="{% url 'expenses:expense_detail' expense.id %}">
-                        {{ expense.title }}
-                    </a>
-                </td>
-                <td class="text-center">{{ expense.applicant }}</td>
-                <td class="text-center">{{ expense.department }}</td>
-                <td class="text-center">{{ expense.expense_date }}</td>
-                <td class="text-center">{{ expense.category }}</td>
-                <td class="amount-text">{{ expense.amount|intcomma }}</td>
-                <td class="text-center">{{ expense.status }}</td>
-                <td class="text-center">{{ expense.approver }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="10" class="text-center">経費申請データがありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 90px;">
+                <col style="width: 190px;">
+                <col style="width: 120px;">
+                <col style="width: 100px;">
+                <col style="width: 110px;">
+                <col style="width: 100px;">
+                <col style="width: 100px;">
+                <col style="width: 90px;">
+                <col style="width: 100px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>種別</th>
+                    <th>件名</th>
+                    <th>申請者</th>
+                    <th>部署</th>
+                    <th>利用日</th>
+                    <th>分類</th>
+                    <th>金額</th>
+                    <th>状態</th>
+                    <th>承認者</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>
+                        <a href="{% url 'expenses:expense_detail' expense.id %}">
+                            {{ expense.id }}
+                        </a>
+                    </td>
+                    <td>{{ expense.expense_type }}</td>
+                    <td class="text-left long-text">
+                        <a href="{% url 'expenses:expense_detail' expense.id %}">
+                            {{ expense.title }}
+                        </a>
+                    </td>
+                    <td>{{ expense.applicant }}</td>
+                    <td>{{ expense.department }}</td>
+                    <td>{{ expense.expense_date }}</td>
+                    <td>{{ expense.category }}</td>
+                    <td class="text-right nowrap">{{ expense.amount|intcomma }}</td>
+                    <td>{{ expense.status }}</td>
+                    <td>{{ expense.approver }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center">経費申請データがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

@@ -7,11 +7,10 @@
     <h2>製造インシデント管理</h2>
     <p>品質不良、設備故障、ヒヤリハット、安全・環境・IT/OTの異常を管理します。</p>
 
-    <p>
+    <div class="list-actions">
         <a href="{% url 'manufacturing:management_item_list' %}">← 製造管理一覧へ戻る</a>
-        |
         <a href="{% url 'manufacturing:incident_create' %}">＋ インシデント登録</a>
-    </p>
+    </div>
 
     <form method="get" action="{% url 'manufacturing:incident_list' %}" class="search-form">
         <input
@@ -59,72 +58,92 @@
     </p>
 </div>
 
-<div class="table-wrap">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>発生日</th>
-                <th>領域</th>
-                <th>タイトル</th>
-                <th>重大度</th>
-                <th>検出者</th>
-                <th>担当者</th>
-                <th>状態</th>
-                <th>関連管理項目</th>
-                <th>関連タスク</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for incident in incidents %}
-            <tr>
-                <td>
-                    <a href="{% url 'manufacturing:incident_detail' incident.id %}">
-                        {{ incident.id }}
-                    </a>
-                </td>
-                <td>{{ incident.incident_date }}</td>
-                <td>{{ incident.area }}</td>
-                <td>
-                    <a href="{% url 'manufacturing:incident_detail' incident.id %}">
-                        {{ incident.title }}
-                    </a>
-                </td>
-                <td>
-                    {% if incident.severity == "重大" or incident.severity == "高" %}
-                        <span class="badge-high">{{ incident.severity }}</span>
-                    {% elif incident.severity == "中" %}
-                        <span class="badge-middle">{{ incident.severity }}</span>
-                    {% elif incident.severity == "低" %}
-                        <span class="badge-low">{{ incident.severity }}</span>
-                    {% else %}
-                        {{ incident.severity }}
-                    {% endif %}
-                </td>
-                <td>{{ incident.detected_by }}</td>
-                <td>{{ incident.owner }}</td>
-                <td>{{ incident.status }}</td>
-                <td>
-                    {% if incident.related_management_item_id %}
-                        <a href="{% url 'manufacturing:management_item_detail' incident.related_management_item_id %}">
-                            {{ incident.related_management_item_id }}
+<div class="list-frame">
+    <div class="list-scroll">
+        <table class="list-table">
+            <colgroup>
+                <col style="width: 90px;">
+                <col style="width: 110px;">
+                <col style="width: 100px;">
+                <col style="width: 240px;">
+                <col style="width: 80px;">
+                <col style="width: 110px;">
+                <col style="width: 110px;">
+                <col style="width: 100px;">
+                <col style="width: 120px;">
+                <col style="width: 110px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>発生日</th>
+                    <th>領域</th>
+                    <th>タイトル</th>
+                    <th>重大度</th>
+                    <th>検出者</th>
+                    <th>担当者</th>
+                    <th>状態</th>
+                    <th>関連管理項目</th>
+                    <th>関連タスク</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incident in incidents %}
+                <tr>
+                    <td>
+                        <a href="{% url 'manufacturing:incident_detail' incident.id %}">
+                            {{ incident.id }}
                         </a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if incident.related_task_id %}
-                        <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
-                            {{ incident.related_task_id }}
+                    </td>
+                    <td>{{ incident.incident_date }}</td>
+                    <td>{{ incident.area }}</td>
+                    <td class="text-left long-text">
+                        <a href="{% url 'manufacturing:incident_detail' incident.id %}">
+                            {{ incident.title }}
                         </a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="10">インシデントデータがありません。</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                    <td>
+                        {% if incident.severity == "重大" or incident.severity == "高" %}
+                            <span class="badge-high">{{ incident.severity }}</span>
+                        {% elif incident.severity == "中" %}
+                            <span class="badge-middle">{{ incident.severity }}</span>
+                        {% elif incident.severity == "低" %}
+                            <span class="badge-low">{{ incident.severity }}</span>
+                        {% else %}
+                            {{ incident.severity }}
+                        {% endif %}
+                    </td>
+                    <td>{{ incident.detected_by }}</td>
+                    <td>{{ incident.owner }}</td>
+                    <td>
+                        <span class="badge-status">{{ incident.status }}</span>
+                    </td>
+                    <td>
+                        {% if incident.related_management_item_id %}
+                            <a href="{% url 'manufacturing:management_item_detail' incident.related_management_item_id %}">
+                                {{ incident.related_management_item_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if incident.related_task_id %}
+                            <a href="{% url 'tasks:task_detail' incident.related_task_id %}">
+                                {{ incident.related_task_id }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center">インシデントデータがありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

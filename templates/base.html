@@ -19,11 +19,11 @@
             --orange: #d97706;
             --green: #059669;
         }
-    
+
         * {
             box-sizing: border-box;
         }
-    
+
         body {
             margin: 0;
             background: var(--bg);
@@ -32,29 +32,29 @@
             font-size: 14px;
             line-height: 1.7;
         }
-    
+
         a {
             color: var(--blue);
             text-decoration: none;
         }
-    
+
         a:hover {
             color: var(--blue-hover);
             text-decoration: underline;
         }
-    
+
         .top-fixed {
             position: sticky;
             top: 0;
             z-index: 1000;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
         }
-    
+
         header {
             background: var(--head);
             color: #ffffff;
         }
-    
+
         .header-inner,
         .nav-inner,
         main {
@@ -63,21 +63,21 @@
             padding-left: 32px;
             padding-right: 32px;
         }
-    
+
         .header-inner {
             padding-top: 12px;
             padding-bottom: 12px;
         }
-    
+
         header h1 {
             margin: 0;
             font-size: 20px;
         }
-    
+
         nav {
             background: var(--nav);
         }
-    
+
         .nav-inner {
             display: flex;
             flex-wrap: wrap;
@@ -85,19 +85,19 @@
             padding-top: 8px;
             padding-bottom: 8px;
         }
-    
+
         nav a {
             color: #ffffff;
             font-weight: bold;
             font-size: 13px;
             padding: 3px 6px;
         }
-    
+
         main {
             padding-top: 20px;
             padding-bottom: 40px;
         }
-    
+
         h2 {
             margin-top: 0;
             margin-bottom: 12px;
@@ -105,7 +105,7 @@
             border-left: 5px solid var(--blue);
             font-size: 18px;
         }
-    
+
         .card,
         .summary-card,
         .menu-item,
@@ -116,19 +116,19 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
-    
+
         .card {
             padding: 20px 22px;
             margin-bottom: 22px;
         }
-    
+
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 12px;
             margin-bottom: 18px;
         }
-    
+
         .summary-card {
             padding: 12px 14px;
             display: flex;
@@ -136,94 +136,198 @@
             align-items: center;
             gap: 12px;
         }
-    
+
         .summary-label {
             color: #4b5563;
             font-weight: bold;
             line-height: 1.4;
         }
-    
+
         .summary-number {
             font-size: 20px;
             font-weight: bold;
             white-space: nowrap;
         }
-    
+
         .summary-number.danger {
             color: var(--red);
         }
-    
+
         .summary-number.warning {
             color: var(--orange);
         }
-    
+
         .summary-number small {
             margin-left: 5px;
             color: var(--sub);
             font-size: 12px;
         }
-    
+
         .menu-list {
             display: grid;
             grid-template-columns: repeat(2, minmax(220px, 1fr));
             gap: 14px;
             margin-top: 18px;
         }
-    
+
         .menu-item {
             display: block;
             padding: 16px;
             color: var(--text);
             font-weight: bold;
         }
-    
+
         .menu-item:hover {
             background: #eff6ff;
             text-decoration: none;
         }
-    
-        .table-wrap {
-            overflow-x: auto;
-            margin-bottom: 16px;
-        }
-    
-        .scroll-list {
-            max-height: 305px;
-            overflow-y: auto;
-        }
-    
+
+        /* ==============================
+           共通：通常テーブル
+           ============================== */
+
         table {
             width: 100%;
-            min-width: 900px;
             border-collapse: collapse;
             background: #ffffff;
             font-size: 13px;
         }
-    
+
         th,
         td {
             border: 1px solid var(--line);
             padding: 8px 10px;
-            text-align: left;
+            text-align: center;
             vertical-align: middle;
         }
-    
+
         th {
             background: #e5e7eb;
             font-weight: bold;
             white-space: nowrap;
         }
-    
+
         tr:nth-child(even) td {
             background: #fafafa;
         }
-    
-        .scroll-list thead th {
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        /* ==============================
+           共通：一覧テーブル
+           list-frame  = 外枠・角丸・影
+           list-scroll = 高さ制限・縦スクロール
+           list-table  = テーブル本体
+           ============================== */
+
+        .list-frame {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .list-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+        }
+
+        .list-table {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            background: #ffffff;
+            font-size: 13px;
+        }
+
+        .list-table th,
+        .list-table td {
+            border: 1px solid var(--line);
+            padding: 8px 10px;
+            text-align: center;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+
+        .list-table th {
+            background: #e5e7eb;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .list-table tr:nth-child(even) td {
+            background: #fafafa;
+        }
+
+        .list-scroll thead th {
             position: sticky;
             top: 0;
             z-index: 2;
         }
-    
+
+        .table-filter-row th {
+            background: #f8fafc;
+            padding: 6px 8px;
+            text-align: center;
+        }
+
+        .table-filter-input {
+            width: 100%;
+            min-width: 0;
+            height: 32px;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 0;
+            background: #ffffff;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .table-filter-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .table-filter-status {
+            color: var(--sub);
+            font-size: 13px;
+            padding: 6px 10px 8px;
+            background: #ffffff;
+        }
+
+        .text-left {
+            text-align: left !important;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .nowrap {
+            white-space: nowrap !important;
+        }
+
+        .long-text {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        /* ==============================
+           共通：フォーム
+           ============================== */
+
         input,
         select,
         textarea,
@@ -231,7 +335,7 @@
             font-family: inherit;
             font-size: 13px;
         }
-    
+
         input[type="text"],
         input[type="number"],
         input[type="date"],
@@ -244,14 +348,20 @@
         .input-long,
         .input-middle,
         .input-full,
-        .amount-input {
+        .amount-input,
+        .date-input {
             padding: 8px 10px;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
             background: #ffffff;
             color: var(--text);
         }
-    
+
+        input[type="date"],
+        .date-input {
+            height: 38px;
+        }
+
         input:focus,
         select:focus,
         textarea:focus {
@@ -259,26 +369,26 @@
             border-color: var(--blue);
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
         }
-    
+
         .input-long {
             width: 520px;
             max-width: 100%;
         }
-    
+
         .input-middle {
             width: 360px;
             max-width: 100%;
         }
-    
+
         .input-full {
             width: 100%;
         }
-    
+
         .amount-input {
             width: 180px;
             max-width: 100%;
         }
-    
+
         button,
         input[type="submit"],
         .button,
@@ -293,7 +403,7 @@
             cursor: pointer;
             text-decoration: none;
         }
-    
+
         button:hover,
         input[type="submit"]:hover,
         .button:hover,
@@ -302,12 +412,12 @@
             color: #ffffff;
             text-decoration: none;
         }
-    
+
         .small-button {
             padding: 5px 9px;
             font-size: 12px;
         }
-    
+
         .inline-form,
         .task-create-form {
             display: flex;
@@ -316,48 +426,47 @@
             flex-wrap: wrap;
             margin: 0;
         }
-    
+
         .form-row {
             margin-bottom: 16px;
         }
-    
+
         .form-row label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-    
+
         .search-form {
             display: none !important;
         }
-    
-        .count-text,
-        .table-filter-status {
+
+        .count-text {
             color: var(--sub);
             font-size: 13px;
             margin-top: 8px;
         }
-    
-        .table-filter-row th {
-            background: #f8fafc;
-            padding: 6px 8px;
+
+        .list-actions,
+        .form-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 18px;
+            flex-wrap: wrap;
         }
-    
-        .table-filter-input {
-            width: 100%;
-            min-width: 50px;
-            height: 32px;
-            padding: 6px 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 0;
-            background: #ffffff;
-            font-size: 12px;
+
+        .list-actions button,
+        .list-actions a,
+        .form-actions button,
+        .form-actions a {
+            flex: 0 0 auto;
         }
-    
-        .table-filter-input::placeholder {
-            color: #94a3b8;
-        }
-    
+
+        /* ==============================
+           共通：バッジ
+           ============================== */
+
         .badge-high,
         .badge-middle,
         .badge-low,
@@ -373,33 +482,68 @@
             font-weight: bold;
             white-space: nowrap;
         }
-    
+
         .badge-high {
             background: var(--red);
         }
-    
+
         .badge-middle {
             background: var(--orange);
         }
-    
+
         .badge-low {
             background: var(--green);
         }
-    
+
         .badge-status {
             background: #4b5563;
         }
-    
+
+        .status-badge.not-ready {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.ready {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.na {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .risk-badge.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .risk-badge.middle {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .risk-badge.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
         .template-badge.available {
             background: #dbeafe;
             color: #1d4ed8;
         }
-    
+
         .template-badge.none {
             background: #e5e7eb;
             color: #374151;
         }
-    
+
         @media (max-width: 768px) {
             .header-inner,
             .nav-inner,
@@ -407,18 +551,20 @@
                 padding-left: 16px;
                 padding-right: 16px;
             }
-    
+
             .summary-grid,
             .menu-list {
                 grid-template-columns: 1fr;
             }
-    
+
             .inline-form,
-            .task-create-form {
+            .task-create-form,
+            .list-actions,
+            .form-actions {
                 align-items: stretch;
                 flex-direction: column;
             }
-    
+
             .inline-form input,
             .inline-form select,
             .task-create-form input,
@@ -426,84 +572,6 @@
             button {
                 width: 100%;
             }
-    
-            table {
-                min-width: 720px;
-            }
-        }
-        .expense-list-table {
-            table-layout: fixed;
-            min-width: 980px;
-        }
-
-        .expense-list-table th,
-        .expense-list-table td {
-            text-align: center;
-            white-space: normal;
-            word-break: keep-all;
-        }
-
-        .expense-list-table td:nth-child(3) {
-            text-align: left;
-        }
-
-        .expense-list-table .amount-text {
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-        .workflow-list-table th,
-        .workflow-list-table td {
-            text-align: center;
-            vertical-align: middle;
-            white-space: normal;
-            word-break: keep-all;
-        }
-        .manufacturing-template-table {
-            table-layout: fixed;
-            width: 1080px;
-            min-width: 1080px;
-        }
-
-        .manufacturing-template-table th,
-        .manufacturing-template-table td {
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .manufacturing-template-table th {
-            white-space: nowrap;
-        }
-
-        .manufacturing-template-table td {
-            word-break: break-word;
-        }
-
-        .manufacturing-template-table .table-filter-row th {
-            text-align: center;
-        }
-
-        .manufacturing-template-table .table-filter-input {
-            text-align: center;
-        }
-
-        .manufacturing-template-table td:nth-child(8) {
-            white-space: nowrap;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-        .workflow-list-table td:nth-child(3) {
-            text-align: left;
-        }
-
-        .workflow-list-table .amount-text {
-            text-align: right;
-            white-space: nowrap;
         }
     </style>
 </head>
@@ -535,71 +603,76 @@
         {% block content %}
         {% endblock %}
     </main>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const tables = document.querySelectorAll("main table");
-        
+            const tables = document.querySelectorAll("main table.list-table");
+
             tables.forEach(function (table) {
                 if (table.classList.contains("no-column-filter")) {
                     return;
                 }
-        
+
                 const thead = table.querySelector("thead");
                 const tbody = table.querySelector("tbody");
-        
+
                 if (!thead || !tbody) {
                     return;
                 }
-        
+
                 const headerRow = thead.querySelector("tr");
-        
+
                 if (!headerRow) {
                     return;
                 }
-        
+
                 if (thead.querySelector(".table-filter-row")) {
                     return;
                 }
-        
+
                 const headerCells = Array.from(headerRow.children);
-        
+
                 if (headerCells.length === 0) {
                     return;
                 }
-        
+
                 const filterRow = document.createElement("tr");
                 filterRow.className = "table-filter-row";
-        
+
                 headerCells.forEach(function (headerCell, columnIndex) {
                     const filterCell = document.createElement("th");
-        
+
                     const input = document.createElement("input");
                     input.type = "text";
                     input.className = "table-filter-input";
-        
+
                     const label = headerCell.textContent.trim();
                     input.placeholder = label ? label + "で絞込" : "絞込";
                     input.dataset.columnIndex = columnIndex;
-        
+
                     filterCell.appendChild(input);
                     filterRow.appendChild(filterCell);
                 });
-        
+
                 thead.appendChild(filterRow);
-        
+
                 const status = document.createElement("div");
                 status.className = "table-filter-status";
-                table.parentElement.insertAdjacentElement("afterend", status);
-        
+
+                const scrollContainer = table.closest(".list-scroll");
+                if (scrollContainer) {
+                    scrollContainer.insertAdjacentElement("afterend", status);
+                }
+
                 const rows = Array.from(tbody.querySelectorAll("tr"));
-        
+
                 function normalizeText(value) {
                     return String(value || "")
                         .replace(/\s+/g, " ")
                         .trim()
                         .toLowerCase();
                 }
-        
+
                 function applyFilters() {
                     const filters = Array.from(filterRow.querySelectorAll(".table-filter-input"))
                         .map(function (input) {
@@ -611,23 +684,23 @@
                         .filter(function (filter) {
                             return filter.value !== "";
                         });
-        
+
                     let visibleCount = 0;
-        
+
                     rows.forEach(function (row) {
                         const cells = Array.from(row.children);
-        
+
                         const matched = filters.every(function (filter) {
                             const cell = cells[filter.columnIndex];
-        
+
                             if (!cell) {
                                 return false;
                             }
-        
+
                             const cellText = normalizeText(cell.textContent);
                             return cellText.includes(filter.value);
                         });
-        
+
                         if (matched) {
                             row.style.display = "";
                             visibleCount += 1;
@@ -635,19 +708,19 @@
                             row.style.display = "none";
                         }
                     });
-        
+
                     if (filters.length > 0) {
                         status.textContent = visibleCount + "件を表示中";
                     } else {
                         status.textContent = "";
                     }
                 }
-        
+
                 filterRow.querySelectorAll(".table-filter-input").forEach(function (input) {
                     input.addEventListener("input", applyFilters);
                 });
             });
         });
-        </script>
+    </script>
 </body>
 </html>
