@@ -573,6 +573,75 @@
                 width: 100%;
             }
         }
+        /* ==============================
+        共通：登録・編集フォーム
+        ============================== */
+
+        .app-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 16px;
+            margin-top: 10px;
+        }
+
+        .app-form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        .app-form-grid input,
+        .app-form-grid select,
+        .app-form-grid textarea {
+            width: 100%;
+        }
+
+        .app-form-grid textarea {
+            resize: vertical;
+        }
+
+        .form-help {
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .check-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #ffffff;
+            color: var(--text);
+        }
+
+        .check-field input[type="checkbox"] {
+            width: auto;
+        }
+
+        .month-input,
+        input[type="month"] {
+            height: 38px;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #ffffff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .app-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-form-grid .full {
+                grid-column: auto;
+            }
+        }
     </style>
 </head>
 <body>

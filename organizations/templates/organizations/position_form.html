@@ -9,51 +9,59 @@
     <form method="post">
         {% csrf_token %}
 
-        <div class="form-row">
-            <label>役職コード</label>
-            <input type="text" name="position_code" class="input-middle"
-                   value="{% if position %}{{ position.position_code }}{% endif %}"
-                   placeholder="空欄の場合は自動採番">
-        </div>
+        <div class="app-form-grid">
+            <input
+                type="text"
+                name="position_code"
+                class="input-full"
+                value="{% if position %}{{ position.position_code }}{% endif %}"
+                placeholder="役職コード（空欄の場合は自動採番）"
+            >
 
-        <div class="form-row">
-            <label>役職名</label>
-            <input type="text" name="position_name" class="input-middle"
-                   value="{% if position %}{{ position.position_name }}{% endif %}"
-                   required>
-        </div>
+            <input
+                type="text"
+                name="position_name"
+                class="input-full"
+                value="{% if position %}{{ position.position_name }}{% endif %}"
+                placeholder="役職名"
+                required
+            >
 
-        <div class="form-row">
-            <label>ランク</label>
-            <input type="number" name="rank" class="amount-input"
-                   value="{% if position %}{{ position.rank }}{% endif %}">
-        </div>
+            <input
+                type="number"
+                name="rank"
+                class="input-full"
+                value="{% if position %}{{ position.rank }}{% endif %}"
+                placeholder="ランク"
+            >
 
-        <div class="form-row">
-            <label>承認上限額</label>
-            <input type="text" name="approval_limit_amount" class="amount-input"
-                   value="{% if position %}{{ position.approval_limit_amount }}{% endif %}"
-                   placeholder="例：1000000">
-        </div>
+            <input
+                type="text"
+                name="approval_limit_amount"
+                class="input-full"
+                value="{% if position %}{{ position.approval_limit_amount }}{% endif %}"
+                placeholder="承認上限額　例：1000000"
+            >
 
-        <div class="form-row">
-            <label>説明</label>
-            <input type="text" name="description" class="input-long"
-                   value="{% if position %}{{ position.description }}{% endif %}">
-        </div>
+            <input
+                type="text"
+                name="description"
+                class="input-full full"
+                value="{% if position %}{{ position.description }}{% endif %}"
+                placeholder="説明"
+            >
 
-        <div class="form-row">
-            <label>
+            <label class="check-field full">
                 <input type="checkbox" name="is_active" value="1"
                     {% if not position or position.is_active == "1" %}checked{% endif %}>
                 有効
             </label>
         </div>
 
-        <p>
+        <div class="form-actions">
             <button type="submit">保存</button>
             <a class="clear-link" href="{% url 'organizations:position_list' %}">役職一覧へ戻る</a>
-        </p>
+        </div>
     </form>
 </div>
 {% endblock %}

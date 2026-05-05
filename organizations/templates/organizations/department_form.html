@@ -9,24 +9,26 @@
     <form method="post">
         {% csrf_token %}
 
-        <div class="form-row">
-            <label>部署コード</label>
-            <input type="text" name="department_code" class="input-middle"
-                   value="{% if department %}{{ department.department_code }}{% endif %}"
-                   placeholder="空欄の場合は自動採番">
-        </div>
+        <div class="app-form-grid">
+            <input
+                type="text"
+                name="department_code"
+                class="input-full"
+                value="{% if department %}{{ department.department_code }}{% endif %}"
+                placeholder="部署コード（空欄の場合は自動採番）"
+            >
 
-        <div class="form-row">
-            <label>部署名</label>
-            <input type="text" name="department_name" class="input-middle"
-                   value="{% if department %}{{ department.department_name }}{% endif %}"
-                   required>
-        </div>
+            <input
+                type="text"
+                name="department_name"
+                class="input-full"
+                value="{% if department %}{{ department.department_name }}{% endif %}"
+                placeholder="部署名"
+                required
+            >
 
-        <div class="form-row">
-            <label>上位部署</label>
-            <select name="parent_department_id" class="input-middle">
-                <option value="">なし</option>
+            <select name="parent_department_id" class="input-full">
+                <option value="">上位部署：なし</option>
                 {% for dept in departments %}
                     {% if not department or dept.id != department.id %}
                         <option value="{{ dept.id }}"
@@ -36,12 +38,9 @@
                     {% endif %}
                 {% endfor %}
             </select>
-        </div>
 
-        <div class="form-row">
-            <label>責任者</label>
-            <select name="manager_employee_id" class="input-middle">
-                <option value="">未設定</option>
+            <select name="manager_employee_id" class="input-full">
+                <option value="">責任者：未設定</option>
                 {% for emp in employees %}
                     <option value="{{ emp.id }}"
                         {% if department and department.manager_employee_id == emp.id %}selected{% endif %}>
@@ -49,26 +48,26 @@
                     </option>
                 {% endfor %}
             </select>
-        </div>
 
-        <div class="form-row">
-            <label>説明</label>
-            <input type="text" name="description" class="input-long"
-                   value="{% if department %}{{ department.description }}{% endif %}">
-        </div>
+            <input
+                type="text"
+                name="description"
+                class="input-full full"
+                value="{% if department %}{{ department.description }}{% endif %}"
+                placeholder="説明"
+            >
 
-        <div class="form-row">
-            <label>
+            <label class="check-field full">
                 <input type="checkbox" name="is_active" value="1"
                     {% if not department or department.is_active == "1" %}checked{% endif %}>
                 有効
             </label>
         </div>
 
-        <p>
+        <div class="form-actions">
             <button type="submit">保存</button>
             <a class="clear-link" href="{% url 'organizations:department_list' %}">部署一覧へ戻る</a>
-        </p>
+        </div>
     </form>
 </div>
 {% endblock %}

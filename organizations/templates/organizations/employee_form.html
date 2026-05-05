@@ -3,46 +3,29 @@
 {% block title %}{% if employee %}社員編集{% else %}社員追加{% endif %}{% endblock %}
 
 {% block content %}
-<style>
-    .employee-form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px 14px;
-    }
-
-    .employee-form-grid .full {
-        grid-column: 1 / -1;
-    }
-
-    .form-actions {
-        margin-top: 14px;
-    }
-
-    @media (max-width: 768px) {
-        .employee-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .employee-form-grid .full {
-            grid-column: auto;
-        }
-    }
-</style>
-
 <div class="card">
     <h2>{% if employee %}社員編集{% else %}社員追加{% endif %}</h2>
 
     <form method="post">
         {% csrf_token %}
 
-        <div class="employee-form-grid">
-            <input type="text" name="employee_name" class="input-full"
-                   value="{% if employee %}{{ employee.employee_name }}{% endif %}"
-                   placeholder="社員名" required>
+        <div class="app-form-grid">
+            <input
+                type="text"
+                name="employee_name"
+                class="input-full"
+                value="{% if employee %}{{ employee.employee_name }}{% endif %}"
+                placeholder="社員名"
+                required
+            >
 
-            <input type="text" name="employee_code" class="input-full"
-                   value="{% if employee %}{{ employee.employee_code }}{% endif %}"
-                   placeholder="社員コード（空欄の場合は自動採番）">
+            <input
+                type="text"
+                name="employee_code"
+                class="input-full"
+                value="{% if employee %}{{ employee.employee_code }}{% endif %}"
+                placeholder="社員コード（空欄の場合は自動採番）"
+            >
 
             <select name="department_id" class="input-full">
                 <option value="">部署を選択</option>
@@ -64,13 +47,21 @@
                 {% endfor %}
             </select>
 
-            <input type="email" name="email" class="input-full"
-                   value="{% if employee %}{{ employee.email }}{% endif %}"
-                   placeholder="メールアドレス">
+            <input
+                type="email"
+                name="email"
+                class="input-full"
+                value="{% if employee %}{{ employee.email }}{% endif %}"
+                placeholder="メールアドレス"
+            >
 
-            <input type="text" name="role" class="input-full"
-                   value="{% if employee %}{{ employee.role }}{% endif %}"
-                   placeholder="役割・ロール">
+            <input
+                type="text"
+                name="role"
+                class="input-full"
+                value="{% if employee %}{{ employee.role }}{% endif %}"
+                placeholder="役割・ロール"
+            >
 
             <select name="supervisor_employee_id" class="input-full">
                 <option value="">上長を選択</option>
@@ -84,13 +75,13 @@
                 {% endfor %}
             </select>
 
-            <label class="input-full" style="display:flex; align-items:center; gap:8px;">
+            <label class="check-field">
                 <input type="checkbox" name="is_approver" value="1"
                     {% if employee and employee.is_approver == "1" %}checked{% endif %}>
                 承認者にする
             </label>
 
-            <label class="input-full" style="display:flex; align-items:center; gap:8px;">
+            <label class="check-field">
                 <input type="checkbox" name="is_active" value="1"
                     {% if not employee or employee.is_active == "1" %}checked{% endif %}>
                 有効

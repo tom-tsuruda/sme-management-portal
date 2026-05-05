@@ -3,44 +3,6 @@
 {% block title %}製造インシデント登録{% endblock %}
 
 {% block content %}
-<style>
-    .incident-form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px 14px;
-        margin-top: 10px;
-    }
-
-    .incident-form-grid .full {
-        grid-column: 1 / -1;
-    }
-
-    .incident-form-grid textarea {
-        min-height: 86px;
-        resize: vertical;
-    }
-
-    .compact-check {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 10px;
-        border: 1px solid #cbd5e1;
-        background: #ffffff;
-        font-size: 13px;
-    }
-
-    @media (max-width: 768px) {
-        .incident-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .incident-form-grid .full {
-            grid-column: auto;
-        }
-    }
-</style>
-
 <div class="card">
     <h2>製造インシデント登録</h2>
 
@@ -51,14 +13,19 @@
     <form method="post" action="{% url 'manufacturing:incident_create' %}">
         {% csrf_token %}
 
-        <div class="incident-form-grid">
+        <div class="app-form-grid">
             <select name="area" class="input-full">
                 {% for choice in area_choices %}
                     <option value="{{ choice }}">{{ choice }}</option>
                 {% endfor %}
             </select>
 
-            <input type="date" name="incident_date" class="input-full date-input">
+            <input
+                type="date"
+                name="incident_date"
+                class="input-full date-input"
+                title="発生日"
+            >
 
             <input
                 type="text"
@@ -146,12 +113,17 @@
                 placeholder="再発防止策　仕組み・教育・標準化など"
             ></textarea>
 
-            <label class="compact-check">
+            <label class="check-field">
                 <input type="checkbox" name="create_task" value="1">
                 このインシデント対応タスクを作成する
             </label>
 
-            <input type="date" name="due_date" class="input-full date-input" title="タスク期限">
+            <input
+                type="date"
+                name="due_date"
+                class="input-full date-input"
+                title="タスク期限"
+            >
         </div>
 
         <div class="form-actions">

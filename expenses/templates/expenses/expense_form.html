@@ -7,9 +7,9 @@
     <h2>経費申請作成</h2>
     <p>経費精算・旅費精算・交通費・購買立替などを申請します。</p>
 
-    <p>
+    <div class="list-actions">
         <a href="{% url 'expenses:expense_list' %}">← 経費・旅費精算へ戻る</a>
-    </p>
+    </div>
 </div>
 
 <div class="card">
@@ -20,107 +20,116 @@
     >
         {% csrf_token %}
 
-        <div class="form-row">
-            <label>申請種別</label>
-            <select name="expense_type" class="input-middle">
+        <div class="app-form-grid">
+            <select name="expense_type" class="input-full">
                 {% for expense_type in expense_type_choices %}
                     <option value="{{ expense_type }}">{{ expense_type }}</option>
                 {% endfor %}
             </select>
-        </div>
 
-        <div class="form-row">
-            <label>件名</label>
-            <input type="text" name="title" required class="input-long" placeholder="例：東京 出張交通費">
-        </div>
+            <input
+                type="text"
+                name="title"
+                required
+                class="input-full"
+                placeholder="件名　例：東京 出張交通費"
+            >
 
-        <div class="form-row">
-            <label>申請者</label>
-            <div class="inline-form">
-                <select name="applicant_employee_id" class="input-middle">
-                    <option value="">社員マスタから選択</option>
+            <div>
+                <select name="applicant_employee_id" class="input-full">
+                    <option value="">申請者：社員マスタから選択</option>
                     {% for employee in employees %}
                         <option value="{{ employee.id }}">
                             {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
                         </option>
                     {% endfor %}
                 </select>
-
-                <input type="text" name="applicant" class="input-middle" placeholder="または手入力">
+                <div class="form-help">社員マスタを選択した場合は、選択した社員名が優先されます。</div>
             </div>
-            <small>社員マスタを選択した場合は、選択した社員名が優先されます。</small>
-        </div>
 
-        <div class="form-row">
-            <label>部署</label>
-            <div class="inline-form">
-                <select name="department_id" class="input-middle">
-                    <option value="">申請者の部署を使う / 部署マスタから選択</option>
+            <input
+                type="text"
+                name="applicant"
+                class="input-full"
+                placeholder="申請者を手入力"
+            >
+
+            <div>
+                <select name="department_id" class="input-full">
+                    <option value="">部署：申請者の部署を使う / 部署マスタから選択</option>
                     {% for department in departments %}
                         <option value="{{ department.id }}">
                             {{ department.department_name }}
                         </option>
                     {% endfor %}
                 </select>
-
-                <input type="text" name="department" class="input-middle" placeholder="または手入力">
+                <div class="form-help">部署未選択の場合は、申請者の所属部署を自動で使います。</div>
             </div>
-            <small>部署未選択の場合は、申請者の所属部署を自動で使います。手入力も可能です。</small>
-        </div>
 
-        <div class="form-row">
-            <label>利用日</label>
-            <input type="date" name="expense_date" class="input-middle date-input">
-        </div>
+            <input
+                type="text"
+                name="department"
+                class="input-full"
+                placeholder="部署を手入力"
+            >
 
-        <div class="form-row">
-            <label>分類</label>
-            <select name="category" class="input-middle">
+            <input
+                type="date"
+                name="expense_date"
+                class="input-full date-input"
+                title="利用日"
+            >
+
+            <select name="category" class="input-full">
                 {% for category in expense_category_choices %}
                     <option value="{{ category }}">{{ category }}</option>
                 {% endfor %}
             </select>
-        </div>
 
-        <div class="form-row">
-            <label>金額</label>
-            <input type="text" name="amount" class="amount-input" placeholder="例：12,000">
-        </div>
+            <input
+                type="text"
+                name="amount"
+                class="input-full"
+                placeholder="金額　例：12,000"
+            >
 
-        <div class="form-row">
-            <label>支払方法</label>
-            <select name="payment_method" class="input-middle">
+            <select name="payment_method" class="input-full">
                 {% for payment_method in payment_method_choices %}
-                    <option value="{{ payment_method }}">{{ payment_method }}</option>
+                    <option value="{{ payment_method }}">支払方法：{{ payment_method }}</option>
                 {% endfor %}
             </select>
-        </div>
 
-        <div class="form-row">
-            <label>承認者</label>
-            <div class="inline-form">
-                <select name="approver_employee_id" class="input-middle">
-                    <option value="">承認者マスタから選択</option>
+            <div>
+                <select name="approver_employee_id" class="input-full">
+                    <option value="">承認者：社員マスタから選択</option>
                     {% for approver in approvers %}
                         <option value="{{ approver.id }}">
                             {{ approver.employee_name }}（{{ approver.department_name }} / {{ approver.position_name }}）
                         </option>
                     {% endfor %}
                 </select>
-
-                <input type="text" name="approver" class="input-middle" placeholder="または手入力">
+                <div class="form-help">承認者マスタを選択した場合は、選択した承認者名が優先されます。</div>
             </div>
-            <small>承認者マスタを選択した場合は、選択した承認者名が優先されます。</small>
-        </div>
 
-        <div class="form-row">
-            <label>内容・目的</label>
-            <textarea name="description" rows="6" class="input-full" placeholder="例：東京出張に伴う新幹線代"></textarea>
-        </div>
+            <input
+                type="text"
+                name="approver"
+                class="input-full"
+                placeholder="承認者を手入力"
+            >
 
-        <div class="form-row">
-            <label>領収書・証憑添付</label>
-            <input type="file" name="attachment">
+            <textarea
+                name="description"
+                rows="4"
+                class="input-full full"
+                placeholder="内容・目的　例：東京出張に伴う新幹線代"
+            ></textarea>
+
+            <input
+                type="file"
+                name="attachment"
+                class="input-full full"
+            >
         </div>
 
         <div class="form-actions">

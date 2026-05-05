@@ -7,88 +7,119 @@
     <h2>製造KPI登録</h2>
     <p>生産数量、不良率、歩留まり、納期遵守率、設備稼働率などを登録します。</p>
 
-    <p>
+    <div class="list-actions">
         <a href="{% url 'kpi:manufacturing_kpi_list' %}">← 製造KPI一覧へ戻る</a>
-    </p>
+    </div>
 </div>
 
 <div class="card">
     <form method="post" action="{% url 'kpi:manufacturing_kpi_create' %}">
         {% csrf_token %}
 
-        <div class="form-row">
-            <label>対象月</label><br>
-            <input type="month" name="year_month" class="input-middle" required>
+        <div class="app-form-grid">
+            <input
+                type="month"
+                name="year_month"
+                class="input-full month-input"
+                required
+                title="対象月"
+            >
+
+            <input
+                type="text"
+                name="department"
+                class="input-full"
+                placeholder="部署　例：製造部"
+            >
+
+            <input
+                type="text"
+                name="production_volume"
+                class="input-full"
+                placeholder="生産数量　例：11800"
+            >
+
+            <input
+                type="text"
+                name="defect_count"
+                class="input-full"
+                placeholder="不良数　例：119"
+            >
+
+            <input
+                type="text"
+                name="defect_rate"
+                class="input-full"
+                placeholder="不良率（%）　例：1.01"
+            >
+
+            <input
+                type="text"
+                name="yield_rate"
+                class="input-full"
+                placeholder="歩留まり（%）　例：98.0"
+            >
+
+            <input
+                type="text"
+                name="on_time_delivery_rate"
+                class="input-full"
+                placeholder="納期遵守率（%）　例：97.3"
+            >
+
+            <input
+                type="text"
+                name="equipment_availability"
+                class="input-full"
+                placeholder="設備稼働率（%）　例：95.0"
+            >
+
+            <input
+                type="text"
+                name="downtime_hours"
+                class="input-full"
+                placeholder="停止時間　例：9.5"
+            >
+
+            <input
+                type="text"
+                name="accident_count"
+                class="input-full"
+                placeholder="労災件数　例：0"
+            >
+
+            <input
+                type="text"
+                name="near_miss_count"
+                class="input-full"
+                placeholder="ヒヤリハット件数　例：3"
+            >
+
+            <input
+                type="text"
+                name="quality_claim_count"
+                class="input-full"
+                placeholder="品質クレーム件数　例：1"
+            >
+
+            <input
+                type="text"
+                name="energy_usage"
+                class="input-full"
+                placeholder="エネルギー使用量　例：13900"
+            >
+
+            <textarea
+                name="comment"
+                rows="4"
+                class="input-full full"
+                placeholder="コメント　例：不良率・稼働率ともに改善。"
+            ></textarea>
         </div>
 
-        <div class="form-row">
-            <label>部署</label><br>
-            <input type="text" name="department" class="input-middle" placeholder="例：製造部">
-        </div>
-
-        <div class="form-row">
-            <label>生産数量</label><br>
-            <input type="text" name="production_volume" class="amount-input" placeholder="例：11800">
-        </div>
-
-        <div class="form-row">
-            <label>不良数</label><br>
-            <input type="text" name="defect_count" class="amount-input" placeholder="例：119">
-        </div>
-
-        <div class="form-row">
-            <label>不良率（%）</label><br>
-            <input type="text" name="defect_rate" class="amount-input" placeholder="例：1.01">
-        </div>
-
-        <div class="form-row">
-            <label>歩留まり（%）</label><br>
-            <input type="text" name="yield_rate" class="amount-input" placeholder="例：98.0">
-        </div>
-
-        <div class="form-row">
-            <label>納期遵守率（%）</label><br>
-            <input type="text" name="on_time_delivery_rate" class="amount-input" placeholder="例：97.3">
-        </div>
-
-        <div class="form-row">
-            <label>設備稼働率（%）</label><br>
-            <input type="text" name="equipment_availability" class="amount-input" placeholder="例：95.0">
-        </div>
-
-        <div class="form-row">
-            <label>停止時間</label><br>
-            <input type="text" name="downtime_hours" class="amount-input" placeholder="例：9.5">
-        </div>
-
-        <div class="form-row">
-            <label>労災件数</label><br>
-            <input type="text" name="accident_count" class="amount-input" placeholder="例：0">
-        </div>
-
-        <div class="form-row">
-            <label>ヒヤリハット件数</label><br>
-            <input type="text" name="near_miss_count" class="amount-input" placeholder="例：3">
-        </div>
-
-        <div class="form-row">
-            <label>品質クレーム件数</label><br>
-            <input type="text" name="quality_claim_count" class="amount-input" placeholder="例：1">
-        </div>
-
-        <div class="form-row">
-            <label>エネルギー使用量</label><br>
-            <input type="text" name="energy_usage" class="amount-input" placeholder="例：13900">
-        </div>
-
-        <div class="form-row">
-            <label>コメント</label><br>
-            <textarea name="comment" rows="4" class="input-full" placeholder="例：不良率・稼働率ともに改善。"></textarea>
-        </div>
-
-        <p>
+        <div class="form-actions">
             <button type="submit">登録する</button>
-        </p>
+        </div>
     </form>
 </div>
 {% endblock %}
