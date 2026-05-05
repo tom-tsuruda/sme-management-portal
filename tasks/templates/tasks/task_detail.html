@@ -87,6 +87,26 @@
                         {% endif %}
                     </td>
                 </tr>
+                <tr>
+                    <th>対応内容</th>
+                    <td>
+                        {% if task.action_detail %}
+                            {{ task.action_detail|linebreaksbr }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>添付資料メモ</th>
+                    <td>
+                        {% if task.attachment_note %}
+                            {{ task.attachment_note|linebreaksbr }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
             </tbody>
         </table>
     {% else %}

@@ -194,6 +194,8 @@ def add_task(task_name, category, owner, due_date, status, priority, related_doc
         "status",
         "priority",
         "related_document_id",
+        "action_detail",
+        "attachment_note",
     ]
 
     for column in required_columns:
@@ -240,7 +242,8 @@ def update_task(
     due_date,
     status,
     priority,
-    related_document_id,
+    action_detail,
+    attachment_note,
 ):
     """
     task_data.xlsx の指定タスクを更新する。
@@ -270,6 +273,8 @@ def update_task(
         "status",
         "priority",
         "related_document_id",
+        "action_detail",
+        "attachment_note",
     ]
 
     for column in required_columns:
@@ -291,7 +296,8 @@ def update_task(
     df.loc[index, "due_date"] = str(due_date)
     df.loc[index, "status"] = str(status)
     df.loc[index, "priority"] = str(priority)
-    df.loc[index, "related_document_id"] = str(related_document_id)
+    df.loc[index, "action_detail"] = str(action_detail)
+    df.loc[index, "attachment_note"] = str(attachment_note)
 
     if "updated_at" in df.columns:
         df.loc[index, "updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

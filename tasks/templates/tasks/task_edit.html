@@ -93,13 +93,23 @@
         </p>
 
         <p>
-            <label>関連文書ID</label><br>
-            <input
-                type="text"
-                name="related_document_id"
-                value="{{ task.related_document_id }}"
+            <label>対応内容</label><br>
+            <textarea
+                name="action_detail"
+                rows="5"
                 style="width: 100%;"
-            >
+                placeholder="実際に対応した内容、確認したこと、判断結果などを記録してください。"
+            >{{ task.action_detail }}</textarea>
+        </p>
+
+        <p>
+            <label>添付資料メモ</label><br>
+            <textarea
+                name="attachment_note"
+                rows="3"
+                style="width: 100%;"
+                placeholder="添付資料名、保存場所、ファイルパス、共有フォルダURLなどを記録してください。"
+            >{{ task.attachment_note }}</textarea>
         </p>
 
         <p>

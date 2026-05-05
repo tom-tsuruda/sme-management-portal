@@ -5,18 +5,6 @@
 {% block content %}
 <div class="card">
     <h2>文書台帳</h2>
-    <p>規程・契約書・台帳・記録・ひな形を管理します。</p>
-
-    <form method="get" action="/documents/" class="search-form">
-        <input
-            type="text"
-            name="q"
-            value="{{ keyword }}"
-            placeholder="文書名・カテゴリ・状態・主管部署・リスクで検索"
-        >
-        <button type="submit">検索</button>
-        <a class="clear-link" href="/documents/">クリア</a>
-    </form>
 
     <p class="count-text">
         全{{ total_count }}件中 {{ display_count }}件を表示
@@ -79,6 +67,20 @@
         color: #64748b;
         font-size: 0.85rem;
     }
+
+    .document-list-table th,
+    .document-list-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .document-list-table .text-left {
+        text-align: left;
+    }
+
+    .document-list-table .nowrap {
+        white-space: nowrap;
+    }
 </style>
 
 {% for category, category_documents in grouped_documents.items %}
@@ -92,7 +94,7 @@
 
     <div class="list-frame">
         <div class="list-scroll">
-            <table class="list-table">
+            <table class="list-table document-list-table">
                 <colgroup>
                     <col style="width: 240px;">
                     <col style="width: 100px;">
@@ -120,7 +122,6 @@
                 <tbody>
                     {% for doc in category_documents %}
                     <tr>
-
                         <td class="text-left long-text">
                             <a href="{% url 'documents:document_detail' doc.id %}">
                                 {{ doc.document_name }}

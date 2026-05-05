@@ -5,24 +5,6 @@
 {% block content %}
 <div class="card">
     <h2>質問票</h2>
-    <p>回答内容に応じて、要対応タスクを自動抽出します。</p>
-
-    <p>
-        <a href="{% url 'questionnaires:diagnosis_history' %}">
-            診断履歴を見る
-        </a>
-    </p>
-
-    <form method="get" action="/questionnaires/" class="search-form">
-        <input
-            type="text"
-            name="q"
-            value="{{ keyword }}"
-            placeholder="カテゴリ・質問文・選択肢・関連IDで検索"
-        >
-        <button type="submit">検索</button>
-        <a class="clear-link" href="/questionnaires/">クリア</a>
-    </form>
 
     <p class="count-text">
         全{{ total_count }}件中 {{ display_count }}件を表示
@@ -85,8 +67,26 @@
         }
 
         .question-answer-select {
-            width: 190px;
+            width: 170px;
             max-width: 100%;
+        }
+
+        .question-list-table th,
+        .question-list-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .question-list-table .text-left {
+            text-align: left;
+        }
+
+        .question-list-table .nowrap {
+            white-space: nowrap;
+        }
+
+        .question-list-table .related-document-cell {
+            white-space: nowrap;
         }
     </style>
 
@@ -101,12 +101,12 @@
 
         <div class="list-frame">
             <div class="list-scroll">
-                <table class="list-table">
+                <table class="list-table question-list-table">
                     <colgroup>
                         <col style="width: 80px;">
                         <col style="width: 360px;">
                         <col style="width: 120px;">
-                        <col style="width: 60px;">
+                        <col style="width: 70px;">
                         <col style="width: 360px;">
                     </colgroup>
                     <thead>
@@ -121,8 +121,14 @@
                     <tbody>
                         {% for q in category_questions %}
                         <tr>
-                            <td class="nowrap"><strong>{{ q.id }}</strong></td>
-                            <td class="text-left long-text">{{ q.question_text }}</td>
+                            <td class="nowrap">
+                                <strong>{{ q.id }}</strong>
+                            </td>
+
+                            <td class="text-left long-text">
+                                {{ q.question_text }}
+                            </td>
+
                             <td>
                                 <select name="{{ q.id }}" class="question-answer-select">
                                     <option value="">選択してください</option>
@@ -158,6 +164,7 @@
                                     {% endif %}
                                 </select>
                             </td>
+
                             <td>
                                 {% if q.risk_level == "高" %}
                                     <span class="badge-high">高</span>
@@ -169,6 +176,7 @@
                                     <span class="badge-status">{{ q.risk_level|default:"-" }}</span>
                                 {% endif %}
                             </td>
+
                             <td class="text-left long-text">
                                 {% if q.recommended_task_name %}
                                     {{ q.recommended_task_name }}
