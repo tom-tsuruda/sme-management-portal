@@ -14,7 +14,6 @@
     <div class="list-scroll">
         <table class="list-table">
             <colgroup>
-                <col style="width: 90px;">
                 <col style="width: 110px;">
                 <col style="width: 130px;">
                 <col style="width: 120px;">
@@ -27,7 +26,6 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>年月</th>
                     <th>部署</th>
                     <th>生産数量</th>
@@ -42,11 +40,6 @@
             <tbody>
                 {% for row in kpis %}
                 <tr>
-                    <td>
-                        <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
-                            {{ row.id }}
-                        </a>
-                    </td>
                     <td>
                         <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
                             {{ row.year_month }}

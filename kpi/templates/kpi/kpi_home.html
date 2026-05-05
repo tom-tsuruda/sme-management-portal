@@ -1,10 +1,31 @@
 {% extends "base.html" %}
-{% load format_filters %}
 
 {% block title %}経営指標{% endblock %}
 
 {% block content %}
 <h2>経営指標ダッシュボード</h2>
+
+<div class="card">
+    <form method="get" action="{% url 'kpi:kpi_home' %}">
+        <div class="app-form-grid">
+            <div class="field-block">
+                <label>表示する月</label>
+                <select name="selected_month" class="input-full">
+                    {% for month in available_months %}
+                        <option value="{{ month }}" {% if selected_month == month %}selected{% endif %}>
+                            {{ month }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field-block">
+                <label>&nbsp;</label>
+                <button type="submit">表示する</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 {% if latest_monthly_kpi %}
 <div class="summary-grid">
@@ -15,10 +36,7 @@
 
     <div class="summary-card">
         <div class="summary-label">売上高</div>
-        <div class="summary-number">
-            {{ latest_monthly_kpi.sales_amount_display }}
-            <small>{{ latest_monthly_kpi.sales_amount_diff_display }}</small>
-        </div>
+        <div class="summary-number">{{ latest_monthly_kpi.sales_amount_display }}</div>
     </div>
 
     <div class="summary-card">
@@ -28,10 +46,7 @@
 
     <div class="summary-card">
         <div class="summary-label">営業利益率</div>
-        <div class="summary-number danger">
-            {{ latest_monthly_kpi.operating_profit_rate_display }}
-            <small>{{ latest_monthly_kpi.operating_profit_rate_diff_display }}</small>
-        </div>
+        <div class="summary-number danger">{{ latest_monthly_kpi.operating_profit_rate_display }}</div>
     </div>
 </div>
 {% endif %}
@@ -40,15 +55,12 @@
 <div class="summary-grid">
     <div class="summary-card">
         <div class="summary-label">生産数量</div>
-        <div class="summary-number">{{ latest_manufacturing_kpi.production_volume }}</div>
+        <div class="summary-number">{{ latest_manufacturing_kpi.production_volume_display }}</div>
     </div>
 
     <div class="summary-card">
         <div class="summary-label">不良率</div>
-        <div class="summary-number danger">
-            {{ latest_manufacturing_kpi.defect_rate_display }}
-            <small>{{ latest_manufacturing_kpi.defect_rate_diff_display }}</small>
-        </div>
+        <div class="summary-number danger">{{ latest_manufacturing_kpi.defect_rate_display }}</div>
     </div>
 
     <div class="summary-card">
@@ -58,10 +70,7 @@
 
     <div class="summary-card">
         <div class="summary-label">設備稼働率</div>
-        <div class="summary-number">
-            {{ latest_manufacturing_kpi.equipment_availability_display }}
-            <small>{{ latest_manufacturing_kpi.equipment_availability_diff_display }}</small>
-        </div>
+        <div class="summary-number">{{ latest_manufacturing_kpi.equipment_availability_display }}</div>
     </div>
 </div>
 {% endif %}
@@ -77,92 +86,112 @@
 </div>
 
 <div class="card" style="margin-top: 24px;">
-    <h2>最新 月次経営KPI</h2>
+    <h2>選択月 月次経営KPI</h2>
 
     {% if monthly_kpis %}
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>年月</th>
-                    <th>売上高</th>
-                    <th>粗利</th>
-                    <th>粗利率</th>
-                    <th>営業利益</th>
-                    <th>営業利益率</th>
-                    <th>現預金</th>
-                    <th>詳細</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in monthly_kpis %}
-                <tr>
-                    <td>{{ row.year_month }}</td>
-                    <td class="amount-text">{{ row.sales_amount_display }}</td>
-                    <td class="amount-text">{{ row.gross_profit_display }}</td>
-                    <td>{{ row.gross_profit_rate_display }}</td>
-                    <td class="amount-text">{{ row.operating_profit_display }}</td>
-                    <td>{{ row.operating_profit_rate_display }}</td>
-                    <td class="amount-text">{{ row.cash_balance_display }}</td>
-                    <td>
-                        <a href="{% url 'kpi:monthly_kpi_detail' row.id %}">
-                            詳細
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="list-frame">
+        <div class="list-scroll">
+            <table class="list-table">
+                <colgroup>
+                    <col style="width: 110px;">
+                    <col style="width: 130px;">
+                    <col style="width: 130px;">
+                    <col style="width: 90px;">
+                    <col style="width: 130px;">
+                    <col style="width: 100px;">
+                    <col style="width: 130px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>年月</th>
+                        <th>売上高</th>
+                        <th>粗利</th>
+                        <th>粗利率</th>
+                        <th>営業利益</th>
+                        <th>営業利益率</th>
+                        <th>現預金</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in monthly_kpis %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'kpi:monthly_kpi_detail' row.id %}">
+                                {{ row.year_month }}
+                            </a>
+                        </td>
+                        <td class="text-right nowrap">{{ row.sales_amount_display }}</td>
+                        <td class="text-right nowrap">{{ row.gross_profit_display }}</td>
+                        <td class="text-right nowrap">{{ row.gross_profit_rate_display }}</td>
+                        <td class="text-right nowrap">{{ row.operating_profit_display }}</td>
+                        <td class="text-right nowrap">{{ row.operating_profit_rate_display }}</td>
+                        <td class="text-right nowrap">{{ row.cash_balance_display }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% else %}
-        <p>月次経営KPIはありません。</p>
+        <p>選択月の月次経営KPIはありません。</p>
     {% endif %}
 </div>
 
 <div class="card">
-    <h2>最新 製造KPI</h2>
+    <h2>選択月 製造KPI</h2>
 
     {% if manufacturing_kpis %}
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>年月</th>
-                    <th>部署</th>
-                    <th>生産数量</th>
-                    <th>不良率</th>
-                    <th>歩留まり</th>
-                    <th>納期遵守率</th>
-                    <th>設備稼働率</th>
-                    <th>労災</th>
-                    <th>品質クレーム</th>
-                    <th>詳細</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in manufacturing_kpis %}
-                <tr>
-                    <td>{{ row.year_month }}</td>
-                    <td>{{ row.department }}</td>
-                    <td>{{ row.production_volume|amount }}</td>
-                    <td>{{ row.defect_rate_display }}</td>
-                    <td>{{ row.yield_rate_display }}</td>
-                    <td>{{ row.on_time_delivery_rate_display }}</td>
-                    <td>{{ row.equipment_availability_display }}</td>
-                    <td>{{ row.accident_count }}</td>
-                    <td>{{ row.quality_claim_count }}</td>
-                    <td>
-                        <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
-                            詳細
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="list-frame">
+        <div class="list-scroll">
+            <table class="list-table">
+                <colgroup>
+                    <col style="width: 110px;">
+                    <col style="width: 120px;">
+                    <col style="width: 120px;">
+                    <col style="width: 90px;">
+                    <col style="width: 90px;">
+                    <col style="width: 110px;">
+                    <col style="width: 110px;">
+                    <col style="width: 70px;">
+                    <col style="width: 100px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>年月</th>
+                        <th>部署</th>
+                        <th>生産数量</th>
+                        <th>不良率</th>
+                        <th>歩留まり</th>
+                        <th>納期遵守率</th>
+                        <th>設備稼働率</th>
+                        <th>労災</th>
+                        <th>品質クレーム</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in manufacturing_kpis %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'kpi:manufacturing_kpi_detail' row.id %}">
+                                {{ row.year_month }}
+                            </a>
+                        </td>
+                        <td>{{ row.department }}</td>
+                        <td class="text-right nowrap">{{ row.production_volume_display }}</td>
+                        <td class="text-right nowrap">{{ row.defect_rate_display }}</td>
+                        <td class="text-right nowrap">{{ row.yield_rate_display }}</td>
+                        <td class="text-right nowrap">{{ row.on_time_delivery_rate_display }}</td>
+                        <td class="text-right nowrap">{{ row.equipment_availability_display }}</td>
+                        <td class="text-right nowrap">{{ row.accident_count_display }}</td>
+                        <td class="text-right nowrap">{{ row.quality_claim_count_display }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% else %}
-        <p>製造KPIはありません。</p>
+        <p>選択月の製造KPIはありません。</p>
     {% endif %}
 </div>
 {% endblock %}

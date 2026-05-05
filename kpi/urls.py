@@ -9,9 +9,11 @@ urlpatterns = [
 
     path("monthly/", views.monthly_kpi_list, name="monthly_kpi_list"),
     path("monthly/create/", views.monthly_kpi_create, name="monthly_kpi_create"),
+    path("monthly/<str:kpi_id>/edit/", views.monthly_kpi_edit, name="monthly_kpi_edit"),
     path("monthly/<str:kpi_id>/", views.monthly_kpi_detail, name="monthly_kpi_detail"),
 
     path("manufacturing/", views.manufacturing_kpi_list, name="manufacturing_kpi_list"),
     path("manufacturing/create/", views.manufacturing_kpi_create, name="manufacturing_kpi_create"),
+    path("manufacturing/<str:kpi_id>/edit/", views.manufacturing_kpi_edit, name="manufacturing_kpi_edit"),
     path("manufacturing/<str:kpi_id>/", views.manufacturing_kpi_detail, name="manufacturing_kpi_detail"),
 ]

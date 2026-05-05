@@ -261,10 +261,14 @@ def ensure_kpi_excel():
 
     with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
         pd.DataFrame(monthly_rows, columns=MONTHLY_KPI_COLUMNS).to_excel(
-            writer, sheet_name="monthly_kpis", index=False
+            writer,
+            sheet_name="monthly_kpis",
+            index=False,
         )
         pd.DataFrame(manufacturing_rows, columns=MANUFACTURING_KPI_COLUMNS).to_excel(
-            writer, sheet_name="manufacturing_kpis", index=False
+            writer,
+            sheet_name="manufacturing_kpis",
+            index=False,
         )
 
 
@@ -294,30 +298,87 @@ def read_sheet(sheet_name, columns):
     return df
 
 
+def write_kpi_excel(monthly_df=None, manufacturing_df=None):
+    ensure_kpi_excel()
+    backup_kpi_excel()
+
+    if monthly_df is None:
+        monthly_df = read_sheet("monthly_kpis", MONTHLY_KPI_COLUMNS)
+
+    if manufacturing_df is None:
+        manufacturing_df = read_sheet("manufacturing_kpis", MANUFACTURING_KPI_COLUMNS)
+
+    monthly_df = monthly_df.copy()
+    manufacturing_df = manufacturing_df.copy()
+
+    for column in MONTHLY_KPI_COLUMNS:
+        if column not in monthly_df.columns:
+            monthly_df[column] = ""
+
+    for column in MANUFACTURING_KPI_COLUMNS:
+        if column not in manufacturing_df.columns:
+            manufacturing_df[column] = ""
+
+    monthly_df = monthly_df[MONTHLY_KPI_COLUMNS].copy()
+    manufacturing_df = manufacturing_df[MANUFACTURING_KPI_COLUMNS].copy()
+
+    for column in MONTHLY_KPI_COLUMNS:
+        monthly_df[column] = monthly_df[column].astype(str)
+
+    for column in MANUFACTURING_KPI_COLUMNS:
+        manufacturing_df[column] = manufacturing_df[column].astype(str)
+
+    excel_path = get_kpi_excel_path()
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        monthly_df.to_excel(writer, sheet_name="monthly_kpis", index=False)
+        manufacturing_df.to_excel(writer, sheet_name="manufacturing_kpis", index=False)
+
+
+def normalize_number_text(value):
+    if value is None:
+        return ""
+
+    return str(value).replace(",", "").replace("%", "").strip()
+
+
 def to_number(value):
-    if value == "" or value is None:
+    text = normalize_number_text(value)
+
+    if text == "":
         return 0
 
     try:
-        return float(str(value).replace(",", ""))
+        return float(text)
     except Exception:
         return 0
 
 
 def format_amount(value):
+    text = normalize_number_text(value)
+
+    if text == "":
+        return ""
+
     try:
-        number = int(float(value))
-        return f"{number:,}"
+        number = float(text)
+
+        if number.is_integer():
+            return f"{int(number):,}"
+
+        return f"{number:,.1f}".rstrip("0").rstrip(".")
     except Exception:
         return value
 
 
 def format_percent(value):
-    if value == "" or value is None:
+    text = normalize_number_text(value)
+
+    if text == "":
         return ""
 
     try:
-        number = float(str(value).replace(",", "").replace("%", ""))
+        number = float(text)
         return f"{number:,.1f}%"
     except Exception:
         return value
@@ -343,6 +404,7 @@ def enrich_monthly_kpi(row):
         "accounts_receivable",
         "accounts_payable",
         "expense_total",
+        "new_orders",
         "order_backlog",
     ]
 
@@ -356,6 +418,19 @@ def enrich_monthly_kpi(row):
 
 
 def enrich_manufacturing_kpi(row):
+    amount_fields = [
+        "production_volume",
+        "defect_count",
+        "downtime_hours",
+        "accident_count",
+        "near_miss_count",
+        "quality_claim_count",
+        "energy_usage",
+    ]
+
+    for field in amount_fields:
+        row[f"{field}_display"] = format_amount(row.get(field, ""))
+
     percent_fields = [
         "defect_rate",
         "yield_rate",
@@ -405,6 +480,7 @@ def find_monthly_kpi_by_id(kpi_id):
     for row in load_monthly_kpis():
         if str(row.get("id")) == str(kpi_id):
             return row
+
     return None
 
 
@@ -412,48 +488,26 @@ def find_manufacturing_kpi_by_id(kpi_id):
     for row in load_manufacturing_kpis():
         if str(row.get("id")) == str(kpi_id):
             return row
+
     return None
 
 
 def get_latest_monthly_kpi():
     records = load_monthly_kpis()
+
     if records:
         return records[0]
+
     return None
 
 
 def get_latest_manufacturing_kpi():
     records = load_manufacturing_kpis()
+
     if records:
         return records[0]
+
     return None
-
-def write_kpi_excel(monthly_df, manufacturing_df):
-    excel_path = get_kpi_excel_path()
-
-    monthly_df = monthly_df.copy()
-    manufacturing_df = manufacturing_df.copy()
-
-    for column in MONTHLY_KPI_COLUMNS:
-        if column not in monthly_df.columns:
-            monthly_df[column] = ""
-
-    for column in MANUFACTURING_KPI_COLUMNS:
-        if column not in manufacturing_df.columns:
-            manufacturing_df[column] = ""
-
-    monthly_df = monthly_df[MONTHLY_KPI_COLUMNS].copy()
-    manufacturing_df = manufacturing_df[MANUFACTURING_KPI_COLUMNS].copy()
-
-    for column in MONTHLY_KPI_COLUMNS:
-        monthly_df[column] = monthly_df[column].astype(str)
-
-    for column in MANUFACTURING_KPI_COLUMNS:
-        manufacturing_df[column] = manufacturing_df[column].astype(str)
-
-    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
-        monthly_df.to_excel(writer, sheet_name="monthly_kpis", index=False)
-        manufacturing_df.to_excel(writer, sheet_name="manufacturing_kpis", index=False)
 
 
 def generate_next_monthly_kpi_id(year_month, df):
@@ -517,25 +571,21 @@ def create_monthly_kpi(
     comment,
 ):
     monthly_df = read_sheet("monthly_kpis", MONTHLY_KPI_COLUMNS)
-    manufacturing_df = read_sheet("manufacturing_kpis", MANUFACTURING_KPI_COLUMNS)
-
-    backup_kpi_excel()
-
     now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     kpi_id = generate_next_monthly_kpi_id(year_month, monthly_df)
 
     new_row = {
         "id": kpi_id,
         "year_month": year_month,
-        "sales_amount": sales_amount,
-        "gross_profit": gross_profit,
-        "operating_profit": operating_profit,
-        "cash_balance": cash_balance,
-        "accounts_receivable": accounts_receivable,
-        "accounts_payable": accounts_payable,
-        "expense_total": expense_total,
-        "new_orders": new_orders,
-        "order_backlog": order_backlog,
+        "sales_amount": normalize_number_text(sales_amount),
+        "gross_profit": normalize_number_text(gross_profit),
+        "operating_profit": normalize_number_text(operating_profit),
+        "cash_balance": normalize_number_text(cash_balance),
+        "accounts_receivable": normalize_number_text(accounts_receivable),
+        "accounts_payable": normalize_number_text(accounts_payable),
+        "expense_total": normalize_number_text(expense_total),
+        "new_orders": normalize_number_text(new_orders),
+        "order_backlog": normalize_number_text(order_backlog),
         "comment": comment,
         "created_at": now_text,
         "updated_at": now_text,
@@ -546,7 +596,7 @@ def create_monthly_kpi(
         ignore_index=True,
     )
 
-    write_kpi_excel(monthly_df, manufacturing_df)
+    write_kpi_excel(monthly_df=monthly_df)
 
     return kpi_id
 
@@ -567,11 +617,7 @@ def create_manufacturing_kpi(
     energy_usage,
     comment,
 ):
-    monthly_df = read_sheet("monthly_kpis", MONTHLY_KPI_COLUMNS)
     manufacturing_df = read_sheet("manufacturing_kpis", MANUFACTURING_KPI_COLUMNS)
-
-    backup_kpi_excel()
-
     now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     kpi_id = generate_next_manufacturing_kpi_id(year_month, department, manufacturing_df)
 
@@ -579,17 +625,17 @@ def create_manufacturing_kpi(
         "id": kpi_id,
         "year_month": year_month,
         "department": department,
-        "production_volume": production_volume,
-        "defect_count": defect_count,
-        "defect_rate": defect_rate,
-        "yield_rate": yield_rate,
-        "on_time_delivery_rate": on_time_delivery_rate,
-        "equipment_availability": equipment_availability,
-        "downtime_hours": downtime_hours,
-        "accident_count": accident_count,
-        "near_miss_count": near_miss_count,
-        "quality_claim_count": quality_claim_count,
-        "energy_usage": energy_usage,
+        "production_volume": normalize_number_text(production_volume),
+        "defect_count": normalize_number_text(defect_count),
+        "defect_rate": normalize_number_text(defect_rate),
+        "yield_rate": normalize_number_text(yield_rate),
+        "on_time_delivery_rate": normalize_number_text(on_time_delivery_rate),
+        "equipment_availability": normalize_number_text(equipment_availability),
+        "downtime_hours": normalize_number_text(downtime_hours),
+        "accident_count": normalize_number_text(accident_count),
+        "near_miss_count": normalize_number_text(near_miss_count),
+        "quality_claim_count": normalize_number_text(quality_claim_count),
+        "energy_usage": normalize_number_text(energy_usage),
         "comment": comment,
         "created_at": now_text,
         "updated_at": now_text,
@@ -600,9 +646,96 @@ def create_manufacturing_kpi(
         ignore_index=True,
     )
 
-    write_kpi_excel(monthly_df, manufacturing_df)
+    write_kpi_excel(manufacturing_df=manufacturing_df)
 
     return kpi_id
+
+
+def update_monthly_kpi(
+    kpi_id,
+    year_month,
+    sales_amount,
+    gross_profit,
+    operating_profit,
+    cash_balance,
+    accounts_receivable,
+    accounts_payable,
+    expense_total,
+    new_orders,
+    order_backlog,
+    comment,
+):
+    monthly_df = read_sheet("monthly_kpis", MONTHLY_KPI_COLUMNS)
+    matched = monthly_df["id"].astype(str) == str(kpi_id)
+
+    if not matched.any():
+        return None
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    monthly_df.loc[matched, "year_month"] = year_month
+    monthly_df.loc[matched, "sales_amount"] = normalize_number_text(sales_amount)
+    monthly_df.loc[matched, "gross_profit"] = normalize_number_text(gross_profit)
+    monthly_df.loc[matched, "operating_profit"] = normalize_number_text(operating_profit)
+    monthly_df.loc[matched, "cash_balance"] = normalize_number_text(cash_balance)
+    monthly_df.loc[matched, "accounts_receivable"] = normalize_number_text(accounts_receivable)
+    monthly_df.loc[matched, "accounts_payable"] = normalize_number_text(accounts_payable)
+    monthly_df.loc[matched, "expense_total"] = normalize_number_text(expense_total)
+    monthly_df.loc[matched, "new_orders"] = normalize_number_text(new_orders)
+    monthly_df.loc[matched, "order_backlog"] = normalize_number_text(order_backlog)
+    monthly_df.loc[matched, "comment"] = comment
+    monthly_df.loc[matched, "updated_at"] = now_text
+
+    write_kpi_excel(monthly_df=monthly_df)
+
+    return kpi_id
+
+
+def update_manufacturing_kpi(
+    kpi_id,
+    year_month,
+    department,
+    production_volume,
+    defect_count,
+    defect_rate,
+    yield_rate,
+    on_time_delivery_rate,
+    equipment_availability,
+    downtime_hours,
+    accident_count,
+    near_miss_count,
+    quality_claim_count,
+    energy_usage,
+    comment,
+):
+    manufacturing_df = read_sheet("manufacturing_kpis", MANUFACTURING_KPI_COLUMNS)
+    matched = manufacturing_df["id"].astype(str) == str(kpi_id)
+
+    if not matched.any():
+        return None
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    manufacturing_df.loc[matched, "year_month"] = year_month
+    manufacturing_df.loc[matched, "department"] = department
+    manufacturing_df.loc[matched, "production_volume"] = normalize_number_text(production_volume)
+    manufacturing_df.loc[matched, "defect_count"] = normalize_number_text(defect_count)
+    manufacturing_df.loc[matched, "defect_rate"] = normalize_number_text(defect_rate)
+    manufacturing_df.loc[matched, "yield_rate"] = normalize_number_text(yield_rate)
+    manufacturing_df.loc[matched, "on_time_delivery_rate"] = normalize_number_text(on_time_delivery_rate)
+    manufacturing_df.loc[matched, "equipment_availability"] = normalize_number_text(equipment_availability)
+    manufacturing_df.loc[matched, "downtime_hours"] = normalize_number_text(downtime_hours)
+    manufacturing_df.loc[matched, "accident_count"] = normalize_number_text(accident_count)
+    manufacturing_df.loc[matched, "near_miss_count"] = normalize_number_text(near_miss_count)
+    manufacturing_df.loc[matched, "quality_claim_count"] = normalize_number_text(quality_claim_count)
+    manufacturing_df.loc[matched, "energy_usage"] = normalize_number_text(energy_usage)
+    manufacturing_df.loc[matched, "comment"] = comment
+    manufacturing_df.loc[matched, "updated_at"] = now_text
+
+    write_kpi_excel(manufacturing_df=manufacturing_df)
+
+    return kpi_id
+
 
 def format_signed_number(value, suffix=""):
     try:
@@ -662,24 +795,30 @@ def calculate_change_rate(current_value, previous_value):
 def get_trend_badge_for_higher_better(diff):
     if diff > 0:
         return "良好"
+
     if diff < 0:
         return "注意"
+
     return "横ばい"
 
 
 def get_trend_badge_for_lower_better(diff):
     if diff < 0:
         return "良好"
+
     if diff > 0:
         return "要確認"
+
     return "横ばい"
 
 
 def get_trend_badge_for_amount_cost(diff):
     if diff < 0:
         return "良好"
+
     if diff > 0:
         return "注意"
+
     return "横ばい"
 
 

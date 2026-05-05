@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}製造KPI登録{% endblock %}
+{% block title %}{{ page_title|default:"製造KPI登録" }}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>製造KPI登録</h2>
-    <p>生産数量、不良率、歩留まり、納期遵守率、設備稼働率などを登録します。</p>
+    <h2>{{ page_title|default:"製造KPI登録" }}</h2>
+    <p>生産数量、不良率、歩留まり、納期遵守率、設備稼働率などを登録・編集します。</p>
 
     <div class="list-actions">
         <a href="{% url 'kpi:manufacturing_kpi_list' %}">← 製造KPI一覧へ戻る</a>
@@ -13,112 +13,166 @@
 </div>
 
 <div class="card">
-    <form method="post" action="{% url 'kpi:manufacturing_kpi_create' %}">
+    <form method="post">
         {% csrf_token %}
 
         <div class="app-form-grid">
-            <input
-                type="month"
-                name="year_month"
-                class="input-full month-input"
-                required
-                title="対象月"
-            >
+            <div class="field-block">
+                <label>対象月</label>
+                <input
+                    type="month"
+                    name="year_month"
+                    class="input-full month-input"
+                    value="{% if kpi %}{{ kpi.year_month }}{% endif %}"
+                    required
+                >
+            </div>
 
-            <input
-                type="text"
-                name="department"
-                class="input-full"
-                placeholder="部署　例：製造部"
-            >
+            <div class="field-block">
+                <label>部署</label>
+                <input
+                    type="text"
+                    name="department"
+                    class="input-full"
+                    value="{% if kpi %}{{ kpi.department }}{% endif %}"
+                    placeholder="例：製造部"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="production_volume"
-                class="input-full"
-                placeholder="生産数量　例：11800"
-            >
+            <div class="field-block">
+                <label>生産数量</label>
+                <input
+                    type="text"
+                    name="production_volume"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.production_volume }}{% endif %}"
+                    placeholder="例：11,800"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="defect_count"
-                class="input-full"
-                placeholder="不良数　例：119"
-            >
+            <div class="field-block">
+                <label>不良数</label>
+                <input
+                    type="text"
+                    name="defect_count"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.defect_count }}{% endif %}"
+                    placeholder="例：119"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="defect_rate"
-                class="input-full"
-                placeholder="不良率（%）　例：1.01"
-            >
+            <div class="field-block">
+                <label>不良率（%）</label>
+                <input
+                    type="text"
+                    name="defect_rate"
+                    class="input-full"
+                    value="{% if kpi %}{{ kpi.defect_rate }}{% endif %}"
+                    placeholder="例：1.01"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="yield_rate"
-                class="input-full"
-                placeholder="歩留まり（%）　例：98.0"
-            >
+            <div class="field-block">
+                <label>歩留まり（%）</label>
+                <input
+                    type="text"
+                    name="yield_rate"
+                    class="input-full"
+                    value="{% if kpi %}{{ kpi.yield_rate }}{% endif %}"
+                    placeholder="例：98.0"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="on_time_delivery_rate"
-                class="input-full"
-                placeholder="納期遵守率（%）　例：97.3"
-            >
+            <div class="field-block">
+                <label>納期遵守率（%）</label>
+                <input
+                    type="text"
+                    name="on_time_delivery_rate"
+                    class="input-full"
+                    value="{% if kpi %}{{ kpi.on_time_delivery_rate }}{% endif %}"
+                    placeholder="例：97.3"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="equipment_availability"
-                class="input-full"
-                placeholder="設備稼働率（%）　例：95.0"
-            >
+            <div class="field-block">
+                <label>設備稼働率（%）</label>
+                <input
+                    type="text"
+                    name="equipment_availability"
+                    class="input-full"
+                    value="{% if kpi %}{{ kpi.equipment_availability }}{% endif %}"
+                    placeholder="例：95.0"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="downtime_hours"
-                class="input-full"
-                placeholder="停止時間　例：9.5"
-            >
+            <div class="field-block">
+                <label>停止時間</label>
+                <input
+                    type="text"
+                    name="downtime_hours"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.downtime_hours }}{% endif %}"
+                    placeholder="例：9.5"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="accident_count"
-                class="input-full"
-                placeholder="労災件数　例：0"
-            >
+            <div class="field-block">
+                <label>労災件数</label>
+                <input
+                    type="text"
+                    name="accident_count"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.accident_count }}{% endif %}"
+                    placeholder="例：0"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="near_miss_count"
-                class="input-full"
-                placeholder="ヒヤリハット件数　例：3"
-            >
+            <div class="field-block">
+                <label>ヒヤリハット件数</label>
+                <input
+                    type="text"
+                    name="near_miss_count"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.near_miss_count }}{% endif %}"
+                    placeholder="例：3"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="quality_claim_count"
-                class="input-full"
-                placeholder="品質クレーム件数　例：1"
-            >
+            <div class="field-block">
+                <label>品質クレーム件数</label>
+                <input
+                    type="text"
+                    name="quality_claim_count"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.quality_claim_count }}{% endif %}"
+                    placeholder="例：1"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="energy_usage"
-                class="input-full"
-                placeholder="エネルギー使用量　例：13900"
-            >
+            <div class="field-block">
+                <label>エネルギー使用量</label>
+                <input
+                    type="text"
+                    name="energy_usage"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.energy_usage }}{% endif %}"
+                    placeholder="例：13,900"
+                >
+            </div>
 
-            <textarea
-                name="comment"
-                rows="4"
-                class="input-full full"
-                placeholder="コメント　例：不良率・稼働率ともに改善。"
-            ></textarea>
+            <div class="field-block full">
+                <label>コメント</label>
+                <textarea
+                    name="comment"
+                    rows="4"
+                    class="input-full"
+                    placeholder="例：不良率・稼働率ともに改善。"
+                >{% if kpi %}{{ kpi.comment }}{% endif %}</textarea>
+            </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit">登録する</button>
+            <button type="submit">{{ submit_label|default:"登録する" }}</button>
         </div>
     </form>
 </div>

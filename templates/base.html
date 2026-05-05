@@ -642,6 +642,21 @@
                 grid-column: auto;
             }
         }
+        .field-block {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .field-block label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .field-block.full {
+            grid-column: 1 / -1;
+        }
     </style>
 </head>
 <body>
@@ -791,5 +806,92 @@
             });
         });
     </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function stripComma(value) {
+            return String(value || "").replace(/,/g, "");
+        }
+
+        function formatComma(value) {
+            let text = stripComma(value).trim();
+
+            if (text === "") {
+                return "";
+            }
+
+            const isNegative = text.startsWith("-");
+            if (isNegative) {
+                text = text.slice(1);
+            }
+
+            const parts = text.split(".");
+            let integerPart = parts[0].replace(/[^\d]/g, "");
+            let decimalPart = parts.length > 1 ? parts[1].replace(/[^\d]/g, "") : "";
+
+            if (integerPart === "") {
+                return isNegative ? "-" : "";
+            }
+
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            let result = integerPart;
+
+            if (parts.length > 1) {
+                result += "." + decimalPart;
+            }
+
+            if (isNegative) {
+                result = "-" + result;
+            }
+
+            return result;
+        }
+
+        function formatInputKeepingCursor(input) {
+            const originalValue = input.value;
+            const originalPosition = input.selectionStart || 0;
+
+            const commaCountBefore = (originalValue.slice(0, originalPosition).match(/,/g) || []).length;
+            const plainPosition = originalPosition - commaCountBefore;
+
+            const formattedValue = formatComma(originalValue);
+            input.value = formattedValue;
+
+            let nextPosition = 0;
+            let plainCount = 0;
+
+            while (nextPosition < formattedValue.length && plainCount < plainPosition) {
+                if (formattedValue[nextPosition] !== ",") {
+                    plainCount += 1;
+                }
+                nextPosition += 1;
+            }
+
+            input.setSelectionRange(nextPosition, nextPosition);
+        }
+
+        document.querySelectorAll(".comma-number-input").forEach(function (input) {
+            input.inputMode = "decimal";
+
+            input.value = formatComma(input.value);
+
+            input.addEventListener("input", function () {
+                formatInputKeepingCursor(input);
+            });
+
+            input.addEventListener("blur", function () {
+                input.value = formatComma(input.value);
+            });
+        });
+
+        document.querySelectorAll("form").forEach(function (form) {
+            form.addEventListener("submit", function () {
+                form.querySelectorAll(".comma-number-input").forEach(function (input) {
+                    input.value = stripComma(input.value);
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>

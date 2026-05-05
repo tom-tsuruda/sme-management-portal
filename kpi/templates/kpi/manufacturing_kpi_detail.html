@@ -161,7 +161,10 @@
 </div>
 {% endif %}
 
-<p>
+<div class="list-actions">
+    {% if kpi %}
+        <a class="button" href="{% url 'kpi:manufacturing_kpi_edit' kpi.id %}">編集する</a>
+    {% endif %}
     <a href="{% url 'kpi:manufacturing_kpi_list' %}">製造KPI一覧へ戻る</a>
-</p>
+</div>
 {% endblock %}

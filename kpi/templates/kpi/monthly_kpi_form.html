@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}月次経営KPI登録{% endblock %}
+{% block title %}{{ page_title|default:"月次経営KPI登録" }}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>月次経営KPI登録</h2>
-    <p>売上・粗利・営業利益・現預金など、月次の経営指標を登録します。</p>
+    <h2>{{ page_title|default:"月次経営KPI登録" }}</h2>
+    <p>売上・粗利・営業利益・現預金など、月次の経営指標を登録・編集します。</p>
 
     <div class="list-actions">
         <a href="{% url 'kpi:monthly_kpi_list' %}">← 月次経営KPI一覧へ戻る</a>
@@ -13,91 +13,133 @@
 </div>
 
 <div class="card">
-    <form method="post" action="{% url 'kpi:monthly_kpi_create' %}">
+    <form method="post">
         {% csrf_token %}
 
         <div class="app-form-grid">
-            <input
-                type="month"
-                name="year_month"
-                class="input-full month-input"
-                required
-                title="対象月"
-            >
+            <div class="field-block">
+                <label>対象月</label>
+                <input
+                    type="month"
+                    name="year_month"
+                    class="input-full month-input"
+                    value="{% if kpi %}{{ kpi.year_month }}{% endif %}"
+                    required
+                >
+            </div>
 
-            <input
-                type="text"
-                name="sales_amount"
-                class="input-full"
-                placeholder="売上高　例：14800000"
-            >
+            <div class="field-block">
+                <label>売上高</label>
+                <input
+                    type="text"
+                    name="sales_amount"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.sales_amount }}{% endif %}"
+                    placeholder="例：14,800,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="gross_profit"
-                class="input-full"
-                placeholder="粗利　例：4900000"
-            >
+            <div class="field-block">
+                <label>粗利</label>
+                <input
+                    type="text"
+                    name="gross_profit"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.gross_profit }}{% endif %}"
+                    placeholder="例：4,900,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="operating_profit"
-                class="input-full"
-                placeholder="営業利益　例：1280000"
-            >
+            <div class="field-block">
+                <label>営業利益</label>
+                <input
+                    type="text"
+                    name="operating_profit"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.operating_profit }}{% endif %}"
+                    placeholder="例：1,280,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="cash_balance"
-                class="input-full"
-                placeholder="現預金　例：9500000"
-            >
+            <div class="field-block">
+                <label>現預金</label>
+                <input
+                    type="text"
+                    name="cash_balance"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.cash_balance }}{% endif %}"
+                    placeholder="例：9,500,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="accounts_receivable"
-                class="input-full"
-                placeholder="売掛金　例：5200000"
-            >
+            <div class="field-block">
+                <label>売掛金</label>
+                <input
+                    type="text"
+                    name="accounts_receivable"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.accounts_receivable }}{% endif %}"
+                    placeholder="例：5,200,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="accounts_payable"
-                class="input-full"
-                placeholder="買掛金　例：2900000"
-            >
+            <div class="field-block">
+                <label>買掛金</label>
+                <input
+                    type="text"
+                    name="accounts_payable"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.accounts_payable }}{% endif %}"
+                    placeholder="例：2,900,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="expense_total"
-                class="input-full"
-                placeholder="経費合計　例：3620000"
-            >
+            <div class="field-block">
+                <label>経費合計</label>
+                <input
+                    type="text"
+                    name="expense_total"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.expense_total }}{% endif %}"
+                    placeholder="例：3,620,000"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="new_orders"
-                class="input-full"
-                placeholder="新規受注件数　例：25"
-            >
+            <div class="field-block">
+                <label>新規受注件数</label>
+                <input
+                    type="text"
+                    name="new_orders"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.new_orders }}{% endif %}"
+                    placeholder="例：25"
+                >
+            </div>
 
-            <input
-                type="text"
-                name="order_backlog"
-                class="input-full"
-                placeholder="受注残　例：11100000"
-            >
+            <div class="field-block">
+                <label>受注残</label>
+                <input
+                    type="text"
+                    name="order_backlog"
+                    class="input-full comma-number-input"
+                    value="{% if kpi %}{{ kpi.order_backlog }}{% endif %}"
+                    placeholder="例：11,100,000"
+                >
+            </div>
 
-            <textarea
-                name="comment"
-                rows="4"
-                class="input-full full"
-                placeholder="コメント　例：受注好調。粗利率も改善。"
-            ></textarea>
+            <div class="field-block full">
+                <label>コメント</label>
+                <textarea
+                    name="comment"
+                    rows="4"
+                    class="input-full"
+                    placeholder="例：受注好調。粗利率も改善。"
+                >{% if kpi %}{{ kpi.comment }}{% endif %}</textarea>
+            </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit">登録する</button>
+            <button type="submit">{{ submit_label|default:"登録する" }}</button>
         </div>
     </form>
 </div>
