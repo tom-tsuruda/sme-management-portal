@@ -4,7 +4,7 @@ import shutil
 
 import pandas as pd
 from django.conf import settings
-
+from core.backup import backup_excel_file
 
 def get_task_excel_path():
     """
@@ -24,21 +24,12 @@ def get_backup_dir():
 
 
 def backup_task_excel():
-    """
-    task_data.xlsx を更新前にバックアップする。
-    """
-    excel_path = get_task_excel_path()
-
-    if not excel_path.exists():
-        return None
-
-    backup_dir = get_backup_dir()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = backup_dir / f"task_data_{timestamp}.xlsx"
-
-    shutil.copy2(excel_path, backup_path)
-
-    return backup_path
+    return backup_excel_file(
+        excel_path=get_task_excel_path(),
+        base_dir=settings.BASE_DIR,
+        file_prefix="task_data",
+        keep_count=3,
+    )
 
 
 def format_japanese_date(value):

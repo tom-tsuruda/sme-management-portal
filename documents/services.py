@@ -4,6 +4,7 @@ import shutil
 
 import pandas as pd
 from django.conf import settings
+from core.backup import backup_excel_file
 
 ALLOWED_COMPLETED_FILE_EXTENSIONS = {
     ".doc",
@@ -186,18 +187,12 @@ def get_backup_dir():
 
 
 def backup_document_excel():
-    excel_path = get_document_excel_path()
-
-    if not excel_path.exists():
-        return None
-
-    backup_dir = get_backup_dir()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = backup_dir / f"document_master_{timestamp}.xlsx"
-
-    shutil.copy2(excel_path, backup_path)
-
-    return backup_path
+    return backup_excel_file(
+        excel_path=get_document_excel_path(),
+        base_dir=settings.BASE_DIR,
+        file_prefix="document_master",
+        keep_count=3,
+    )
 
 
 def format_japanese_date(value):

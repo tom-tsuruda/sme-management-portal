@@ -6,7 +6,7 @@ import pandas as pd
 from django.conf import settings
 
 from core.formatters import format_amount, format_japanese_date, format_japanese_datetime
-
+from core.backup import backup_excel_file
 
 EXPENSE_COLUMNS = [
     "id",
@@ -57,18 +57,12 @@ def get_backup_dir():
 
 
 def backup_expense_excel():
-    excel_path = get_expense_excel_path()
-
-    if not excel_path.exists():
-        return None
-
-    backup_dir = get_backup_dir()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = backup_dir / f"expense_data_{timestamp}.xlsx"
-
-    shutil.copy2(excel_path, backup_path)
-
-    return backup_path
+    return backup_excel_file(
+        excel_path=get_expense_excel_path(),
+        base_dir=settings.BASE_DIR,
+        file_prefix="expense_data",
+        keep_count=3,
+    )
 
 
 def ensure_expense_excel():

@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 from django.conf import settings
-
+from core.backup import backup_excel_file
 
 DEPARTMENT_COLUMNS = [
     "id",
@@ -93,6 +93,11 @@ def read_sheet(sheet_name, columns):
 
     return df
 
+def write_organization_excel(departments_df, positions_df, employees_df):
+    ensure_organization_excel()
+    backup_organization_excel()
+
+    excel_path = get_organization_excel_path()
 
 def write_organization_excel(departments_df, positions_df, employees_df):
     excel_path = get_organization_excel_path()
@@ -512,3 +517,11 @@ def delete_employee(employee_id):
 
     write_organization_excel(departments_df, positions_df, employees_df)
     return True
+
+def backup_organization_excel():
+    return backup_excel_file(
+        excel_path=get_organization_excel_path(),
+        base_dir=settings.BASE_DIR,
+        file_prefix="organization_master",
+        keep_count=3,
+    )
