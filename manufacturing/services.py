@@ -1356,4 +1356,107 @@ def create_management_items_from_templates(template_ids):
 
     return len(new_rows)
 
-from manufacturing.services import sync_incident_status_from_task
+def map_task_status_to_incident_status(task_status):
+    """
+    タスク状態を製造インシデント状態に変換する。
+    対応しない状態は None を返す。
+    """
+    status_map = {
+        "未着手": "未対応",
+        "要対応": "未対応",
+        "進行中": "対応中",
+        "完了": "完了",
+    }
+
+    return status_map.get(str(task_status).strip())
+
+
+def sync_incident_status_from_task(task_id, task_status):
+    """
+    related_task_id が task_id と一致する製造インシデントの状態を、
+    タスク状態に合わせて更新する。
+
+    例：
+        TASK-007 が 完了
+        → related_task_id が TASK-007 のインシデントを 完了 にする
+
+    戻り値：
+        更新したインシデントIDのリスト
+    """
+    incident_status = map_task_status_to_incident_status(task_status)
+
+    if not incident_status:
+        return []
+
+    excel_path = get_manufacturing_excel_path()
+
+    if not excel_path.exists():
+        return []
+
+    try:
+        workbook = pd.read_excel(
+            excel_path,
+            sheet_name=None,
+            dtype=str,
+        )
+    except Exception:
+        return []
+
+    if "incidents" not in workbook:
+        return []
+
+    incidents_df = workbook["incidents"].fillna("")
+
+    for column in INCIDENT_COLUMNS:
+        if column not in incidents_df.columns:
+            incidents_df[column] = ""
+
+    for column in incidents_df.columns:
+        incidents_df[column] = incidents_df[column].astype(str)
+
+    if "related_task_id" not in incidents_df.columns:
+        return []
+
+    if "status" not in incidents_df.columns:
+        return []
+
+    target_indexes = incidents_df.index[
+        incidents_df["related_task_id"].astype(str).str.strip() == str(task_id).strip()
+    ].tolist()
+
+    if not target_indexes:
+        return []
+
+    backup_manufacturing_excel()
+
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    updated_incident_ids = []
+
+    for index in target_indexes:
+        current_status = str(incidents_df.loc[index, "status"]).strip()
+
+        if current_status == incident_status:
+            continue
+
+        incidents_df.loc[index, "status"] = incident_status
+
+        if "updated_at" in incidents_df.columns:
+            incidents_df.loc[index, "updated_at"] = now_text
+
+        updated_incident_ids.append(str(incidents_df.loc[index, "id"]))
+
+    if not updated_incident_ids:
+        return []
+
+    workbook["incidents"] = incidents_df
+
+    with pd.ExcelWriter(excel_path, engine="openpyxl", mode="w") as writer:
+        for sheet_name, sheet_df in workbook.items():
+            sheet_df = sheet_df.fillna("")
+
+            for column in sheet_df.columns:
+                sheet_df[column] = sheet_df[column].astype(str)
+
+            sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+    return updated_incident_ids
