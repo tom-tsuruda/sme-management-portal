@@ -47,7 +47,7 @@
                 </tr>
                 <tr>
                     <th>申請内容</th>
-                    <td style="white-space: pre-wrap;">{{ workflow_request.description }}</td>
+                    <td class="pre-wrap">{{ workflow_request.description }}</td>
                 </tr>
                 <tr>
                     <th>作成日</th>
@@ -78,12 +78,26 @@
         {% csrf_token %}
 
         <input type="file" name="attachment" required>
-        <input type="text" name="uploaded_by" placeholder="アップロード者" class="input-short">
+        <input
+            type="text"
+            name="uploaded_by"
+            list="workflow-uploaded-by-list"
+            placeholder="アップロード者を選択または入力"
+            class="input-middle"
+        >
+        <datalist id="workflow-uploaded-by-list">
+            {% if workflow_request.applicant %}
+                <option value="{{ workflow_request.applicant }}">
+            {% endif %}
+            {% if workflow_request.approver %}
+                <option value="{{ workflow_request.approver }}">
+            {% endif %}
+        </datalist>
         <button type="submit">添付する</button>
     </form>
 
     {% if attachments %}
-        <div class="table-wrap" style="margin-top: 14px;">
+        <div class="table-wrap table-wrap-spaced">
             <table>
                 <thead>
                     <tr>
@@ -114,36 +128,57 @@
     {% endif %}
 </div>
 
-<div class="card">
+<div class="card card-compact">
     <h2>承認処理</h2>
 
-    <form method="post" action="{% url 'workflows:update_status' workflow_request.id %}">
+    <form method="post" action="{% url 'workflows:update_status' workflow_request.id %}" class="approval-form">
         {% csrf_token %}
 
-        <div class="form-row">
-            <label>処理</label><br>
-            <select name="status" class="input-middle">
-                {% for status in status_choices %}
-                    <option value="{{ status }}" {% if workflow_request.status == status %}selected{% endif %}>
-                        {{ status }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
+        <div class="approval-form-main">
+            <div class="approval-form-field">
+                <label for="workflow-status">処理</label>
+                <select id="workflow-status" name="status">
+                    {% for status in status_choices %}
+                        <option value="{{ status }}" {% if workflow_request.status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-row">
-            <label>処理者</label><br>
-            <input type="text" name="actor" placeholder="例：部長" class="input-middle">
-        </div>
+            <div class="approval-form-field">
+                <label for="workflow-actor">処理者</label>
+                <input
+                    id="workflow-actor"
+                    type="text"
+                    name="actor"
+                    list="workflow-actor-list"
+                    placeholder="選択または入力"
+                    value="{{ workflow_request.approver }}"
+                >
+                <datalist id="workflow-actor-list">
+                    {% if workflow_request.approver %}
+                        <option value="{{ workflow_request.approver }}">
+                    {% endif %}
+                    {% if workflow_request.applicant %}
+                        <option value="{{ workflow_request.applicant }}">
+                    {% endif %}
+                </datalist>
+            </div>
 
-        <div class="form-row">
-            <label>コメント</label><br>
-            <textarea name="comment" rows="4" class="input-full"></textarea>
-        </div>
-
-        <p>
             <button type="submit">保存</button>
-        </p>
+        </div>
+
+        <div class="approval-form-field">
+            <label for="workflow-comment">コメント</label>
+            <textarea
+                id="workflow-comment"
+                name="comment"
+                rows="2"
+                class="textarea-small"
+                placeholder="必要に応じてコメントを入力"
+            ></textarea>
+        </div>
     </form>
 </div>
 

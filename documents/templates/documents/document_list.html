@@ -96,15 +96,15 @@
         <div class="list-scroll">
             <table class="list-table document-list-table">
                 <colgroup>
-                    <col style="width: 240px;">
+                    <col style="width: 200px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
                     <col style="width: 100px;">
-                    <col style="width: 90px;">
-                    <col style="width: 120px;">
                     <col style="width: 100px;">
-                    <col style="width: 120px;">
-                    <col style="width: 130px;">
                     <col style="width: 70px;">
-                    <col style="width: 120px;">
+                    <col style="width: 80px;">
                 </colgroup>
                 <thead>
                     <tr>
@@ -116,7 +116,7 @@
                         <th>ひな形</th>
                         <th>完成文書</th>
                         <th>リスク</th>
-                        <th>次回確認日</th>
+                        <th>最新登録日</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -213,9 +213,9 @@
                             {% endif %}
                         </td>
 
-                        <td>
-                            {% if doc.next_review_date %}
-                                {{ doc.next_review_date }}
+                        <td class="small-text nowrap">
+                            {% if doc.completed_at %}
+                                {{ doc.completed_at }}
                             {% else %}
                                 -
                             {% endif %}

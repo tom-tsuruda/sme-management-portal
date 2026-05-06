@@ -16,7 +16,7 @@
     <form method="post" action="{% url 'workflows:request_create' %}">
         {% csrf_token %}
 
-        <div class="app-form-grid">
+        <div class="form-grid">
             <select name="request_type" class="input-full">
                 {% for request_type in request_type_choices %}
                     <option value="{{ request_type }}">{{ request_type }}</option>
@@ -31,43 +31,42 @@
                 placeholder="件名"
             >
 
-            <div>
-                <select name="applicant_employee_id" class="input-full">
-                    <option value="">申請者：社員マスタから選択</option>
+            <div class="field">
+                <input
+                    type="text"
+                    name="applicant"
+                    list="workflow-applicant-list"
+                    class="input-full"
+                    placeholder="申請者を選択または入力"
+                >
+                <datalist id="workflow-applicant-list">
                     {% for employee in employees %}
-                        <option value="{{ employee.id }}">
-                            {{ employee.employee_name }}（{{ employee.department_name }} / {{ employee.position_name }}）
-                        </option>
+                        <option value="{{ employee.employee_name }}">
                     {% endfor %}
-                </select>
-                <div class="form-help">社員マスタを選択した場合は、選択した社員名が優先されます。</div>
+                </datalist>
+                <div class="help-text">社員マスタにない場合は、そのまま手入力できます。</div>
             </div>
 
-            <input
-                type="text"
-                name="applicant"
-                class="input-full"
-                placeholder="申請者を手入力"
-            >
-
-            <div>
-                <select name="department_id" class="input-full">
-                    <option value="">部署：申請者の部署を使う / 部署マスタから選択</option>
+            <div class="field">
+                <input
+                    type="text"
+                    name="department"
+                    list="workflow-department-list"
+                    class="input-full"
+                    placeholder="部署を選択または入力"
+                >
+                <datalist id="workflow-department-list">
                     {% for department in departments %}
-                        <option value="{{ department.id }}">
-                            {{ department.department_name }}
-                        </option>
+                        <option value="{{ department.department_name }}">
                     {% endfor %}
-                </select>
-                <div class="form-help">部署未選択の場合は、申請者の所属部署を自動で使います。</div>
+                    {% for employee in employees %}
+                        {% if employee.department_name %}
+                            <option value="{{ employee.department_name }}">
+                        {% endif %}
+                    {% endfor %}
+                </datalist>
+                <div class="help-text">候補になければ、そのまま手入力できます。</div>
             </div>
-
-            <input
-                type="text"
-                name="department"
-                class="input-full"
-                placeholder="部署を手入力"
-            >
 
             <input
                 type="text"
@@ -76,24 +75,24 @@
                 class="input-full"
             >
 
-            <div>
-                <select name="approver_employee_id" class="input-full">
-                    <option value="">承認者：社員マスタから選択</option>
+            <div class="field">
+                <input
+                    type="text"
+                    name="approver"
+                    list="workflow-approver-list"
+                    class="input-full"
+                    placeholder="承認者を選択または入力"
+                >
+                <datalist id="workflow-approver-list">
                     {% for approver in approvers %}
-                        <option value="{{ approver.id }}">
-                            {{ approver.employee_name }}（{{ approver.department_name }} / {{ approver.position_name }}）
-                        </option>
+                        <option value="{{ approver.employee_name }}">
                     {% endfor %}
-                </select>
-                <div class="form-help">承認者マスタを選択した場合は、選択した承認者名が優先されます。</div>
+                    {% for employee in employees %}
+                        <option value="{{ employee.employee_name }}">
+                    {% endfor %}
+                </datalist>
+                <div class="help-text">承認者マスタにない場合は、そのまま手入力できます。</div>
             </div>
-
-            <input
-                type="text"
-                name="approver"
-                class="input-full"
-                placeholder="承認者を手入力"
-            >
 
             <textarea
                 name="description"

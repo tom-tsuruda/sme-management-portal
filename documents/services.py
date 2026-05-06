@@ -219,6 +219,7 @@ def normalize_document_record(doc):
         "established_date",
         "revised_date",
         "next_review_date",
+        "completed_at",
     ]:
         if key in doc:
             doc[key] = format_japanese_date(doc.get(key, ""))

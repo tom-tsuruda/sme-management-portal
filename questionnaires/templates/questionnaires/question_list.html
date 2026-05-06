@@ -14,82 +14,6 @@
 <form method="post" action="/questionnaires/answer/">
     {% csrf_token %}
 
-    <style>
-        .question-category-block {
-            margin-bottom: 18px;
-            background: #ffffff;
-            border-radius: 14px;
-            border: 1px solid #d5dbe3;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-            overflow: hidden;
-        }
-
-        .question-category-block summary {
-            cursor: pointer;
-            padding: 16px 20px;
-            font-weight: 800;
-            font-size: 1.05rem;
-            background: #f1f5f9;
-            border-left: 6px solid #2563eb;
-            list-style: none;
-        }
-
-        .question-category-block summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .question-category-block summary::before {
-            content: "▶";
-            display: inline-block;
-            margin-right: 10px;
-            transition: transform 0.2s ease;
-        }
-
-        .question-category-block[open] summary::before {
-            transform: rotate(90deg);
-        }
-
-        .question-category-block summary:hover {
-            background: #e8eef7;
-        }
-
-        .question-category-meta {
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-left: 8px;
-        }
-
-        .question-category-block .list-frame {
-            border: none;
-            border-radius: 0;
-            box-shadow: none;
-            margin-bottom: 0;
-        }
-
-        .question-answer-select {
-            width: 170px;
-            max-width: 100%;
-        }
-
-        .question-list-table th,
-        .question-list-table td {
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .question-list-table .text-left {
-            text-align: left;
-        }
-
-        .question-list-table .nowrap {
-            white-space: nowrap;
-        }
-
-        .question-list-table .related-document-cell {
-            white-space: nowrap;
-        }
-    </style>
-
     {% for category, category_questions in grouped_questions.items %}
     <details class="question-category-block">
         <summary>
@@ -103,11 +27,11 @@
             <div class="list-scroll">
                 <table class="list-table question-list-table">
                     <colgroup>
-                        <col style="width: 80px;">
-                        <col style="width: 360px;">
-                        <col style="width: 120px;">
-                        <col style="width: 70px;">
-                        <col style="width: 360px;">
+                        <col class="question-col-id">
+                        <col class="question-col-text">
+                        <col class="question-col-answer">
+                        <col class="question-col-risk">
+                        <col class="question-col-task">
                     </colgroup>
                     <thead>
                         <tr>

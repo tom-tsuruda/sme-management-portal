@@ -6,22 +6,49 @@
 <h2>経営指標ダッシュボード</h2>
 
 <div class="card">
-    <form method="get" action="{% url 'kpi:kpi_home' %}">
-        <div class="app-form-grid">
-            <div class="field-block">
-                <label>表示する月</label>
-                <select name="selected_month" class="input-full">
-                    {% for month in available_months %}
-                        <option value="{{ month }}" {% if selected_month == month %}selected{% endif %}>
-                            {{ month }}
-                        </option>
-                    {% endfor %}
-                </select>
+    <form method="get" action="{% url 'kpi:kpi_home' %}" class="kpi-filter-form">
+        <div class="kpi-filter-layout">
+            <div class="kpi-period-area">
+                <div class="kpi-period-title">期間を選択</div>
+
+                <div class="kpi-period-row">
+                    <div class="field kpi-filter-field">
+                        <label for="start_month">開始月</label>
+                        <select id="start_month" name="start_month" class="kpi-month-select">
+                            {% for month in available_months %}
+                                <option value="{{ month }}" {% if start_month == month %}selected{% endif %}>
+                                    {{ month }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field kpi-filter-field">
+                        <label for="end_month">終了月</label>
+                        <select id="end_month" name="end_month" class="kpi-month-select">
+                            {% for month in available_months %}
+                                <option value="{{ month }}" {% if end_month == month %}selected{% endif %}>
+                                    {{ month }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="kpi-filter-actions">
+                        <label>&nbsp;</label>
+                        <button type="submit">表示する</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="field-block">
-                <label>&nbsp;</label>
-                <button type="submit">表示する</button>
+            <div class="kpi-shortcuts">
+                <a class="kpi-sub-button" href="{% url 'kpi:monthly_kpi_list' %}">
+                    月次経営KPI
+                </a>
+
+                <a class="kpi-sub-button" href="{% url 'kpi:manufacturing_kpi_list' %}">
+                    製造KPI
+                </a>
             </div>
         </div>
     </form>
@@ -30,7 +57,7 @@
 {% if latest_monthly_kpi %}
 <div class="summary-grid">
     <div class="summary-card">
-        <div class="summary-label">対象月</div>
+        <div class="summary-label">対象期間</div>
         <div class="summary-number">{{ latest_monthly_kpi.year_month }}</div>
     </div>
 
@@ -75,18 +102,8 @@
 </div>
 {% endif %}
 
-<div class="menu-list">
-    <a class="menu-item" href="{% url 'kpi:monthly_kpi_list' %}">
-        月次経営KPI
-    </a>
-
-    <a class="menu-item" href="{% url 'kpi:manufacturing_kpi_list' %}">
-        製造KPI
-    </a>
-</div>
-
-<div class="card" style="margin-top: 24px;">
-    <h2>選択月 月次経営KPI</h2>
+<div class="card">
+    <h2>選択期間 月次経営KPI</h2>
 
     {% if monthly_kpis %}
     <div class="list-frame">
@@ -133,12 +150,12 @@
         </div>
     </div>
     {% else %}
-        <p>選択月の月次経営KPIはありません。</p>
+        <p>選択期間の月次経営KPIはありません。</p>
     {% endif %}
 </div>
 
 <div class="card">
-    <h2>選択月 製造KPI</h2>
+    <h2>選択期間 製造KPI</h2>
 
     {% if manufacturing_kpis %}
     <div class="list-frame">
@@ -191,7 +208,7 @@
         </div>
     </div>
     {% else %}
-        <p>選択月の製造KPIはありません。</p>
+        <p>選択期間の製造KPIはありません。</p>
     {% endif %}
 </div>
 {% endblock %}

@@ -59,7 +59,7 @@
                 </tr>
                 <tr>
                     <th>内容・目的</th>
-                    <td style="white-space: pre-wrap;">{{ expense.description }}</td>
+                    <td class="pre-wrap">{{ expense.description }}</td>
                 </tr>
                 <tr>
                     <th>作成日</th>
@@ -90,12 +90,26 @@
         {% csrf_token %}
 
         <input type="file" name="attachment" required>
-        <input type="text" name="uploaded_by" placeholder="アップロード者" class="input-short">
+        <input
+            type="text"
+            name="uploaded_by"
+            list="expense-uploaded-by-list"
+            placeholder="アップロード者を選択または入力"
+            class="input-middle"
+        >
+        <datalist id="expense-uploaded-by-list">
+            {% if expense.applicant %}
+                <option value="{{ expense.applicant }}">
+            {% endif %}
+            {% if expense.approver %}
+                <option value="{{ expense.approver }}">
+            {% endif %}
+        </datalist>
         <button type="submit">添付する</button>
     </form>
 
     {% if attachments %}
-        <div class="table-wrap" style="margin-top: 14px;">
+        <div class="table-wrap table-wrap-spaced">
             <table>
                 <thead>
                     <tr>
@@ -126,36 +140,57 @@
     {% endif %}
 </div>
 
-<div class="card">
+<div class="card card-compact">
     <h2>承認・精算処理</h2>
 
-    <form method="post" action="{% url 'expenses:update_status' expense.id %}">
+    <form method="post" action="{% url 'expenses:update_status' expense.id %}" class="approval-form">
         {% csrf_token %}
 
-        <div class="form-row">
-            <label>処理</label><br>
-            <select name="status" class="input-middle">
-                {% for status in status_choices %}
-                    <option value="{{ status }}" {% if expense.status == status %}selected{% endif %}>
-                        {{ status }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
+        <div class="approval-form-main">
+            <div class="approval-form-field">
+                <label for="expense-status">処理</label>
+                <select id="expense-status" name="status">
+                    {% for status in status_choices %}
+                        <option value="{{ status }}" {% if expense.status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-row">
-            <label>処理者</label><br>
-            <input type="text" name="actor" placeholder="例：部長" class="input-middle">
-        </div>
+            <div class="approval-form-field">
+                <label for="expense-actor">処理者</label>
+                <input
+                    id="expense-actor"
+                    type="text"
+                    name="actor"
+                    list="expense-actor-list"
+                    placeholder="選択または入力"
+                    value="{{ expense.approver }}"
+                >
+                <datalist id="expense-actor-list">
+                    {% if expense.approver %}
+                        <option value="{{ expense.approver }}">
+                    {% endif %}
+                    {% if expense.applicant %}
+                        <option value="{{ expense.applicant }}">
+                    {% endif %}
+                </datalist>
+            </div>
 
-        <div class="form-row">
-            <label>コメント</label><br>
-            <textarea name="comment" rows="4" class="input-full"></textarea>
-        </div>
-
-        <p>
             <button type="submit">保存</button>
-        </p>
+        </div>
+
+        <div class="approval-form-field">
+            <label for="expense-comment">コメント</label>
+            <textarea
+                id="expense-comment"
+                name="comment"
+                rows="2"
+                class="textarea-small"
+                placeholder="必要に応じてコメントを入力"
+            ></textarea>
+        </div>
     </form>
 </div>
 

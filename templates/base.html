@@ -1,663 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}中小企業・経営ポータル{% endblock %}</title>
     <link rel="icon" href="data:,">
-    <style>
-        :root {
-            --bg: #f5f7fa;
-            --card: #ffffff;
-            --text: #111827;
-            --sub: #6b7280;
-            --line: #d1d5db;
-            --head: #1f2937;
-            --nav: #374151;
-            --blue: #2563eb;
-            --blue-hover: #1d4ed8;
-            --red: #dc2626;
-            --orange: #d97706;
-            --green: #059669;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-        a {
-            color: var(--blue);
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: var(--blue-hover);
-            text-decoration: underline;
-        }
-
-        .top-fixed {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        header {
-            background: var(--head);
-            color: #ffffff;
-        }
-
-        .header-inner,
-        .nav-inner,
-        main {
-            max-width: 1160px;
-            margin: 0 auto;
-            padding-left: 32px;
-            padding-right: 32px;
-        }
-
-        .header-inner {
-            padding-top: 12px;
-            padding-bottom: 12px;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-        nav {
-            background: var(--nav);
-        }
-
-        .nav-inner {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px 14px;
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-
-        nav a {
-            color: #ffffff;
-            font-weight: bold;
-            font-size: 13px;
-            padding: 3px 6px;
-        }
-
-        main {
-            padding-top: 20px;
-            padding-bottom: 40px;
-        }
-
-        h2 {
-            margin-top: 0;
-            margin-bottom: 12px;
-            padding-left: 10px;
-            border-left: 5px solid var(--blue);
-            font-size: 18px;
-        }
-
-        .card,
-        .summary-card,
-        .menu-item,
-        .table-wrap,
-        .document-category-block {
-            background: var(--card);
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        .card {
-            padding: 20px 22px;
-            margin-bottom: 22px;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .summary-card {
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .summary-label {
-            color: #4b5563;
-            font-weight: bold;
-            line-height: 1.4;
-        }
-
-        .summary-number {
-            font-size: 20px;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .summary-number.danger {
-            color: var(--red);
-        }
-
-        .summary-number.warning {
-            color: var(--orange);
-        }
-
-        .summary-number small {
-            margin-left: 5px;
-            color: var(--sub);
-            font-size: 12px;
-        }
-
-        .menu-list {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(220px, 1fr));
-            gap: 14px;
-            margin-top: 18px;
-        }
-
-        .menu-item {
-            display: block;
-            padding: 16px;
-            color: var(--text);
-            font-weight: bold;
-        }
-
-        .menu-item:hover {
-            background: #eff6ff;
-            text-decoration: none;
-        }
-
-        /* ==============================
-           共通：通常テーブル
-           ============================== */
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #ffffff;
-            font-size: 13px;
-        }
-
-        th,
-        td {
-            border: 1px solid var(--line);
-            padding: 8px 10px;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        th {
-            background: #e5e7eb;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        tr:nth-child(even) td {
-            background: #fafafa;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-            margin-bottom: 16px;
-        }
-
-        /* ==============================
-           共通：一覧テーブル
-           list-frame  = 外枠・角丸・影
-           list-scroll = 高さ制限・縦スクロール
-           list-table  = テーブル本体
-           ============================== */
-
-        .list-frame {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .list-scroll {
-            max-height: 300px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-gutter: stable;
-        }
-
-        .list-table {
-            width: 100%;
-            min-width: 0;
-            max-width: 100%;
-            table-layout: fixed;
-            border-collapse: collapse;
-            background: #ffffff;
-            font-size: 13px;
-        }
-
-        .list-table th,
-        .list-table td {
-            border: 1px solid var(--line);
-            padding: 8px 10px;
-            text-align: center;
-            vertical-align: middle;
-            overflow: hidden;
-        }
-
-        .list-table th {
-            background: #e5e7eb;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .list-table tr:nth-child(even) td {
-            background: #fafafa;
-        }
-
-        .list-scroll thead th {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        .table-filter-row th {
-            background: #f8fafc;
-            padding: 6px 8px;
-            text-align: center;
-        }
-
-        .table-filter-input {
-            width: 100%;
-            min-width: 0;
-            height: 32px;
-            padding: 6px 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 0;
-            background: #ffffff;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        .table-filter-input::placeholder {
-            color: #94a3b8;
-        }
-
-        .table-filter-status {
-            color: var(--sub);
-            font-size: 13px;
-            padding: 6px 10px 8px;
-            background: #ffffff;
-        }
-
-        .text-left {
-            text-align: left !important;
-        }
-
-        .text-center {
-            text-align: center !important;
-        }
-
-        .text-right {
-            text-align: right !important;
-        }
-
-        .nowrap {
-            white-space: nowrap !important;
-        }
-
-        .long-text {
-            white-space: normal;
-            word-break: break-word;
-        }
-
-        /* ==============================
-           共通：フォーム
-           ============================== */
-
-        input,
-        select,
-        textarea,
-        button {
-            font-family: inherit;
-            font-size: 13px;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
-        input[type="email"],
-        input[type="password"],
-        input[type="search"],
-        input[type="file"],
-        select,
-        textarea,
-        .input-long,
-        .input-middle,
-        .input-full,
-        .amount-input,
-        .date-input {
-            padding: 8px 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            background: #ffffff;
-            color: var(--text);
-        }
-
-        input[type="date"],
-        .date-input {
-            height: 38px;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--blue);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
-        }
-
-        .input-long {
-            width: 520px;
-            max-width: 100%;
-        }
-
-        .input-middle {
-            width: 360px;
-            max-width: 100%;
-        }
-
-        .input-full {
-            width: 100%;
-        }
-
-        .amount-input {
-            width: 180px;
-            max-width: 100%;
-        }
-
-        button,
-        input[type="submit"],
-        .button,
-        .btn {
-            display: inline-block;
-            padding: 8px 14px;
-            border: none;
-            border-radius: 4px;
-            background: var(--blue);
-            color: #ffffff;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        button:hover,
-        input[type="submit"]:hover,
-        .button:hover,
-        .btn:hover {
-            background: var(--blue-hover);
-            color: #ffffff;
-            text-decoration: none;
-        }
-
-        .small-button {
-            padding: 5px 9px;
-            font-size: 12px;
-        }
-
-        .inline-form,
-        .task-create-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 0;
-        }
-
-        .form-row {
-            margin-bottom: 16px;
-        }
-
-        .form-row label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .search-form {
-            display: none !important;
-        }
-
-        .count-text {
-            color: var(--sub);
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        .list-actions,
-        .form-actions {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            margin-top: 18px;
-            flex-wrap: wrap;
-        }
-
-        .list-actions button,
-        .list-actions a,
-        .form-actions button,
-        .form-actions a {
-            flex: 0 0 auto;
-        }
-
-        /* ==============================
-           共通：バッジ
-           ============================== */
-
-        .badge-high,
-        .badge-middle,
-        .badge-low,
-        .badge-status,
-        .status-badge,
-        .risk-badge,
-        .template-badge {
-            display: inline-block;
-            padding: 3px 7px;
-            border-radius: 4px;
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .badge-high {
-            background: var(--red);
-        }
-
-        .badge-middle {
-            background: var(--orange);
-        }
-
-        .badge-low {
-            background: var(--green);
-        }
-
-        .badge-status {
-            background: #4b5563;
-        }
-
-        .status-badge.not-ready {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-badge.progress {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-badge.ready {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-badge.na {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-
-        .risk-badge.high {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .risk-badge.middle {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .risk-badge.low {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .template-badge.available {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .template-badge.none {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        @media (max-width: 768px) {
-            .header-inner,
-            .nav-inner,
-            main {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-
-            .summary-grid,
-            .menu-list {
-                grid-template-columns: 1fr;
-            }
-
-            .inline-form,
-            .task-create-form,
-            .list-actions,
-            .form-actions {
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .inline-form input,
-            .inline-form select,
-            .task-create-form input,
-            .task-create-form select,
-            button {
-                width: 100%;
-            }
-        }
-        /* ==============================
-        共通：登録・編集フォーム
-        ============================== */
-
-        .app-form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px 16px;
-            margin-top: 10px;
-        }
-
-        .app-form-grid .full {
-            grid-column: 1 / -1;
-        }
-
-        .app-form-grid input,
-        .app-form-grid select,
-        .app-form-grid textarea {
-            width: 100%;
-        }
-
-        .app-form-grid textarea {
-            resize: vertical;
-        }
-
-        .form-help {
-            margin-top: 6px;
-            color: #6b7280;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .check-field {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-height: 38px;
-            padding: 8px 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            background: #ffffff;
-            color: var(--text);
-        }
-
-        .check-field input[type="checkbox"] {
-            width: auto;
-        }
-
-        .month-input,
-        input[type="month"] {
-            height: 38px;
-            padding: 8px 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            background: #ffffff;
-            color: var(--text);
-            font-family: inherit;
-            font-size: 13px;
-        }
-
-        @media (max-width: 768px) {
-            .app-form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .app-form-grid .full {
-                grid-column: auto;
-            }
-        }
-        .field-block {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .field-block label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #374151;
-        }
-
-        .field-block.full {
-            grid-column: 1 / -1;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body>
     <div class="top-fixed">
@@ -794,11 +142,7 @@
                         }
                     });
 
-                    if (filters.length > 0) {
-                        status.textContent = visibleCount + "件を表示中";
-                    } else {
-                        status.textContent = "";
-                    }
+                    status.textContent = filters.length > 0 ? visibleCount + "件を表示中" : "";
                 }
 
                 filterRow.querySelectorAll(".table-filter-input").forEach(function (input) {
@@ -807,92 +151,92 @@
             });
         });
     </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        function stripComma(value) {
-            return String(value || "").replace(/,/g, "");
-        }
 
-        function formatComma(value) {
-            let text = stripComma(value).trim();
-
-            if (text === "") {
-                return "";
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function stripComma(value) {
+                return String(value || "").replace(/,/g, "");
             }
 
-            const isNegative = text.startsWith("-");
-            if (isNegative) {
-                text = text.slice(1);
-            }
+            function formatComma(value) {
+                let text = stripComma(value).trim();
 
-            const parts = text.split(".");
-            let integerPart = parts[0].replace(/[^\d]/g, "");
-            let decimalPart = parts.length > 1 ? parts[1].replace(/[^\d]/g, "") : "";
-
-            if (integerPart === "") {
-                return isNegative ? "-" : "";
-            }
-
-            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-            let result = integerPart;
-
-            if (parts.length > 1) {
-                result += "." + decimalPart;
-            }
-
-            if (isNegative) {
-                result = "-" + result;
-            }
-
-            return result;
-        }
-
-        function formatInputKeepingCursor(input) {
-            const originalValue = input.value;
-            const originalPosition = input.selectionStart || 0;
-
-            const commaCountBefore = (originalValue.slice(0, originalPosition).match(/,/g) || []).length;
-            const plainPosition = originalPosition - commaCountBefore;
-
-            const formattedValue = formatComma(originalValue);
-            input.value = formattedValue;
-
-            let nextPosition = 0;
-            let plainCount = 0;
-
-            while (nextPosition < formattedValue.length && plainCount < plainPosition) {
-                if (formattedValue[nextPosition] !== ",") {
-                    plainCount += 1;
+                if (text === "") {
+                    return "";
                 }
-                nextPosition += 1;
+
+                const isNegative = text.startsWith("-");
+                if (isNegative) {
+                    text = text.slice(1);
+                }
+
+                const parts = text.split(".");
+                let integerPart = parts[0].replace(/[^\d]/g, "");
+                let decimalPart = parts.length > 1 ? parts[1].replace(/[^\d]/g, "") : "";
+
+                if (integerPart === "") {
+                    return isNegative ? "-" : "";
+                }
+
+                integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                let result = integerPart;
+
+                if (parts.length > 1) {
+                    result += "." + decimalPart;
+                }
+
+                if (isNegative) {
+                    result = "-" + result;
+                }
+
+                return result;
             }
 
-            input.setSelectionRange(nextPosition, nextPosition);
-        }
+            function formatInputKeepingCursor(input) {
+                const originalValue = input.value;
+                const originalPosition = input.selectionStart || 0;
 
-        document.querySelectorAll(".comma-number-input").forEach(function (input) {
-            input.inputMode = "decimal";
+                const commaCountBefore = (originalValue.slice(0, originalPosition).match(/,/g) || []).length;
+                const plainPosition = originalPosition - commaCountBefore;
 
-            input.value = formatComma(input.value);
+                const formattedValue = formatComma(originalValue);
+                input.value = formattedValue;
 
-            input.addEventListener("input", function () {
-                formatInputKeepingCursor(input);
-            });
+                let nextPosition = 0;
+                let plainCount = 0;
 
-            input.addEventListener("blur", function () {
+                while (nextPosition < formattedValue.length && plainCount < plainPosition) {
+                    if (formattedValue[nextPosition] !== ",") {
+                        plainCount += 1;
+                    }
+                    nextPosition += 1;
+                }
+
+                input.setSelectionRange(nextPosition, nextPosition);
+            }
+
+            document.querySelectorAll(".comma-number-input").forEach(function (input) {
+                input.inputMode = "decimal";
                 input.value = formatComma(input.value);
-            });
-        });
 
-        document.querySelectorAll("form").forEach(function (form) {
-            form.addEventListener("submit", function () {
-                form.querySelectorAll(".comma-number-input").forEach(function (input) {
-                    input.value = stripComma(input.value);
+                input.addEventListener("input", function () {
+                    formatInputKeepingCursor(input);
+                });
+
+                input.addEventListener("blur", function () {
+                    input.value = formatComma(input.value);
+                });
+            });
+
+            document.querySelectorAll("form").forEach(function (form) {
+                form.addEventListener("submit", function () {
+                    form.querySelectorAll(".comma-number-input").forEach(function (input) {
+                        input.value = stripComma(input.value);
+                    });
                 });
             });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
