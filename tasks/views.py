@@ -61,6 +61,39 @@ def get_task_notification_priority(task, status):
     return "中"
 
 
+def sync_related_incidents_from_task(task_id, status):
+    """
+    タスク状態変更に連動して、関連する製造インシデント状態を更新する。
+    manufacturing.services は tasks.services を参照しているため、
+    循環 import を避ける目的で関数内 import にする。
+    """
+    try:
+        from manufacturing.services import sync_incident_status_from_task
+    except Exception:
+        return []
+
+    return sync_incident_status_from_task(task_id, status)
+
+
+def notify_synced_incidents(task, task_id, status, synced_incident_ids):
+    if not synced_incident_ids:
+        return
+
+    create_notification(
+        title="関連インシデントの状態を更新しました",
+        message=(
+            f"タスク「{task.get('task_name', '')}」の状態変更に連動して、"
+            f"関連インシデント {', '.join(synced_incident_ids)} の状態を更新しました。"
+            f"タスク状態：{status}。"
+        ),
+        target_user=task.get("owner", "") or "製造責任者",
+        category="製造管理",
+        priority="中",
+        related_type="manufacturing",
+        related_id=", ".join(synced_incident_ids),
+    )
+
+
 def create_task(request):
     """
     画面から新しいタスクを追加する。
@@ -214,6 +247,7 @@ def edit_task(request, task_id):
         )
 
         if update_result:
+            synced_incident_ids = sync_related_incidents_from_task(task_id, status)
             updated_task = find_task_by_id(task_id)
 
             create_notification(
@@ -232,6 +266,13 @@ def edit_task(request, task_id):
                 related_id=task_id,
             )
 
+            notify_synced_incidents(
+                task=updated_task or task,
+                task_id=task_id,
+                status=status,
+                synced_incident_ids=synced_incident_ids,
+            )
+
         return redirect("tasks:task_detail", task_id=task_id)
 
     return render(request, "tasks/task_edit.html", {
@@ -247,14 +288,15 @@ def update_status(request):
     タスク一覧画面から状態を更新する。
     """
     if request.method == "POST":
-        task_id = request.POST.get("task_id", "")
-        status = request.POST.get("status", "")
-        keyword = request.POST.get("keyword", "")
+        task_id = request.POST.get("task_id", "").strip()
+        status = request.POST.get("status", "").strip()
+        keyword = request.POST.get("keyword", "").strip()
 
         if task_id and status:
             update_result = update_task_status(task_id, status)
 
             if update_result:
+                synced_incident_ids = sync_related_incidents_from_task(task_id, status)
                 task = find_task_by_id(task_id)
 
                 if task:
@@ -276,6 +318,13 @@ def update_status(request):
                         related_id=task_id,
                     )
 
+                    notify_synced_incidents(
+                        task=task,
+                        task_id=task_id,
+                        status=status,
+                        synced_incident_ids=synced_incident_ids,
+                    )
+
         if keyword:
             query = urlencode({"q": keyword})
             return redirect(f"/tasks/?{query}")
@@ -288,12 +337,13 @@ def update_status_from_detail(request, task_id):
     タスク詳細画面から状態を更新する。
     """
     if request.method == "POST":
-        status = request.POST.get("status", "")
+        status = request.POST.get("status", "").strip()
 
         if task_id and status:
             update_result = update_task_status(task_id, status)
 
             if update_result:
+                synced_incident_ids = sync_related_incidents_from_task(task_id, status)
                 task = find_task_by_id(task_id)
 
                 if task:
@@ -313,6 +363,13 @@ def update_status_from_detail(request, task_id):
                         priority=priority,
                         related_type="tasks",
                         related_id=task_id,
+                    )
+
+                    notify_synced_incidents(
+                        task=task,
+                        task_id=task_id,
+                        status=status,
+                        synced_incident_ids=synced_incident_ids,
                     )
 
     return redirect("tasks:task_detail", task_id=task_id)

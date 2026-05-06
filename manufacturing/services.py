@@ -1355,3 +1355,5 @@ def create_management_items_from_templates(template_ids):
     )
 
     return len(new_rows)
+
+from manufacturing.services import sync_incident_status_from_task
